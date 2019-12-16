@@ -1,0 +1,8 @@
+display0:
+  # 模板名称
+  name: '&7<NAME> <DURABILITY>'
+  # 模板描述
+  lore:
+    - '&9<TYPE> &8<WEIGHT>'
+    - ''
+    - '&f<LORE...>'

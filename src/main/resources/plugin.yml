@@ -1,0 +1,5 @@
+name: Zaphkiel
+main: ink.ptms.zaphkiel.Zaphkiel
+author: 坏黑
+
+version: ${version}

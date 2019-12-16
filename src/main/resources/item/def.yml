@@ -1,0 +1,28 @@
+item0:
+  # 模板
+  display: display0
+  # 材质
+  icon: DRIED_KELP
+  # 名称
+  name:
+    # 名称
+    NAME: '&7黑黑黑羊肉'
+  # 描述
+  lore:
+    # 类型
+    TYPE: '&9食物'
+    # 描述
+    LORE:
+      - '&f黑羊身上撕下来的皮肉'
+  # 数据
+  data:
+    # 重量
+    weight: 0.01
+    # 耐久
+    durability: 3
+  # 事件
+  event:
+    # 消耗时
+    onConsume: |-
+      event.setCancelled(true)
+      event.getPlayer().setFoodLevel(event.getPlayer().getFoodLevel() + 2)
