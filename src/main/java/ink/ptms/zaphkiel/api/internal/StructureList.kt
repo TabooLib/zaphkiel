@@ -40,7 +40,7 @@ class StructureList(source: List<String>) {
                             more = true
                         }
                     } else {
-                        builder.append(vars[variable.text]?.firstOrNull() ?: "")
+                        builder.append(vars[variable.text]?.removeAt(0) ?: "")
                     }
                 } else {
                     builder.append(variable.text)

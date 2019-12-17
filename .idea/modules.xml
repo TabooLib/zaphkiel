@@ -2,9 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/me.skymc.taboolib.example.Zaphkiel.iml" filepath="$PROJECT_DIR$/.idea/modules/me.skymc.taboolib.example.Zaphkiel.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/me.skymc.taboolib.example.Zaphkiel.main.iml" filepath="$PROJECT_DIR$/.idea/modules/me.skymc.taboolib.example.Zaphkiel.main.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/me.skymc.taboolib.example.Zaphkiel.test.iml" filepath="$PROJECT_DIR$/.idea/modules/me.skymc.taboolib.example.Zaphkiel.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/ink.ptms.zaphkiel.Zaphkiel.iml" filepath="$PROJECT_DIR$/.idea/modules/ink.ptms.zaphkiel.Zaphkiel.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/ink.ptms.zaphkiel.Zaphkiel.main.iml" filepath="$PROJECT_DIR$/.idea/modules/ink.ptms.zaphkiel.Zaphkiel.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/ink.ptms.zaphkiel.Zaphkiel.test.iml" filepath="$PROJECT_DIR$/.idea/modules/ink.ptms.zaphkiel.Zaphkiel.test.iml" />
     </modules>
   </component>
 </project>

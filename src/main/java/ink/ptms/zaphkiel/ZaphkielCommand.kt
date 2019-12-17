@@ -1,5 +1,6 @@
 package ink.ptms.zaphkiel
 
+import ink.ptms.zaphkiel.api.ItemStream
 import ink.ptms.zaphkiel.api.internal.ItemList
 import io.izzel.taboolib.cronus.CronusUtils
 import io.izzel.taboolib.module.command.base.*
@@ -44,6 +45,43 @@ class ZaphkielCommand : BaseMainCommand() {
                 itemStack.amount = NumberConversions.toInt(args[2])
             }
             CronusUtils.addItem(target, itemStack)
+        }
+    }
+
+    @SubCommand(priority = 0.01)
+    val test = object : BaseSubCommand() {
+
+        override fun getArguments(): Array<Argument> = arrayOf(Argument("节点") { ZaphkielAPI.registeredItem.keys.toList() })
+
+        override fun getDescription(): String = "测试耗能"
+
+        override fun onCommand(sender: CommandSender, command: Command?, label: String, args: Array<String>) {
+            val item = ZaphkielAPI.registeredItem[args[0]]
+            if (item == null) {
+                notify(sender, "物品 \"&f${args[0]}&7\" 不存在.")
+                return
+            }
+            val build = ItemStream(item.build(null).save())
+            val time1 = System.currentTimeMillis()
+            for (i in 0..10000) {
+                item.build(null)
+            }
+            notify(sender, "构建 10000 次耗能 ${System.currentTimeMillis() - time1}ms")
+            val time2 = System.currentTimeMillis()
+            for (i in 0..10000) {
+                item.build(null).save()
+            }
+            notify(sender, "构建+写入 10000 次耗能 ${System.currentTimeMillis() - time2}ms")
+            val time3 = System.currentTimeMillis()
+            for (i in 0..10000) {
+                item.build(null, build)
+            }
+            notify(sender, "重构 10000 次耗能 ${System.currentTimeMillis() - time3}ms")
+            val time4 = System.currentTimeMillis()
+            for (i in 0..10000) {
+                item.build(null, build).save()
+            }
+            notify(sender, "重构+写入 10000 次耗能 ${System.currentTimeMillis() - time4}ms")
         }
     }
 

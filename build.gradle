@@ -5,7 +5,7 @@ plugins {
 }
 
 configurations {
-    group = 'me.skymc.taboolib.example'
+    group = 'ink.ptms.zaphkiel'
     version = '1.0-SNAPSHOT'
 
     sourceCompatibility = 1.8

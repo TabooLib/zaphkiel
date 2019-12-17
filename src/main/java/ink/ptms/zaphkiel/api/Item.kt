@@ -4,6 +4,7 @@ import ink.ptms.zaphkiel.ZaphkielAPI
 import ink.ptms.zaphkiel.api.event.ItemBuildEvent
 import ink.ptms.zaphkiel.api.internal.ItemKey
 import ink.ptms.zaphkiel.api.internal.ScriptAPI
+import ink.ptms.zaphkiel.api.internal.Translator
 import io.izzel.taboolib.module.locale.TLocale
 import io.izzel.taboolib.module.nms.nbt.NBTBase
 import io.izzel.taboolib.module.nms.nbt.NBTCompound
@@ -47,11 +48,12 @@ data class Item(
         val itemStream = ItemStream(icon.clone())
         val compound = itemStream.compound.computeIfAbsent("zaphkiel") { NBTCompound() }.asCompound()
         compound[ItemKey.ID.key] = NBTBase(id)
-        compound[ItemKey.DATA.key] = NBTBase.translateSection(NBTCompound(), data)
+        compound[ItemKey.DATA.key] = Translator.toNBTCompound(NBTCompound(), data)
         return build(player, itemStream)
     }
 
     fun build(player: Player?, itemStream: ItemStream): ItemStream {
+        updateData(itemStream.getZaphkielData(), data)
         val pre = ItemBuildEvent.Pre(player, itemStream, name.toMutableMap(), lore.toMutableMap()).call()
         val display = ZaphkielAPI.registeredDisplay[display]
         if (display != null) {
@@ -62,9 +64,18 @@ data class Item(
             pre.itemStream.setDisplayName("§c$id")
             pre.itemStream.setLore(listOf("", "§4- NO DISPLAY PLAN -"))
         }
-        val compound = pre.itemStream.compound.computeIfAbsent("zaphkiel") { NBTCompound() }.asCompound()
-        compound[ItemKey.HASH.key] = NBTBase(hash)
+        pre.itemStream.compound["zaphkiel"]!!.asCompound()[ItemKey.HASH.key] = NBTBase(hash)
         return ItemBuildEvent.Post(player, pre.itemStream, pre.name, pre.lore).call().itemStream
+    }
+
+    private fun updateData(compound: NBTCompound, section: ConfigurationSection, path: String = "") {
+        section.getKeys(false).forEach { key ->
+            if (key.endsWith("!!")) {
+                compound.putDeep(path + key.substring(0, key.length - 2), Translator.toNBTBase(config.get("data.$path$key")))
+            } else if (section.isConfigurationSection(key)) {
+                updateData(compound, section.getConfigurationSection(key)!!, "$path$key.")
+            }
+        }
     }
 
     data class ItemEvent(val name: String, val script: CompiledScript) {

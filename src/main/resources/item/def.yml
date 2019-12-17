@@ -2,7 +2,7 @@ item0:
   # 模板
   display: display0
   # 材质
-  icon: DRIED_KELP
+  icon: ROTTEN_FLESH
   # 名称
   name:
     # 名称
@@ -19,7 +19,9 @@ item0:
     # 重量
     weight: 0.01
     # 耐久
-    durability: 3
+    durability!!: 3
+    # 耐久损耗
+    durability_event!!: onConsume
   # 事件
   event:
     # 消耗时
