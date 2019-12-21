@@ -82,7 +82,7 @@ data class Item(
 
         fun eval(bukkitEvent: Event) {
             try {
-                script.eval(SimpleBindings(mapOf(Pair("event", bukkitEvent), Pair("api", ScriptAPI))))
+                script.eval(SimpleBindings(mapOf(Pair("event", bukkitEvent), Pair("api", ScriptAPI()))))
             } catch (t: Throwable) {
                 t.printStackTrace()
             }

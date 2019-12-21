@@ -1,0 +1,8 @@
+# 数据库
+Database:
+  host: ~
+  port: 3306
+  user: root
+  password: root
+  database: test
+  table: zaphkiel_database

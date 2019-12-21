@@ -20,8 +20,6 @@ item0:
     weight: 0.01
     # 耐久
     durability!!: 3
-    # 耐久损耗
-    durability_event!!: onConsume
   # 事件
   event:
     # 消耗时

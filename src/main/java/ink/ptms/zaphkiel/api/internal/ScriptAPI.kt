@@ -9,7 +9,7 @@ import org.bukkit.entity.Player
  * @Author sky
  * @Since 2019-12-15 22:30
  */
-object ScriptAPI {
+class ScriptAPI {
 
     fun command(sender: CommandSender, command: String) {
         Commands.dispatchCommand(sender, command)
