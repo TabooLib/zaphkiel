@@ -41,7 +41,7 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="Gradle: org.spigotmc:spigot:1.14.4-R0.1-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Gradle: org.spigotmc:spigot:1.14.4-R0.1-20191211.040645-13" level="project" />
     <orderEntry type="library" name="Gradle: io.izzel.taboolib:TabooLib:all:5.13" level="project" />
     <orderEntry type="library" name="Gradle: io.izzel.taboolib.loader:TabooLibloader:all:1.2" level="project" />
     <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.2.41" level="project" />

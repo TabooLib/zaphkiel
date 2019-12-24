@@ -24,10 +24,16 @@ item0:
   event:
     # 消耗时
     onConsume: |-
+      api.toCooldown(item, 200)
+      e.setCancelled(true)
+      e.getPlayer().sendMessage("§7你的饱食度得到恢复")
+      e.getPlayer().setFoodLevel(e.getPlayer().getFoodLevel() + 2)
+    # 右键时
+    onRightClick: |-
       if (api.isCooldown(item)) {
-        e.getPlayer().sendMessage("§c你暂时不能使用这个")
-      } else {
-        api.toCooldown(item, 200)
-        e.getPlayer().sendMessage("§7你的饱食度得到恢复")
-        e.getPlayer().setFoodLevel(e.getPlayer().getFoodLevel() + 2)
+          e.setCancelled(true)
+          if (api.isCooldown(e.getPlayer(), "notify") != true) {
+              api.toCooldown(e.getPlayer(), "notify", 20)
+              e.getPlayer().sendMessage("§c你暂时不能使用这个")
+          }
       }

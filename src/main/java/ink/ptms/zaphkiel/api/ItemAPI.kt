@@ -36,8 +36,16 @@ open class ItemAPI(val item: Item) {
         ZaphkielAPI.database.getData(player).set("Zaphkiel.cooldown.${item.id}", System.currentTimeMillis() + (gameTick * 50L))
     }
 
+    fun toCooldown(player: Player, index: String, gameTick: Int) {
+        ZaphkielAPI.database.getData(player).set("Zaphkiel.cooldown.$index", System.currentTimeMillis() + (gameTick * 50L))
+    }
+
     fun isCooldown(player: Player): Boolean {
         return ZaphkielAPI.database.getData(player).getLong("Zaphkiel.cooldown.${item.id}") > System.currentTimeMillis()
+    }
+
+    fun isCooldown(player: Player, index: String): Boolean {
+        return ZaphkielAPI.database.getData(player).getLong("Zaphkiel.cooldown.$index") > System.currentTimeMillis()
     }
 
     fun toCooldown(itemStack: ItemStack, gameTick: Int) {

@@ -13,6 +13,7 @@ import io.izzel.taboolib.util.lite.Scripts
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
+import org.bukkit.event.Cancellable
 import org.bukkit.event.Event
 import org.bukkit.inventory.ItemStack
 import org.bukkit.util.NumberConversions
@@ -40,12 +41,8 @@ data class Item(
         Strings.hashKeyForDisk(this.saveToString())
     }!!
 
-    fun eval(key: String, bukkitEvent: Event, itemStack: ItemStack): Boolean {
-        if (event.containsKey(key)) {
-            event[key]!!.eval(bukkitEvent, itemStack)
-            return true
-        }
-        return false
+    fun eval(key: String, bukkitEvent: Event, itemStack: ItemStack) {
+        event[key]?.eval(bukkitEvent, itemStack)
     }
 
     fun build(player: Player?): ItemStream {
