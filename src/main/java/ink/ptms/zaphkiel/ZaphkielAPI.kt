@@ -4,6 +4,9 @@ import com.google.common.collect.Maps
 import ink.ptms.zaphkiel.api.Item
 import ink.ptms.zaphkiel.api.Display
 import ink.ptms.zaphkiel.api.ItemStream
+import ink.ptms.zaphkiel.api.data.Database
+import ink.ptms.zaphkiel.api.data.DatabaseSQL
+import ink.ptms.zaphkiel.api.data.DatabaseYML
 import ink.ptms.zaphkiel.api.event.ItemRebuildEvent
 import io.izzel.taboolib.TabooLib
 import io.izzel.taboolib.module.nms.nbt.NBTBase
@@ -29,6 +32,16 @@ object ZaphkielAPI {
     val folderDisplay = File(Zaphkiel.getPlugin().dataFolder, "display")
     val registeredItem = Maps.newHashMap<String, Item>()!!
     val registeredDisplay = Maps.newHashMap<String, Display>()!!
+    val database: Database = if (Zaphkiel.CONF.contains("Database.host")) {
+        try {
+            DatabaseSQL()
+        } catch (t: Throwable) {
+            t.printStackTrace()
+        }
+        DatabaseYML()
+    } else {
+        DatabaseYML()
+    }
 
     fun read(item: ItemStack): ItemStream {
         if (Items.isNull(item)) {

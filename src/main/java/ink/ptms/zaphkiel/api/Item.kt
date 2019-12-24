@@ -3,7 +3,6 @@ package ink.ptms.zaphkiel.api
 import ink.ptms.zaphkiel.ZaphkielAPI
 import ink.ptms.zaphkiel.api.event.ItemBuildEvent
 import ink.ptms.zaphkiel.api.internal.ItemKey
-import ink.ptms.zaphkiel.api.internal.ScriptAPI
 import ink.ptms.zaphkiel.api.internal.Translator
 import io.izzel.taboolib.module.locale.TLocale
 import io.izzel.taboolib.module.nms.nbt.NBTBase
@@ -32,16 +31,21 @@ data class Item(
         val icon: ItemStack = parseIcon(config.getString("icon", "STONE")!!),
         val name: Map<String, String> = parseName(config),
         val lore: Map<String, List<String>> = parseLore(config),
-        val data: ConfigurationSection = config.getConfigurationSection("data") ?: config.createSection("data"),
-        val event: Map<String, ItemEvent> = parseEvent(config)) {
+        val data: ConfigurationSection = config.getConfigurationSection("data") ?: config.createSection("data")) {
+
+    val event: Map<String, ItemEvent> = parseEvent(this, config)
 
     val hash = YamlConfiguration().run {
         this.set("value", config)
         Strings.hashKeyForDisk(this.saveToString())
     }!!
 
-    fun eval(key: String, bukkitEvent: Event) {
-        event[key]?.eval(bukkitEvent)
+    fun eval(key: String, bukkitEvent: Event, itemStack: ItemStack): Boolean {
+        if (event.containsKey(key)) {
+            event[key]!!.eval(bukkitEvent, itemStack)
+            return true
+        }
+        return false
     }
 
     fun build(player: Player?): ItemStream {
@@ -78,11 +82,16 @@ data class Item(
         }
     }
 
-    data class ItemEvent(val name: String, val script: CompiledScript) {
+    data class ItemEvent(val item: Item, val name: String, val script: CompiledScript) {
 
-        fun eval(bukkitEvent: Event) {
+        fun eval(bukkitEvent: Event, itemStack: ItemStack) {
             try {
-                script.eval(SimpleBindings(mapOf(Pair("event", bukkitEvent), Pair("api", ScriptAPI()))))
+                script.eval(SimpleBindings(mapOf(
+                        Pair("e", bukkitEvent),
+                        Pair("event", bukkitEvent),
+                        Pair("item", itemStack),
+                        Pair("api", ItemAPI.get(ItemAPI(item)))
+                )))
             } catch (t: Throwable) {
                 t.printStackTrace()
             }
@@ -118,11 +127,11 @@ data class Item(
             return map
         }
 
-        fun parseEvent(config: ConfigurationSection): Map<String, ItemEvent> {
+        fun parseEvent(item: Item, config: ConfigurationSection): Map<String, ItemEvent> {
             val map = HashMap<String, ItemEvent>()
             val event = config.getConfigurationSection("event") ?: return emptyMap()
             event.getKeys(false).forEach { key ->
-                map[key] = ItemEvent(key, Scripts.compile(config.getString("event.$key")!!))
+                map[key] = ItemEvent(item, key, Scripts.compile(config.getString("event.$key")!!))
             }
             return map
         }

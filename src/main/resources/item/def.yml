@@ -24,5 +24,10 @@ item0:
   event:
     # 消耗时
     onConsume: |-
-      event.setCancelled(true)
-      event.getPlayer().setFoodLevel(event.getPlayer().getFoodLevel() + 2)
+      if (api.isCooldown(item)) {
+        e.getPlayer().sendMessage("§c你暂时不能使用这个")
+      } else {
+        api.toCooldown(item, 200)
+        e.getPlayer().sendMessage("§7你的饱食度得到恢复")
+        e.getPlayer().setFoodLevel(e.getPlayer().getFoodLevel() + 2)
+      }

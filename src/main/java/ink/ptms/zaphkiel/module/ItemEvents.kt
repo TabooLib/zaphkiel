@@ -18,26 +18,10 @@ import org.bukkit.event.player.*
 class ItemEvents : Listener {
 
     @EventHandler(ignoreCancelled = true)
-    fun e(e: PlayerDropItemEvent) {
-        val item = ZaphkielAPI.read(e.itemDrop.itemStack)
-        if (item.isExtension()) {
-            item.getZaphkielItem().eval("onDrop", e)
-        }
-    }
-
-    @EventHandler(ignoreCancelled = true)
     fun e(e: PlayerItemBreakEvent) {
         val item = ZaphkielAPI.read(e.brokenItem)
         if (item.isExtension()) {
-            item.getZaphkielItem().eval("onBreak", e)
-        }
-    }
-
-    @EventHandler(ignoreCancelled = true)
-    fun e(e: PlayerItemConsumeEvent) {
-        val item = ZaphkielAPI.read(e.item)
-        if (item.isExtension()) {
-            item.getZaphkielItem().eval("onConsume", e)
+            item.getZaphkielItem().eval("onBreak", e, e.brokenItem)
         }
     }
 
@@ -45,22 +29,38 @@ class ItemEvents : Listener {
     fun e(e: PlayerItemDamageEvent) {
         val item = ZaphkielAPI.read(e.item)
         if (item.isExtension()) {
-            item.getZaphkielItem().eval("onItemDamage", e)
+            item.getZaphkielItem().eval("onDamage", e, e.item)
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    fun e(e: PlayerDropItemEvent) {
+        val item = ZaphkielAPI.read(e.itemDrop.itemStack)
+        if (item.isExtension() && item.getZaphkielItem().eval("onDrop", e, e.itemDrop.itemStack)) {
+            e.isCancelled = true
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    fun e(e: PlayerItemConsumeEvent) {
+        val item = ZaphkielAPI.read(e.item)
+        if (item.isExtension() && item.getZaphkielItem().eval("onConsume", e, e.item)) {
+            e.isCancelled = true
         }
     }
 
     @EventHandler(ignoreCancelled = true)
     fun e(e: PlayerSwapHandItemsEvent) {
-        if (Items.nonNull(e.mainHandItem)) {
-            val item = ZaphkielAPI.read(e.mainHandItem!!)
-            if (item.isExtension()) {
-                item.getZaphkielItem().eval("onSwapHand", e)
-            }
-        }
         if (Items.nonNull(e.offHandItem)) {
             val item = ZaphkielAPI.read(e.offHandItem!!)
-            if (item.isExtension()) {
-                item.getZaphkielItem().eval("onSwapHand", e)
+            if (item.isExtension() && item.getZaphkielItem().eval("onSwapToOffhand", e, e.offHandItem!!)) {
+                e.isCancelled = true
+            }
+        }
+        if (Items.nonNull(e.mainHandItem)) {
+            val item = ZaphkielAPI.read(e.mainHandItem!!)
+            if (item.isExtension() && item.getZaphkielItem().eval("onSwapToMainHand", e, e.mainHandItem!!)) {
+                e.isCancelled = true
             }
         }
     }
@@ -74,10 +74,14 @@ class ItemEvents : Listener {
             }
             when (e.action) {
                 Action.LEFT_CLICK_AIR, Action.LEFT_CLICK_BLOCK -> {
-                    item.getZaphkielItem().eval("onLeftCLick", e)
+                    if (item.getZaphkielItem().eval("onLeftClick", e, e.item!!)) {
+                        e.isCancelled = true
+                    }
                 }
                 Action.RIGHT_CLICK_AIR, Action.RIGHT_CLICK_BLOCK -> {
-                    item.getZaphkielItem().eval("onRightClick", e)
+                    if (item.getZaphkielItem().eval("onRightClick", e, e.item!!)) {
+                        e.isCancelled = true
+                    }
                 }
                 else -> {
                 }
