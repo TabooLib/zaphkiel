@@ -4,6 +4,7 @@ import com.google.common.collect.Maps
 import ink.ptms.zaphkiel.api.Item
 import ink.ptms.zaphkiel.api.Display
 import ink.ptms.zaphkiel.api.ItemStream
+import ink.ptms.zaphkiel.api.Model
 import ink.ptms.zaphkiel.api.data.Database
 import ink.ptms.zaphkiel.api.data.DatabaseSQL
 import ink.ptms.zaphkiel.api.data.DatabaseYML
@@ -31,6 +32,7 @@ object ZaphkielAPI {
     val folderItem = File(Zaphkiel.getPlugin().dataFolder, "item")
     val folderDisplay = File(Zaphkiel.getPlugin().dataFolder, "display")
     val registeredItem = Maps.newHashMap<String, Item>()!!
+    val registeredModel = Maps.newHashMap<String, Model>()!!
     val registeredDisplay = Maps.newHashMap<String, Display>()!!
     val database: Database = if (Zaphkiel.CONF.contains("Database.host")) {
         try {
@@ -80,8 +82,10 @@ object ZaphkielAPI {
 
     fun reloadItem() {
         registeredItem.clear()
+        registeredModel.clear()
+        reloadModel(folderItem)
         reloadItem(folderItem)
-        Zaphkiel.LOGS.info("Loaded ${registeredItem.size} items.")
+        Zaphkiel.LOGS.info("Loaded ${registeredItem.size} items and ${registeredModel.size} models.")
     }
 
     fun reloadItem(file: File) {
@@ -91,6 +95,17 @@ object ZaphkielAPI {
             val conf = Files.load(file)
             conf.getKeys(false).forEach { key ->
                 registeredItem[key] = Item(conf.getConfigurationSection(key)!!)
+            }
+        }
+    }
+
+    fun reloadModel(file: File) {
+        if (file.isDirectory) {
+            file.listFiles().forEach { reloadModel(it) }
+        } else {
+            val conf = Files.load(file)
+            conf.getKeys(false).filter { it.endsWith("$") }.forEach { key ->
+                registeredModel[key.substring(0, key.length - 1)] = Model(conf.getConfigurationSection(key)!!)
             }
         }
     }

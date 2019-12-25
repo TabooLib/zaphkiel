@@ -1,5 +1,7 @@
 package ink.ptms.zaphkiel.api
 
+import com.google.common.collect.Maps
+import ink.ptms.zaphkiel.Zaphkiel
 import ink.ptms.zaphkiel.ZaphkielAPI
 import ink.ptms.zaphkiel.api.event.ItemBuildEvent
 import ink.ptms.zaphkiel.api.internal.ItemKey
@@ -13,7 +15,6 @@ import io.izzel.taboolib.util.lite.Scripts
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
-import org.bukkit.event.Cancellable
 import org.bukkit.event.Event
 import org.bukkit.inventory.ItemStack
 import org.bukkit.util.NumberConversions
@@ -32,9 +33,22 @@ data class Item(
         val icon: ItemStack = parseIcon(config.getString("icon", "STONE")!!),
         val name: Map<String, String> = parseName(config),
         val lore: Map<String, List<String>> = parseLore(config),
-        val data: ConfigurationSection = config.getConfigurationSection("data") ?: config.createSection("data")) {
+        val data: ConfigurationSection = config.getConfigurationSection("data") ?: config.createSection("data"),
+        val model: String? = config.getString("event.from")) {
 
-    val event: Map<String, ItemEvent> = parseEvent(this, config)
+    val eventData: Map<String, Any> = config.getConfigurationSection("event.data")?.getValues(false) ?: emptyMap()
+    val eventMap: Map<String, ItemEvent> = kotlin.run {
+        if (model != null) {
+            val model = ZaphkielAPI.registeredModel[model]
+            if (model == null) {
+                Zaphkiel.LOGS.error("Model ${this.model} not found.")
+                return@run emptyMap()
+            }
+            return@run parseEvent(this, model.config)
+        } else {
+            return@run parseEvent(this, config)
+        }
+    }
 
     val hash = YamlConfiguration().run {
         this.set("value", config)
@@ -42,7 +56,7 @@ data class Item(
     }!!
 
     fun eval(key: String, bukkitEvent: Event, itemStack: ItemStack) {
-        event[key]?.eval(bukkitEvent, itemStack)
+        eventMap[key]?.eval(bukkitEvent, itemStack, eventData)
     }
 
     fun build(player: Player?): ItemStream {
@@ -75,22 +89,6 @@ data class Item(
                 compound.putDeep(path + key.substring(0, key.length - 2), Translator.toNBTBase(config.get("data.$path$key")))
             } else if (section.isConfigurationSection(key)) {
                 updateData(compound, section.getConfigurationSection(key)!!, "$path$key.")
-            }
-        }
-    }
-
-    data class ItemEvent(val item: Item, val name: String, val script: CompiledScript) {
-
-        fun eval(bukkitEvent: Event, itemStack: ItemStack) {
-            try {
-                script.eval(SimpleBindings(mapOf(
-                        Pair("e", bukkitEvent),
-                        Pair("event", bukkitEvent),
-                        Pair("item", itemStack),
-                        Pair("api", ItemAPI.get(ItemAPI(item)))
-                )))
-            } catch (t: Throwable) {
-                t.printStackTrace()
             }
         }
     }
