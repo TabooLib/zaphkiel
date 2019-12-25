@@ -1,22 +1,3 @@
-# 模型（以 "$" 符号结尾视为模型文件，不可获取）
-food$:
-  event:
-    # 消耗时
-    onConsume: |-
-      api.toCooldown(item, cd)
-      event.setCancelled(true)
-      event.getPlayer().sendMessage("§7你的饱食度得到恢复")
-      event.getPlayer().setFoodLevel(event.getPlayer().getFoodLevel() + value)
-    # 右键时
-    onRightClick: |-
-      if (api.isCooldown(item)) {
-          event.setCancelled(true)
-          if (api.isCooldown(event.getPlayer(), "notify") != true) {
-              api.toCooldown(event.getPlayer(), "notify", 20)
-              event.getPlayer().sendMessage("§c你暂时不能使用这个")
-          }
-      }
-
 # 物品
 item0:
   # 模板
@@ -48,3 +29,22 @@ item0:
     data:
       cd: 200
       value: 2
+
+# 模型（以 "$" 符号结尾视为模型文件，不可获取）
+food$:
+  event:
+    # 消耗时
+    onConsume: |-
+      api.toCooldown(item, cd)
+      event.setCancelled(true)
+      event.getPlayer().sendMessage("§7你的饱食度得到恢复")
+      event.getPlayer().setFoodLevel(event.getPlayer().getFoodLevel() + value)
+    # 右键时
+    onRightClick: |-
+      if (api.isCooldown(item)) {
+          event.setCancelled(true)
+          if (api.isCooldown(event.getPlayer(), "notify") != true) {
+              api.toCooldown(event.getPlayer(), "notify", 20)
+              event.getPlayer().sendMessage("§c你暂时不能使用这个")
+          }
+      }
