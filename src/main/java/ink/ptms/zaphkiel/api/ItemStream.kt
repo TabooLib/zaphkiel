@@ -1,6 +1,7 @@
 package ink.ptms.zaphkiel.api
 
 import ink.ptms.zaphkiel.ZaphkielAPI
+import ink.ptms.zaphkiel.api.event.ItemReleaseEvent
 import ink.ptms.zaphkiel.api.internal.ItemKey
 import io.izzel.taboolib.module.nms.NMS
 import io.izzel.taboolib.module.nms.nbt.NBTBase
@@ -41,13 +42,8 @@ data class ItemStream(
     }
 
     fun save(): ItemStack {
-        itemStack.itemMeta = NMS.handle().saveNBT(itemStack, compound).itemMeta!!
+        itemStack.itemMeta = ItemReleaseEvent(NMS.handle().saveNBT(itemStack, compound).itemMeta!!, this).call().itemMeta
         return itemStack
-    }
-
-    fun save(itemStack: ItemStack): ItemStack {
-        itemStack.itemMeta = NMS.handle().saveNBT(itemStack, compound).itemMeta!!
-        return itemStack;
     }
 
     fun getZaphkielItem(): Item {

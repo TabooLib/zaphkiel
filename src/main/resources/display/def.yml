@@ -1,7 +1,19 @@
-display0:
-  # 模板名称
+display_armor:
+  name:  '&7<NAME>'
+  lore:
+    - '&9<TYPE> &8<WEIGHT>'
+    - ''
+    - '&f<LORE>'
+
+display_weapon:
+  name:  '&7<NAME>'
+  lore:
+    - '&9<TYPE> &8<WEIGHT>'
+    - ''
+    - '&f<LORE>'
+
+display_consumable:
   name: '&7<NAME> <DURABILITY>'
-  # 模板描述
   lore:
     - '&9<TYPE> &8<WEIGHT>'
     - ''

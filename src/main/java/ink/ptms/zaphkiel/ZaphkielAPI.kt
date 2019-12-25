@@ -8,20 +8,14 @@ import ink.ptms.zaphkiel.api.Model
 import ink.ptms.zaphkiel.api.data.Database
 import ink.ptms.zaphkiel.api.data.DatabaseSQL
 import ink.ptms.zaphkiel.api.data.DatabaseYML
-import ink.ptms.zaphkiel.api.event.ItemRebuildEvent
-import io.izzel.taboolib.TabooLib
-import io.izzel.taboolib.module.nms.nbt.NBTBase
-import io.izzel.taboolib.module.nms.nbt.NBTCompound
-import io.izzel.taboolib.module.nms.nbt.NBTList
+import ink.ptms.zaphkiel.api.event.ItemBuildEvent
 import io.izzel.taboolib.util.Files
 import io.izzel.taboolib.util.item.Items
-import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.entity.Player
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
 import java.io.File
 import java.lang.RuntimeException
-import java.util.regex.Pattern
 
 /**
  * @Author sky
@@ -73,7 +67,7 @@ object ZaphkielAPI {
         if (itemStream.isVanilla()) {
             return itemStream
         }
-        val pre = ItemRebuildEvent(player, itemStream, itemStream.shouldRefresh()).call()
+        val pre = ItemBuildEvent.Rebuild(player, itemStream, itemStream.shouldRefresh()).call()
         if (pre.isCancelled) {
             return itemStream
         }

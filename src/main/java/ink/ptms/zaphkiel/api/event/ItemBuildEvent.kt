@@ -1,9 +1,8 @@
 package ink.ptms.zaphkiel.api.event
 
 import io.izzel.taboolib.module.event.EventNormal
-import ink.ptms.zaphkiel.api.Item
 import ink.ptms.zaphkiel.api.ItemStream
-import io.izzel.taboolib.module.nms.nbt.NBTCompound
+import io.izzel.taboolib.module.event.EventCancellable
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 
@@ -13,12 +12,16 @@ import org.bukkit.entity.Player
  */
 class ItemBuildEvent {
 
+    /**
+     * 构建之前
+     * 可被取消
+     */
     class Pre(
             val player: Player?,
             val itemStream: ItemStream,
             val name: MutableMap<String, String>,
             val lore: MutableMap<String, List<String>>
-    ) : EventNormal<Pre>() {
+    ) : EventCancellable<Pre>() {
 
         init {
             async(!Bukkit.isPrimaryThread())
@@ -29,7 +32,7 @@ class ItemBuildEvent {
         }
 
         fun addLore(key: String, value: Any) {
-            val list = lore.computeIfAbsent(key) { arrayListOf() } as ArrayList
+            val list = lore.computeIfAbsent(key) { ArrayList() } as ArrayList
             list.add(value.toString())
         }
 
@@ -38,6 +41,11 @@ class ItemBuildEvent {
         }
     }
 
+    /**
+     * 构建之后
+     * 不可取消
+     * 名称、描述、数据已就绪
+     */
     class Post(
             val player: Player?,
             val itemStream: ItemStream,
@@ -46,6 +54,23 @@ class ItemBuildEvent {
     ) : EventNormal<Post>() {
 
         init {
+            async(!Bukkit.isPrimaryThread())
+        }
+    }
+
+    /**
+     * 重构之前
+     * 可被取消
+     * 递交至构建事件之前
+     */
+    class Rebuild(
+            val player: Player?,
+            val itemStream: ItemStream,
+            fromRefresh: Boolean
+    ) : EventCancellable<Rebuild>() {
+
+        init {
+            isCancelled = !fromRefresh
             async(!Bukkit.isPrimaryThread())
         }
     }

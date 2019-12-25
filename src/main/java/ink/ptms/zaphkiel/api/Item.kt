@@ -70,6 +70,9 @@ data class Item(
     fun build(player: Player?, itemStream: ItemStream): ItemStream {
         updateData(itemStream.getZaphkielData(), data)
         val pre = ItemBuildEvent.Pre(player, itemStream, name.toMutableMap(), lore.toMutableMap()).call()
+        if (pre.isCancelled) {
+            return itemStream
+        }
         val display = ZaphkielAPI.registeredDisplay[display]
         if (display != null) {
             val product = display.toProductTrim(pre.name, pre.lore)
