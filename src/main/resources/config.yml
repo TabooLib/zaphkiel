@@ -1,4 +1,3 @@
-# 数据库
 Database:
   host: ~
   port: 3306
@@ -6,3 +5,9 @@ Database:
   password: root
   database: test
   table: zaphkiel_database
+
+Durability:
+  display: '&8[ &f%symbol% &8]'
+  display-symbol:
+    0: ◆
+    1: ◇

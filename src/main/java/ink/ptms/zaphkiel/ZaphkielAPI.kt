@@ -9,6 +9,7 @@ import ink.ptms.zaphkiel.api.data.Database
 import ink.ptms.zaphkiel.api.data.DatabaseSQL
 import ink.ptms.zaphkiel.api.data.DatabaseYML
 import ink.ptms.zaphkiel.api.event.ItemBuildEvent
+import ink.ptms.zaphkiel.api.event.PluginReloadEvent
 import io.izzel.taboolib.util.Files
 import io.izzel.taboolib.util.item.Items
 import org.bukkit.entity.Player
@@ -80,6 +81,7 @@ object ZaphkielAPI {
         reloadModel(folderItem)
         reloadItem(folderItem)
         Zaphkiel.LOGS.info("Loaded ${registeredItem.size} items and ${registeredModel.size} models.")
+        PluginReloadEvent().call()
     }
 
     fun reloadItem(file: File) {

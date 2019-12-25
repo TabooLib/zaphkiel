@@ -1,12 +1,12 @@
 display_armor:
-  name:  '&7<NAME>'
+  name: '&7<NAME>'
   lore:
     - '&9<TYPE> &8<WEIGHT>'
     - ''
     - '&f<LORE>'
 
 display_weapon:
-  name:  '&7<NAME>'
+  name: '&7<NAME>'
   lore:
     - '&9<TYPE> &8<WEIGHT>'
     - ''
