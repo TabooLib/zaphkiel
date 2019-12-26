@@ -67,6 +67,15 @@ open class ItemAPI(val item: Item, val itemStack: ItemStack, val player: Player)
         return itemStream.getZaphkielData().getDeep("cooldown.${item.id}")?.asLong() ?: 0 > System.currentTimeMillis()
     }
 
+    fun getMaxDurability(): Int {
+        return (itemStream.getZaphkielData()["durability"] ?: NBTBase(-1)).asInt()
+    }
+
+    fun getCurrentDurability(): Int {
+        val max = itemStream.getZaphkielData()["durability"] ?: return -1
+        return (itemStream.getZaphkielData()["durability_current"] ?: NBTBase(max.asInt())).asInt()
+    }
+
     fun toRepair(value: Int): Boolean {
         val max = itemStream.getZaphkielData()["durability"] ?: return true
         val current = itemStream.getZaphkielData()["durability_current"] ?: NBTBase(max.asInt())
