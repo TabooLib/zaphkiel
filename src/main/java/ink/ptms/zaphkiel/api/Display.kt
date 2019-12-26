@@ -8,7 +8,7 @@ import org.bukkit.configuration.ConfigurationSection
  * @Author sky
  * @Since 2019-12-15 14:49
  */
-data class Display(
+class Display(
         val config: ConfigurationSection,
         val id: String = config.name,
         val name: String? = config.getString("name"),

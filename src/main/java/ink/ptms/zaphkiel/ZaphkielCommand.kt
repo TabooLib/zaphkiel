@@ -107,12 +107,13 @@ class ZaphkielCommand : BaseMainCommand() {
     @SubCommand(priority = 0.2)
     val reload = object : BaseSubCommand() {
 
-        override fun getDescription(): String = "重载物品"
+        override fun getDescription(): String = "重载插件"
 
         override fun onCommand(sender: CommandSender, command: Command?, label: String, args: Array<String>) {
+            Zaphkiel.CONF.reload()
             ZaphkielAPI.reloadItem()
             ZaphkielAPI.reloadDisplay()
-            notify(sender, "物品已重载.")
+            notify(sender, "插件已重载.")
         }
     }
 

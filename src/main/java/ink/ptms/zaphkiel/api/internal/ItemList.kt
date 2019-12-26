@@ -68,7 +68,7 @@ class ItemList : Listener {
         }
     }
 
-    companion object {
+    internal companion object {
 
         fun open(player: Player, page: Int) {
             val itemsAll = ZaphkielAPI.registeredItem.keys.toList()

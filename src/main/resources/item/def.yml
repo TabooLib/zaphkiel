@@ -28,22 +28,22 @@ item_rotten_flesh:
   event:
     from: base_food
     data:
-      cd: 200
-      value: 1
+      cooldown: 100
+      regain_health: 1
+      regain_hunger: 2
 
 base_food$:
   event:
     onConsume: |-
-      api.toCooldown(item, cd)
-      event.setCancelled(true)
-      event.getPlayer().sendMessage("§7Your health and satiety have recovered.")
-      event.getPlayer().setFoodLevel(Math.min(event.getPlayer().getFoodLevel() + value, 20))
-      event.getPlayer().setFoodLevel(Math.min(event.getPlayer().getFoodLevel() + value, event.getPlayer().getMaxHealth()))
-    onRightClick: |-
-      if (api.isCooldown(item)) {
+      if (api.isCooldown()) {
           event.setCancelled(true)
-          if (api.isCooldown(event.getPlayer(), "notify") != true) {
-              api.toCooldown(event.getPlayer(), "notify", 20)
-              event.getPlayer().sendMessage("§cYou are temporarily unable to use it.")
-          }
+          event.getPlayer().sendMessage("§cYou are temporarily unable to use it.")
+      } else {
+          event.setCancelled(true)
+          event.getPlayer().sendMessage("§7Your health and satiety have recovered.")
+          event.getPlayer().setHealth(Math.min(event.getPlayer().getHealth() + regain_health, event.getPlayer().getMaxHealth()))
+          event.getPlayer().setFoodLevel(Math.min(event.getPlayer().getFoodLevel() + regain_hunger, 20))
+          api.toCooldown(cooldown)
+          api.toRepair(-1)
+          api.save()
       }

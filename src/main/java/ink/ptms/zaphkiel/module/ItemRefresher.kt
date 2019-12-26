@@ -17,7 +17,7 @@ import org.bukkit.event.player.*
  * @Since 2019-12-16 10:40
  */
 @TListener
-class ItemRefresher : Listener {
+private class ItemRefresher : Listener {
 
     @EventHandler
     fun e(e: PlayerJoinEvent) {

@@ -15,7 +15,7 @@ import org.bukkit.inventory.ItemStack
  * @Since 2019-12-15 22:22
  */
 @TListener
-class ItemEvents : Listener {
+private class ItemEvents : Listener {
 
     @EventHandler(ignoreCancelled = true)
     fun e(e: PlayerItemBreakEvent) {

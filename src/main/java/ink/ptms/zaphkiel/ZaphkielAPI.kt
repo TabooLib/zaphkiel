@@ -64,7 +64,7 @@ object ZaphkielAPI {
         if (Items.isNull(item)) {
             throw RuntimeException("Could not read empty item.");
         }
-        val itemStream = ItemStream(item, isFromRebuild = true)
+        val itemStream = ItemStream(item)
         if (itemStream.isVanilla()) {
             return itemStream
         }
@@ -72,7 +72,7 @@ object ZaphkielAPI {
         if (pre.isCancelled) {
             return itemStream
         }
-        return itemStream.getZaphkielItem().build(player, itemStream)
+        return itemStream.fromRebuild().getZaphkielItem().build(player, itemStream)
     }
 
     fun reloadItem() {
@@ -80,8 +80,8 @@ object ZaphkielAPI {
         registeredModel.clear()
         reloadModel(folderItem)
         reloadItem(folderItem)
-        Zaphkiel.LOGS.info("Loaded ${registeredItem.size} items and ${registeredModel.size} models.")
-        PluginReloadEvent().call()
+        PluginReloadEvent.Item().call()
+        Zaphkiel.LOGS.info("Loaded ${registeredItem.size} item(s) and ${registeredModel.size} model(s).")
     }
 
     fun reloadItem(file: File) {
@@ -89,7 +89,7 @@ object ZaphkielAPI {
             file.listFiles().forEach { reloadItem(it) }
         } else {
             val conf = Files.load(file)
-            conf.getKeys(false).forEach { key ->
+            conf.getKeys(false).filter { !it.endsWith("$") }.forEach { key ->
                 registeredItem[key] = Item(conf.getConfigurationSection(key)!!)
             }
         }
@@ -109,7 +109,8 @@ object ZaphkielAPI {
     fun reloadDisplay() {
         registeredDisplay.clear()
         reloadDisplay(folderDisplay)
-        Zaphkiel.LOGS.info("Loaded ${registeredDisplay.size} display plan.")
+        PluginReloadEvent.Display().call()
+        Zaphkiel.LOGS.info("Loaded ${registeredDisplay.size} display plan(s).")
     }
 
     fun reloadDisplay(file: File) {

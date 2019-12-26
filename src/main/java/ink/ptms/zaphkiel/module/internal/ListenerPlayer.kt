@@ -13,7 +13,7 @@ import org.bukkit.event.player.PlayerJoinEvent
  * @Since 2019-12-24 21:31
  */
 @TListener
-class ListenerPlayer : Listener {
+private class ListenerPlayer : Listener {
 
     @EventHandler
     fun e(e: PlayerJoinEvent) {
