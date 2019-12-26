@@ -22,7 +22,7 @@ class MetaAttribute(item: Item) : Meta(item) {
                     try {
                         val uuid = UUID.randomUUID()
                         val attribute = NBTCompound()
-                        val attributeValue = item.config.getString("meta.attributes.$hand.$name")!!
+                        val attributeValue = item.config.getString("meta.attribute.$hand.$name")!!
                         if (attributeValue.endsWith("%")) {
                             attribute["Amount"] = NBTBase(NumberConversions.toDouble(attributeValue.substring(0, attributeValue.length - 1)) / 100.0)
                             attribute["Operation"] = NBTBase(1)
