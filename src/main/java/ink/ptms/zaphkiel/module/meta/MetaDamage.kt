@@ -14,4 +14,8 @@ class MetaDamage(item: Item) : Meta(item) {
             itemMeta.damage = damage
         }
     }
+
+    override fun toString(): String {
+        return "MetaDamage(damage=$damage)"
+    }
 }

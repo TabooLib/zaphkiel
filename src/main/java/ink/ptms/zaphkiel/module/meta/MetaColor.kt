@@ -22,4 +22,8 @@ class MetaColor(item: Item) : Meta(item) {
             itemMeta.setColor(color)
         }
     }
+
+    override fun toString(): String {
+        return "MetaColor(color=$color)"
+    }
 }

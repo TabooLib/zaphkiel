@@ -12,4 +12,8 @@ class MetaUnbreakable(item: Item) : Meta(item) {
     override fun build(itemMeta: ItemMeta) {
         itemMeta.isUnbreakable = unbreakable
     }
+
+    override fun toString(): String {
+        return "MetaUnbreakable(unbreakable=$unbreakable)"
+    }
 }

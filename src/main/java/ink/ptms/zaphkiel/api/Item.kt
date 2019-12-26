@@ -5,6 +5,7 @@ import ink.ptms.zaphkiel.ZaphkielAPI
 import ink.ptms.zaphkiel.api.event.ItemBuildEvent
 import ink.ptms.zaphkiel.api.internal.ItemKey
 import ink.ptms.zaphkiel.api.internal.Translator
+import ink.ptms.zaphkiel.module.meta.MetaBuilder
 import io.izzel.taboolib.module.nms.nbt.NBTBase
 import io.izzel.taboolib.module.nms.nbt.NBTCompound
 import io.izzel.taboolib.util.Strings
@@ -13,7 +14,6 @@ import io.izzel.taboolib.util.lite.Scripts
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
-import org.bukkit.event.Event
 import org.bukkit.event.player.PlayerEvent
 import org.bukkit.inventory.ItemStack
 import org.bukkit.util.NumberConversions
@@ -33,6 +33,7 @@ class Item(
         val data: ConfigurationSection = config.getConfigurationSection("data") ?: config.createSection("data"),
         val model: String? = config.getString("event.from")) {
 
+    val meta = MetaBuilder.getBuilders(this)
     val eventData: Map<String, Any> = config.getConfigurationSection("event.data")?.getValues(false) ?: emptyMap()
     val eventMap: Map<String, ItemEvent> = kotlin.run {
         if (model != null) {
@@ -52,8 +53,8 @@ class Item(
         Strings.hashKeyForDisk(this.saveToString())
     }!!
 
-    fun eval(key: String, bukkitEvent: PlayerEvent, itemStack: ItemStack) {
-        eventMap[key]?.eval(bukkitEvent, itemStack, eventData)
+    fun eval(key: String, playerEvent: PlayerEvent, itemStack: ItemStack) {
+        eventMap[key]?.eval(playerEvent, itemStack, eventData)
     }
 
     fun build(player: Player?): ItemStream {
@@ -99,6 +100,7 @@ class Item(
         if (lore != other.lore) return false
         if (data != other.data) return false
         if (model != other.model) return false
+        if (meta != other.meta) return false
         if (eventData != other.eventData) return false
         if (eventMap != other.eventMap) return false
         if (hash != other.hash) return false
@@ -114,6 +116,7 @@ class Item(
         result = 31 * result + lore.hashCode()
         result = 31 * result + data.hashCode()
         result = 31 * result + (model?.hashCode() ?: 0)
+        result = 31 * result + meta.hashCode()
         result = 31 * result + eventData.hashCode()
         result = 31 * result + eventMap.hashCode()
         result = 31 * result + hash.hashCode()
@@ -121,7 +124,7 @@ class Item(
     }
 
     override fun toString(): String {
-        return "Item(config=$config, id='$id', display='$display', icon=$icon, name=$name, lore=$lore, data=$data, model=$model, eventData=$eventData, eventMap=$eventMap, hash='$hash')"
+        return "Item(config=$config, id='$id', display='$display', icon=$icon, name=$name, lore=$lore, data=$data, model=$model, meta=$meta, eventData=$eventData, eventMap=$eventMap, hash='$hash')"
     }
 
     private companion object {

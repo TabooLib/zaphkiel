@@ -22,4 +22,8 @@ class MetaPotion(item: Item) : Meta(item) {
             potions.forEach { itemMeta.addCustomEffect(it, true) }
         }
     }
+
+    override fun toString(): String {
+        return "MetaPotion(potions=$potions)"
+    }
 }

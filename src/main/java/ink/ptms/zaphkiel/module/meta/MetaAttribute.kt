@@ -49,4 +49,8 @@ class MetaAttribute(item: Item) : Meta(item) {
     override fun build(compound: NBTCompound) {
         compound["AttributeModifiers"] = attributeList
     }
+
+    override fun toString(): String {
+        return "MetaAttribute(attributeList=$attributeList)"
+    }
 }

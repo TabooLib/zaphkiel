@@ -2,6 +2,7 @@ package ink.ptms.zaphkiel.module
 
 import ink.ptms.zaphkiel.ZaphkielAPI
 import ink.ptms.zaphkiel.api.ItemStreamGenerated
+import ink.ptms.zaphkiel.api.event.ItemBuildEvent
 import ink.ptms.zaphkiel.api.event.ItemReleaseEvent
 import io.izzel.taboolib.module.inject.TListener
 import io.izzel.taboolib.module.locale.TLocale
@@ -21,7 +22,12 @@ import org.bukkit.util.NumberConversions
 private class ItemBuilder : Listener {
 
     @EventHandler
-    fun e1(e: ItemReleaseEvent) {
+    fun e(e: ItemBuildEvent.Post) {
+        e.item.meta.forEach { it.build(e.itemStream.compound) }
+    }
+
+    @EventHandler
+    fun e(e: ItemReleaseEvent) {
         if (e.itemStream is ItemStreamGenerated) {
             val item = e.itemStream.getZaphkielItem()
             val display = ZaphkielAPI.registeredDisplay[item.display]
@@ -34,5 +40,6 @@ private class ItemBuilder : Listener {
                 e.itemMeta.lore = listOf("", "§4- NO DISPLAY PLAN -")
             }
         }
+        e.item.meta.forEach { it.build(e.itemMeta) }
     }
 }

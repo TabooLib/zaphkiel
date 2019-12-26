@@ -4,6 +4,7 @@ import ink.ptms.zaphkiel.api.Item
 import io.izzel.taboolib.util.item.Items
 import org.bukkit.inventory.meta.Damageable
 import org.bukkit.inventory.meta.ItemMeta
+import java.util.*
 
 @MetaKey("itemflag")
 class MetaItemflag(item: Item) : Meta(item) {
@@ -12,5 +13,9 @@ class MetaItemflag(item: Item) : Meta(item) {
 
     override fun build(itemMeta: ItemMeta) {
         itemMeta.addItemFlags(*itemflag)
+    }
+
+    override fun toString(): String {
+        return "MetaItemflag(itemflag=${Arrays.toString(itemflag)})"
     }
 }

@@ -23,6 +23,8 @@ class ItemBuildEvent {
             val lore: MutableMap<String, List<String>>
     ) : EventCancellable<Pre>() {
 
+        val item = itemStream.getZaphkielItem()
+
         init {
             async(!Bukkit.isPrimaryThread())
         }
@@ -53,6 +55,8 @@ class ItemBuildEvent {
             val lore: Map<String, List<String>>
     ) : EventNormal<Post>() {
 
+        val item = itemStream.getZaphkielItem()
+
         init {
             async(!Bukkit.isPrimaryThread())
         }
@@ -68,6 +72,8 @@ class ItemBuildEvent {
             val itemStream: ItemStream,
             fromRefresh: Boolean
     ) : EventCancellable<Rebuild>() {
+
+        val item = itemStream.getZaphkielItem()
 
         init {
             isCancelled = !fromRefresh

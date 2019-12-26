@@ -22,4 +22,8 @@ class MetaEnchantment(item: Item) : Meta(item) {
             enchants.forEach { (enchant, level) -> itemMeta.addEnchant(enchant, level, true) }
         }
     }
+
+    override fun toString(): String {
+        return "MetaEnchantment(enchants=$enchants)"
+    }
 }

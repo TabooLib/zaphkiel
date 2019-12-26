@@ -20,4 +20,8 @@ class MetaShiny(item: Item) : Meta(item) {
             itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS)
         }
     }
+
+    override fun toString(): String {
+        return "MetaShiny(shiny=$shiny)"
+    }
 }
