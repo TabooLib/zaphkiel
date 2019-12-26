@@ -86,7 +86,7 @@ object ZaphkielAPI {
 
     fun reloadItem(file: File) {
         if (file.isDirectory) {
-            file.listFiles().forEach { reloadItem(it) }
+            file.listFiles()?.forEach { reloadItem(it) }
         } else {
             val conf = Files.load(file)
             conf.getKeys(false).filter { !it.endsWith("$") }.forEach { key ->
@@ -97,7 +97,7 @@ object ZaphkielAPI {
 
     fun reloadModel(file: File) {
         if (file.isDirectory) {
-            file.listFiles().forEach { reloadModel(it) }
+            file.listFiles()?.forEach { reloadModel(it) }
         } else {
             val conf = Files.load(file)
             conf.getKeys(false).filter { it.endsWith("$") }.forEach { key ->
@@ -115,7 +115,7 @@ object ZaphkielAPI {
 
     fun reloadDisplay(file: File) {
         if (file.isDirectory) {
-            file.listFiles().forEach { reloadDisplay(it) }
+            file.listFiles()?.forEach { reloadDisplay(it) }
         } else {
             val conf = Files.load(file)
             conf.getKeys(false).forEach { key ->
