@@ -13,6 +13,8 @@ import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerItemBreakEvent
 import org.bukkit.inventory.ItemStack
+import kotlin.math.max
+import kotlin.math.min
 
 /**
  * @Author sky
@@ -68,7 +70,7 @@ open class ItemAPI(val item: Item, val itemStack: ItemStack, val player: Player)
     fun toRepair(value: Int): Boolean {
         val max = itemStream.getZaphkielData()["durability"] ?: return true
         val current = itemStream.getZaphkielData()["durability_current"] ?: NBTBase(max.asInt())
-        val currentLatest = Math.max(Math.min(current.asInt() + value, max.asInt()), 0)
+        val currentLatest = max(min(current.asInt() + value, max.asInt()), 0)
         return if (currentLatest > 0) {
             itemStream.getZaphkielData()["durability_current"] = NBTBase(currentLatest)
             true

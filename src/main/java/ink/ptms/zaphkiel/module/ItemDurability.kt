@@ -2,15 +2,19 @@ package ink.ptms.zaphkiel.module
 
 import com.google.common.collect.Lists
 import ink.ptms.zaphkiel.Zaphkiel
+import ink.ptms.zaphkiel.api.ItemStream
 import ink.ptms.zaphkiel.api.event.ItemBuildEvent
 import ink.ptms.zaphkiel.api.event.ItemReleaseEvent
 import ink.ptms.zaphkiel.api.event.PluginReloadEvent
 import io.izzel.taboolib.module.inject.TListener
 import io.izzel.taboolib.module.inject.TSchedule
 import io.izzel.taboolib.module.nms.nbt.NBTBase
+import net.minecraft.server.v1_14_R1.ItemStack
+import org.bukkit.Bukkit
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
+import org.bukkit.event.player.PlayerItemDamageEvent
 import org.bukkit.event.player.PlayerMoveEvent
 import org.bukkit.inventory.meta.Damageable
 
@@ -58,6 +62,15 @@ private class ItemDurability : Listener {
             val dPercent = current.asInt() / dMax.toDouble()
             val dScaled = dMax - (dMax * dPercent)
             (e.itemMeta as Damageable).damage = dScaled.toInt()
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGH)
+    fun e(e: PlayerItemDamageEvent) {
+        val itemStream = ItemStream(e.item)
+        if (itemStream.isExtension() && itemStream.getZaphkielData().containsKey("durability")) {
+            Bukkit.getScheduler().runTask(Zaphkiel.getPlugin(), Runnable { e.player.updateInventory() })
+            e.isCancelled = true
         }
     }
 }

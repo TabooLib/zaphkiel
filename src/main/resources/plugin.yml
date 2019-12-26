@@ -1,5 +1,6 @@
 name: Zaphkiel
 main: ink.ptms.zaphkiel.Zaphkiel
 author: 坏黑
+api-version: 1.13
 
 version: ${version}

@@ -31,21 +31,25 @@ class Item(
         val name: Map<String, String> = parseName(config),
         val lore: Map<String, List<String>> = parseLore(config),
         val data: ConfigurationSection = config.getConfigurationSection("data") ?: config.createSection("data"),
-        val model: String? = config.getString("event.from")) {
+        val model: List<String> = config.getString("event.from")?.split(",")?.map { it.trim() } ?: emptyList()) {
 
     val meta = MetaBuilder.getBuilders(this)
     val eventData: Map<String, Any> = config.getConfigurationSection("event.data")?.getValues(false) ?: emptyMap()
-    val eventMap: Map<String, ItemEvent> = kotlin.run {
-        if (model != null) {
-            val model = ZaphkielAPI.registeredModel[model]
-            if (model == null) {
-                Zaphkiel.LOGS.error("Model ${this.model} not found.")
-                return@run emptyMap()
+    val eventMap: Map<String, ItemEvent> = run {
+        val map = HashMap<String, ItemEvent>()
+        if (model.isNotEmpty()) {
+            model.forEach {
+                val model = ZaphkielAPI.registeredModel[it]
+                if (model != null) {
+                    map.putAll(parseEvent(this, model.config))
+                } else {
+                    Zaphkiel.LOGS.error("Model ${this.model} not found.")
+                }
             }
-            return@run parseEvent(this, model.config)
         } else {
-            return@run parseEvent(this, config)
+            map.putAll(parseEvent(this, config))
         }
+        return@run map
     }
 
     val hash = YamlConfiguration().run {
@@ -115,7 +119,7 @@ class Item(
         result = 31 * result + name.hashCode()
         result = 31 * result + lore.hashCode()
         result = 31 * result + data.hashCode()
-        result = 31 * result + (model?.hashCode() ?: 0)
+        result = 31 * result + model.hashCode()
         result = 31 * result + meta.hashCode()
         result = 31 * result + eventData.hashCode()
         result = 31 * result + eventMap.hashCode()
