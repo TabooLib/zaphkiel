@@ -1,3 +1,67 @@
+item_intensify_sword:
+  display: display_weapon
+  icon: GOLDEN_SWORD
+  name:
+    NAME: '&eIntensify Sword'
+  lore:
+    TYPE: '&9Sword'
+    LORE:
+      - '&6An indestructible golden sword.'
+    meta:
+      itemflag:
+        - HIDE_UNBREAKABLE
+      unbreakable: true
+    data:
+      weight: 0.45
+
+item_wooden_sword:
+  display: display_weapon
+  icon: WOODEN_SWORD
+  name:
+    NAME: '&7Wooden Sword'
+  lore:
+    TYPE: '&9Sword'
+    LORE:
+      - '&fCan be bought everywhere.'
+    meta:
+      attribute:
+        mainhand:
+          damage: +7
+          attackspeed: +10%
+    data:
+      weight: 0.25
+      durability!!: 127
+
+item_enchanted_book:
+  display: display_item
+  icon: ENCHANTED_BOOK
+  name:
+    NAME: '&7Enchanted Book'
+  lore:
+    TYPE: '&9Item'
+    LORE:
+      - '&fCan be bought everywhere.'
+  meta:
+    enchantment:
+      durability: 1
+  data:
+    weight: 0.10
+
+item_slowness_potion:
+  display: display_item
+  icon: POTION
+  name:
+    NAME: '&7Slowness Potion'
+  lore:
+    TYPE: '&9Potion'
+    LORE:
+      - '&fCan be bought everywhere.'
+  meta:
+    potion:
+      slowness: 1-60
+  data:
+    weight: 0.01
+
 item_leather_armor:
   display: display_armor
   icon: LEATHER_CHESTPLATE
@@ -10,7 +74,7 @@ item_leather_armor:
   meta:
     color: 255-255-255
   data:
-    weight: 0.5
+    weight: 0.50
     durability!!: 100
 
 item_rotten_flesh:

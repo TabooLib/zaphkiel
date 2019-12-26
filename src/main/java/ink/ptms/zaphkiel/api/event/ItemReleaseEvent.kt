@@ -11,6 +11,8 @@ import org.bukkit.inventory.meta.ItemMeta
  */
 class ItemReleaseEvent(var itemMeta: ItemMeta, val itemStream: ItemStream) : EventNormal<ItemReleaseEvent>() {
 
+    val item = itemStream.getZaphkielItem()
+
     init {
         async(!Bukkit.isPrimaryThread())
     }

@@ -5,9 +5,13 @@ import ink.ptms.zaphkiel.api.ItemStreamGenerated
 import ink.ptms.zaphkiel.api.event.ItemReleaseEvent
 import io.izzel.taboolib.module.inject.TListener
 import io.izzel.taboolib.module.locale.TLocale
+import org.bukkit.Color
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
+import org.bukkit.inventory.meta.Damageable
+import org.bukkit.inventory.meta.LeatherArmorMeta
+import org.bukkit.util.NumberConversions
 
 /**
  * @Author sky
@@ -17,7 +21,7 @@ import org.bukkit.event.player.PlayerJoinEvent
 private class ItemBuilder : Listener {
 
     @EventHandler
-    fun e(e: ItemReleaseEvent) {
+    fun e1(e: ItemReleaseEvent) {
         if (e.itemStream is ItemStreamGenerated) {
             val item = e.itemStream.getZaphkielItem()
             val display = ZaphkielAPI.registeredDisplay[item.display]
@@ -30,10 +34,5 @@ private class ItemBuilder : Listener {
                 e.itemMeta.lore = listOf("", "§4- NO DISPLAY PLAN -")
             }
         }
-    }
-
-    @EventHandler
-    fun e(e: PlayerJoinEvent) {
-
     }
 }
