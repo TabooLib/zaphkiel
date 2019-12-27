@@ -34,7 +34,6 @@ item_wooden_sword:
     onDamage: |-
       event.setCancelled(true)
       api.toRepair(-1)
-      api.save()
 
 item_enchanted_book:
   display: display_item
@@ -115,5 +114,4 @@ base_food$:
           event.getPlayer().setFoodLevel(Math.min(event.getPlayer().getFoodLevel() + regain_hunger, 20))
           api.toCooldown(cooldown)
           api.toRepair(-1)
-          api.save()
       }

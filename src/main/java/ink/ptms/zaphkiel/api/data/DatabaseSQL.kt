@@ -1,15 +1,18 @@
 package ink.ptms.zaphkiel.api.data
 
 import ink.ptms.zaphkiel.Zaphkiel
+import ink.ptms.zaphkiel.ZaphkielAPI
 import io.izzel.taboolib.module.db.source.DBSource
 import io.izzel.taboolib.module.db.sql.SQLColumn
 import io.izzel.taboolib.module.db.sql.SQLHost
 import io.izzel.taboolib.module.db.sql.SQLTable
 import io.izzel.taboolib.module.db.sql.query.Where
 import io.izzel.taboolib.module.inject.PlayerContainer
+import org.bukkit.Bukkit
 import org.bukkit.configuration.file.FileConfiguration
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
+import org.bukkit.metadata.FixedMetadataValue
 import java.nio.charset.StandardCharsets
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
@@ -26,6 +29,7 @@ class DatabaseSQL : Database() {
     val dataSource: DataSource = DBSource.create(host)
 
     override fun getData(player: Player): FileConfiguration {
+        player.setMetadata("zaphkiel:save", FixedMetadataValue(Zaphkiel.getPlugin(), true))
         if (dataMap.contains(player.name)) {
             return dataMap[player.name]!!
         } else if (isExists(player)) {
@@ -37,6 +41,9 @@ class DatabaseSQL : Database() {
 
     override fun saveData(player: Player) {
         val data = dataMap[player.name] ?: return
+        if (data.getKeys(false).isEmpty()) {
+            return
+        }
         if (isExists(player)) {
             table.update(Where.`is`("name", player.name)).set("data", Base64.getEncoder().encodeToString(data.saveToString().toByteArray(StandardCharsets.UTF_8))).run(dataSource)
         } else {

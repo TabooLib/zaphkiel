@@ -23,6 +23,7 @@ import kotlin.math.min
 open class ItemAPI(val item: Item, val itemStack: ItemStack, val player: Player) {
 
     val itemStream = ItemStream(itemStack)
+    var isChanged = false
 
     fun command(sender: CommandSender, command: String) {
         Commands.dispatchCommand(sender, command)
@@ -60,6 +61,7 @@ open class ItemAPI(val item: Item, val itemStack: ItemStack, val player: Player)
     }
 
     fun toCooldown(gameTick: Int) {
+        isChanged = true
         itemStream.getZaphkielData().putDeep("cooldown.${item.id}", System.currentTimeMillis() + (gameTick * 50L))
     }
 
@@ -77,6 +79,7 @@ open class ItemAPI(val item: Item, val itemStack: ItemStack, val player: Player)
     }
 
     fun toRepair(value: Int): Boolean {
+        isChanged = true
         val max = itemStream.getZaphkielData()["durability"] ?: return true
         val current = itemStream.getZaphkielData()["durability_current"] ?: NBTBase(max.asInt())
         val currentLatest = max(min(current.asInt() + value, max.asInt()), 0)
