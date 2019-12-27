@@ -111,8 +111,7 @@ class ZaphkielCommand : BaseMainCommand() {
 
         override fun onCommand(sender: CommandSender, command: Command?, label: String, args: Array<String>) {
             Zaphkiel.CONF.reload()
-            ZaphkielAPI.reloadItem()
-            ZaphkielAPI.reloadDisplay()
+            Zaphkiel.reload()
             notify(sender, "插件已重载.")
         }
     }

@@ -30,12 +30,10 @@ class DatabaseSQL : Database() {
 
     override fun getData(player: Player): FileConfiguration {
         player.setMetadata("zaphkiel:save", FixedMetadataValue(Zaphkiel.getPlugin(), true))
-        if (dataMap.contains(player.name)) {
-            return dataMap[player.name]!!
-        } else if (isExists(player)) {
-            return dataMap.computeIfAbsent(player.name) { get(player) }
-        } else {
-            return dataMap.computeIfAbsent(player.name) { YamlConfiguration() }
+        return when {
+            dataMap.contains(player.name) -> dataMap[player.name]!!
+            isExists(player) -> dataMap.computeIfAbsent(player.name) { get(player) }
+            else -> dataMap.computeIfAbsent(player.name) { YamlConfiguration() }
         }
     }
 

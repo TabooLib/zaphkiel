@@ -20,18 +20,16 @@ public class Zaphkiel extends Plugin {
     @TInject
     public static final TConfig CONF = null;
 
-    @Override
-    public void onStarting() {
-        if (!new File(getDataFolder(), "item").exists()) {
-            saveResource("item/def.yml", true);
-        }
-        if (!new File(getDataFolder(), "display").exists()) {
-            saveResource("display/def.yml", true);
-        }
-    }
+    public static final ZaphkielAPI API = ZaphkielAPI.INSTANCE;
 
     @TSchedule(delay = 20)
-    public void activated() {
+    public static void reload() {
+        if (!API.getFolderItem().exists()) {
+            getPlugin().saveResource("item/def.yml", true);
+        }
+        if (!API.getFolderDisplay().exists()) {
+            getPlugin().saveResource("display/def.yml", true);
+        }
         ZaphkielAPI.INSTANCE.reloadItem();
         ZaphkielAPI.INSTANCE.reloadDisplay();
     }

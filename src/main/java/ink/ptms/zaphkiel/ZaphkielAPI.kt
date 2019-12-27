@@ -32,15 +32,15 @@ object ZaphkielAPI {
     val registeredItem = Maps.newHashMap<String, Item>()!!
     val registeredModel = Maps.newHashMap<String, Model>()!!
     val registeredDisplay = Maps.newHashMap<String, Display>()!!
-    val database: Database = if (Zaphkiel.CONF.contains("Database.host")) {
-        try {
-            DatabaseSQL()
-        } catch (t: Throwable) {
-            t.printStackTrace()
+    val database by lazy {
+        if (Zaphkiel.CONF.contains("Database.host")) {
+            try {
+                return@lazy DatabaseSQL()
+            } catch (t: Throwable) {
+                t.printStackTrace()
+            }
         }
-        DatabaseYML()
-    } else {
-        DatabaseYML()
+        return@lazy DatabaseYML()
     }
 
     fun read(item: ItemStack): ItemStream {
