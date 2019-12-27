@@ -11,3 +11,9 @@ Durability:
   display-symbol:
     0: ◆
     1: ◇
+
+InternetItem:
+  item:
+  # - https://.../item-internet.yml
+  display:
+  # - https://.../display-internet.yml

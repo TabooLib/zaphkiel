@@ -22,16 +22,11 @@ import org.bukkit.inventory.meta.Damageable
  * @Author sky
  * @Since 2019-12-16 21:46
  */
-@TListener(register = "reload")
+@TListener
 private class ItemDurability : Listener {
 
     var durability: String? = null
     var durabilitySymbol: List<String>? = null
-
-    fun reload() {
-        durability = Zaphkiel.CONF.getString("Durability.display")
-        durabilitySymbol = Lists.newArrayList<String>(Zaphkiel.CONF.getString("Durability.display-symbol.0"), Zaphkiel.CONF.getString("Durability.display-symbol.1"))
-    }
 
     fun toDisplay(current: Int, max: Int): String = durability!!.replace("%symbol%", (1..max).joinToString("") { i ->
         if (current >= i) {
@@ -43,7 +38,8 @@ private class ItemDurability : Listener {
 
     @EventHandler
     fun e(e: PluginReloadEvent.Item) {
-        reload()
+        durability = Zaphkiel.CONF.getString("Durability.display")
+        durabilitySymbol = Lists.newArrayList<String>(Zaphkiel.CONF.getString("Durability.display-symbol.0"), Zaphkiel.CONF.getString("Durability.display-symbol.1"))
     }
 
     @EventHandler

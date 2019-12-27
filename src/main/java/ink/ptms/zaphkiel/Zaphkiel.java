@@ -3,6 +3,7 @@ package ink.ptms.zaphkiel;
 import io.izzel.taboolib.loader.Plugin;
 import io.izzel.taboolib.module.config.TConfig;
 import io.izzel.taboolib.module.inject.TInject;
+import io.izzel.taboolib.module.inject.TSchedule;
 import io.izzel.taboolib.module.locale.logger.TLogger;
 
 import java.io.File;
@@ -29,8 +30,8 @@ public class Zaphkiel extends Plugin {
         }
     }
 
-    @Override
-    public void onActivated() {
+    @TSchedule(delay = 20)
+    public void activated() {
         ZaphkielAPI.INSTANCE.reloadItem();
         ZaphkielAPI.INSTANCE.reloadDisplay();
     }
