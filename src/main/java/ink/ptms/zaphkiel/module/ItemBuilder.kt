@@ -23,7 +23,7 @@ private class ItemBuilder : Listener {
 
     @EventHandler
     fun e(e: ItemBuildEvent.Post) {
-        e.item.meta.forEach { it.build(e.itemStream.compound) }
+        e.item.meta.forEach { it.build(e.player, e.itemStream.compound) }
     }
 
     @EventHandler

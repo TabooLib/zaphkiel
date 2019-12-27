@@ -6,6 +6,7 @@ import io.izzel.taboolib.module.nms.nbt.Attribute
 import io.izzel.taboolib.module.nms.nbt.NBTBase
 import io.izzel.taboolib.module.nms.nbt.NBTCompound
 import io.izzel.taboolib.module.nms.nbt.NBTList
+import org.bukkit.entity.Player
 import org.bukkit.util.NumberConversions
 import java.util.*
 
@@ -22,7 +23,7 @@ class MetaAttribute(item: Item) : Meta(item) {
                     try {
                         val uuid = UUID.randomUUID()
                         val attribute = NBTCompound()
-                        val attributeValue = item.config.getString("meta.attributes.$hand.$name")!!
+                        val attributeValue = item.config.getString("meta.attribute.$hand.$name")!!
                         if (attributeValue.endsWith("%")) {
                             attribute["Amount"] = NBTBase(NumberConversions.toDouble(attributeValue.substring(0, attributeValue.length - 1)) / 100.0)
                             attribute["Operation"] = NBTBase(1)
@@ -46,7 +47,7 @@ class MetaAttribute(item: Item) : Meta(item) {
         }
     }
 
-    override fun build(compound: NBTCompound) {
+    override fun build(player: Player?, compound: NBTCompound) {
         compound["AttributeModifiers"] = attributeList
     }
 

@@ -10,11 +10,14 @@ import ink.ptms.zaphkiel.api.data.DatabaseSQL
 import ink.ptms.zaphkiel.api.data.DatabaseYML
 import ink.ptms.zaphkiel.api.event.ItemBuildEvent
 import ink.ptms.zaphkiel.api.event.PluginReloadEvent
+import io.izzel.taboolib.module.lite.SimpleReflection
 import io.izzel.taboolib.util.Files
 import io.izzel.taboolib.util.item.Items
+import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Player
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
+import org.bukkit.potion.PotionEffectType
 import java.io.File
 import java.lang.RuntimeException
 
@@ -122,5 +125,23 @@ object ZaphkielAPI {
                 registeredDisplay[key] = Display(conf.getConfigurationSection(key)!!)
             }
         }
+    }
+
+    fun asPotionEffect(name: String): PotionEffectType? {
+        SimpleReflection.checkAndSave(PotionEffectType::class.java)
+        try {
+            return SimpleReflection.getFieldValue(PotionEffectType::class.java, null, name.toUpperCase()) as PotionEffectType
+        } catch (t: Throwable) {
+        }
+        return null
+    }
+
+    fun asEnchantment(name: String): Enchantment? {
+        SimpleReflection.checkAndSave(Enchantment::class.java)
+        try {
+            return SimpleReflection.getFieldValue(Enchantment::class.java, null, name.toUpperCase()) as Enchantment
+        } catch (t: Throwable) {
+        }
+        return null
     }
 }

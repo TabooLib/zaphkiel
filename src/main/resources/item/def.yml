@@ -7,12 +7,11 @@ item_intensify_sword:
     TYPE: '&9Sword'
     LORE:
       - '&6An indestructible golden sword.'
-    meta:
-      itemflag:
-        - HIDE_UNBREAKABLE
-      unbreakable: true
-    data:
-      weight: 0.45
+  meta:
+    unbreakable: true
+    unique: true
+  data:
+    weight: 0.45
 
 item_wooden_sword:
   display: display_weapon
@@ -23,14 +22,14 @@ item_wooden_sword:
     TYPE: '&9Sword'
     LORE:
       - '&fCan be bought everywhere.'
-    meta:
-      attribute:
-        mainhand:
-          damage: +7
-          attackspeed: +10%
-    data:
-      weight: 0.25
-      durability!!: 127
+  meta:
+    attribute:
+      mainhand:
+        damage: +7
+        attackspeed: +10%
+  data:
+    weight: 0.25
+    durability!!: 127
   event:
     onDamage: |-
       event.setCancelled(true)
@@ -48,7 +47,9 @@ item_enchanted_book:
       - '&fCan be bought everywhere.'
   meta:
     enchantment:
-      durability: 1
+      DAMAGE_ALL: 1
+    itemflag:
+      - HIDE_POTION_EFFECTS
   data:
     weight: 0.10
 
@@ -63,7 +64,7 @@ item_slowness_potion:
       - '&fCan be bought everywhere.'
   meta:
     potion:
-      slowness: 1-60
+      slow: 60-1
   data:
     weight: 0.01
 

@@ -2,6 +2,7 @@ package ink.ptms.zaphkiel.module.meta
 
 import ink.ptms.zaphkiel.api.Item
 import io.izzel.taboolib.module.nms.nbt.NBTCompound
+import org.bukkit.entity.Player
 import org.bukkit.inventory.meta.ItemMeta
 
 abstract class Meta(val item: Item) {
@@ -10,7 +11,7 @@ abstract class Meta(val item: Item) {
 
     }
 
-    open fun build(compound: NBTCompound) {
+    open fun build(player: Player?, compound: NBTCompound) {
 
     }
 }
