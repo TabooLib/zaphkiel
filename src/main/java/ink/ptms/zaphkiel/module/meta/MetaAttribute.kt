@@ -6,6 +6,7 @@ import io.izzel.taboolib.module.nms.nbt.Attribute
 import io.izzel.taboolib.module.nms.nbt.NBTBase
 import io.izzel.taboolib.module.nms.nbt.NBTCompound
 import io.izzel.taboolib.module.nms.nbt.NBTList
+import org.bukkit.entity.Player
 import org.bukkit.util.NumberConversions
 import java.util.*
 
@@ -46,7 +47,7 @@ class MetaAttribute(item: Item) : Meta(item) {
         }
     }
 
-    override fun build(compound: NBTCompound) {
+    override fun build(player: Player?, compound: NBTCompound) {
         compound["AttributeModifiers"] = attributeList
     }
 

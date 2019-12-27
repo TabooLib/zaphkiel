@@ -9,6 +9,7 @@ item_intensify_sword:
       - '&6An indestructible golden sword.'
   meta:
     unbreakable: true
+    unique: true
   data:
     weight: 0.45
 
