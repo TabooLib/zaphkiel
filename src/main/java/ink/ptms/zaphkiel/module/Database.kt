@@ -1,4 +1,4 @@
-package ink.ptms.zaphkiel.module.internal
+package ink.ptms.zaphkiel.module
 
 import ink.ptms.zaphkiel.Zaphkiel
 import ink.ptms.zaphkiel.ZaphkielAPI
@@ -15,7 +15,7 @@ import org.bukkit.event.player.PlayerQuitEvent
  * @Since 2019-12-24 21:31
  */
 @TListener(cancel = "cancel")
-private class ListenerPlayer : Listener {
+private class Database : Listener {
 
     @EventHandler
     fun e(e: PlayerJoinEvent) {
@@ -33,7 +33,7 @@ private class ListenerPlayer : Listener {
 
     companion object {
 
-        @TSchedule(period = 200, async = true)
+        @TSchedule(period = 100, async = true)
         fun saveTask() {
             Bukkit.getOnlinePlayers().forEach {
                 if (it.hasMetadata("zaphkiel:save")) {

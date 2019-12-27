@@ -2,6 +2,7 @@ package ink.ptms.zaphkiel.api
 
 import ink.ptms.zaphkiel.Zaphkiel
 import ink.ptms.zaphkiel.ZaphkielAPI
+import io.izzel.taboolib.module.locale.TLocale
 import io.izzel.taboolib.module.nms.nbt.NBTBase
 import io.izzel.taboolib.util.Commands
 import io.izzel.taboolib.util.lite.Effects
@@ -42,6 +43,10 @@ open class ItemAPI(val item: Item, val itemStack: ItemStack, val player: Player)
 
     fun commandConsole(command: String) {
         Commands.dispatchCommand(Bukkit.getConsoleSender(), command)
+    }
+
+    fun toPlaceholder(source: String): String {
+        return TLocale.Translate.setPlaceholders(player, source)
     }
 
     fun toCooldown(player: Player, gameTick: Int) {
