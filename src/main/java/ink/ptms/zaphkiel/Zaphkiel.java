@@ -20,14 +20,12 @@ public class Zaphkiel extends Plugin {
     @TInject
     public static final TConfig CONF = null;
 
-    public static final ZaphkielAPI API = ZaphkielAPI.INSTANCE;
-
     @TSchedule(delay = 20)
     public static void reload() {
-        if (!API.getFolderItem().exists()) {
+        if (!ZaphkielAPI.INSTANCE.getFolderItem().exists()) {
             getPlugin().saveResource("item/def.yml", true);
         }
-        if (!API.getFolderDisplay().exists()) {
+        if (!ZaphkielAPI.INSTANCE.getFolderDisplay().exists()) {
             getPlugin().saveResource("display/def.yml", true);
         }
         ZaphkielAPI.INSTANCE.reloadItem();

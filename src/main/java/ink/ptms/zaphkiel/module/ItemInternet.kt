@@ -19,7 +19,7 @@ import java.nio.charset.StandardCharsets
  * @Author Administrator
  * @Since 2019-12-27 16:01
  */
-@TListener(register = "reload", cancel = "cancel")
+@TListener(cancel = "cancel")
 class ItemInternet : Listener {
 
     fun cancel() {
