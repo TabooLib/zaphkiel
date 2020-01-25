@@ -28,6 +28,14 @@ class DatabaseSQL : Database() {
     val table = SQLTable(Zaphkiel.CONF.getString("Database.table")).column("\$primary_key_id", "text:name", "text:data")!!
     val dataSource: DataSource = DBSource.create(host)
 
+    init {
+        try {
+            table.create(dataSource)
+        } catch (t: Throwable) {
+            t.printStackTrace()
+        }
+    }
+
     override fun getData(player: Player): FileConfiguration {
         player.setMetadata("zaphkiel:save", FixedMetadataValue(Zaphkiel.getPlugin(), true))
         return when {
