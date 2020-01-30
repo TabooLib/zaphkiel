@@ -51,7 +51,7 @@ object ZaphkielAPI {
     }
 
     fun rebuild(player: Player?, inventory: Inventory) {
-        for (i in 0..40) {
+        for (i in 0 until inventory.size) {
             val item = inventory.getItem(i)
             if (Items.isNull(item)) {
                 continue
