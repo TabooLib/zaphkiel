@@ -27,9 +27,12 @@ class Item(
         val config: ConfigurationSection,
         val id: String = config.name,
         val display: String = config.getString("display") ?: "null",
-        val icon: ItemStack = parseIcon(config.getString("icon", "STONE")!!),
+        val icon: ItemStack = parseIcon(config),
+        val iconLocked: Boolean = config.contains("icon!!"),
         val name: Map<String, String> = parseName(config),
+        val nameLocked: Boolean = config.contains("name!!"),
         val lore: Map<String, List<String>> = parseLore(config),
+        val loreLocked: Boolean = config.contains("lore!!"),
         val data: ConfigurationSection = config.getConfigurationSection("data") ?: config.createSection("data"),
         val model: List<String> = config.getString("event.from")?.split(",")?.map { it.trim() } ?: emptyList()) {
 
@@ -133,28 +136,31 @@ class Item(
 
     private companion object {
 
-        fun parseIcon(icon: String): ItemStack {
-            val args = icon.split("~")
+        fun parseIcon(config: ConfigurationSection): ItemStack {
+            val node = if (config.contains("icon!!")) "icon!!" else "icon"
+            val args = config.getString(node, "STONE")!!.split("~")
             return ItemStack(Items.asMaterial(args[0]), 1, NumberConversions.toShort(args.getOrElse(1) { "0" }))
         }
 
         fun parseName(config: ConfigurationSection): Map<String, String> {
             val map = HashMap<String, String>()
-            val name = config.getConfigurationSection("name") ?: return emptyMap()
+            val node = if (config.contains("name!!")) "name!!" else "name"
+            val name = config.getConfigurationSection(node) ?: return emptyMap()
             name.getKeys(false).forEach { key ->
-                map[key] = config.getString("name.$key")!!
+                map[key] = config.getString("$node.$key")!!
             }
             return map
         }
 
         fun parseLore(config: ConfigurationSection): Map<String, List<String>> {
             val map = HashMap<String, List<String>>()
-            val lore = config.getConfigurationSection("lore") ?: return emptyMap()
+            val node = if (config.contains("lore!!")) "lore!!" else "lore"
+            val lore = config.getConfigurationSection(node) ?: return emptyMap()
             lore.getKeys(false).forEach { key ->
-                if (config.isList("lore.$key")) {
-                    map[key] = config.getStringList("lore.$key")
+                if (config.isList("$node.$key")) {
+                    map[key] = config.getStringList("$node.$key")
                 } else {
-                    map[key] = listOf(config.getString("lore.$key")!!)
+                    map[key] = listOf(config.getString("$node.$key")!!)
                 }
             }
             return map

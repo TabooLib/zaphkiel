@@ -7,7 +7,6 @@ import io.izzel.taboolib.module.nms.NMS
 import io.izzel.taboolib.module.nms.nbt.NBTBase
 import io.izzel.taboolib.module.nms.nbt.NBTCompound
 import io.izzel.taboolib.module.nms.nbt.NBTList
-import io.izzel.taboolib.util.item.Items
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import java.lang.RuntimeException
@@ -53,7 +52,10 @@ open class ItemStream(
     fun save(): ItemStack {
         val itemMeta = NMS.handle().saveNBT(itemStack, compound).itemMeta
         if (itemMeta != null) {
-            itemStack.itemMeta = ItemReleaseEvent(itemMeta, this).call().itemMeta
+            val event = ItemReleaseEvent(itemStack.type, itemStack.durability.toInt(), itemMeta, this).call()
+            itemStack.type = event.icon
+            itemStack.itemMeta = event.itemMeta
+            itemStack.durability = event.data.toShort()
         }
         return itemStack
     }

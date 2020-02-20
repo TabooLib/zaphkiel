@@ -5,14 +5,15 @@ import ink.ptms.zaphkiel.api.Item
 import ink.ptms.zaphkiel.api.Display
 import ink.ptms.zaphkiel.api.ItemStream
 import ink.ptms.zaphkiel.api.Model
-import ink.ptms.zaphkiel.api.data.Database
 import ink.ptms.zaphkiel.api.data.DatabaseSQL
 import ink.ptms.zaphkiel.api.data.DatabaseYML
 import ink.ptms.zaphkiel.api.event.ItemBuildEvent
 import ink.ptms.zaphkiel.api.event.PluginReloadEvent
+import io.izzel.taboolib.module.config.TConfigWatcher
 import io.izzel.taboolib.module.lite.SimpleReflection
 import io.izzel.taboolib.util.Files
 import io.izzel.taboolib.util.item.Items
+import org.bukkit.Bukkit
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Player
 import org.bukkit.inventory.Inventory
@@ -27,6 +28,7 @@ import java.lang.RuntimeException
  */
 object ZaphkielAPI {
 
+    val loaded = ArrayList<File>()
     val folderItem = File(Zaphkiel.getPlugin().dataFolder, "item")
     val folderDisplay = File(Zaphkiel.getPlugin().dataFolder, "display")
     val registeredItem = Maps.newHashMap<String, Item>()!!
@@ -79,6 +81,7 @@ object ZaphkielAPI {
     }
 
     fun reloadItem() {
+        loaded.forEach { TConfigWatcher.getInst().removeListener(it) }
         registeredItem.clear()
         registeredModel.clear()
         reloadModel(folderItem)
@@ -91,9 +94,29 @@ object ZaphkielAPI {
         if (file.isDirectory) {
             file.listFiles()?.forEach { reloadItem(it) }
         } else {
-            val conf = Files.load(file)
-            conf.getKeys(false).filter { !it.endsWith("$") }.forEach { key ->
-                registeredItem[key] = Item(conf.getConfigurationSection(key)!!)
+            val keys = ArrayList<String>()
+            val task = Runnable {
+                keys.forEach { registeredItem.remove(it) }
+                val conf = Files.load(file)
+                conf.getKeys(false).filter { !it.endsWith("$") }.forEach { key ->
+                    try {
+                        registeredItem[key] = Item(conf.getConfigurationSection(key)!!)
+                    } catch (t: Throwable) {
+                        t.printStackTrace()
+                    }
+                    keys.add(key)
+                }
+            }.run {
+                this.run()
+                this
+            }
+            if (loaded.add(file)) {
+                TConfigWatcher.getInst().addSimpleListener(file) {
+                    task.run()
+                    Bukkit.getOnlinePlayers().forEach { player ->
+                        ZaphkielAPI.rebuild(player, player.inventory)
+                    }
+                }
             }
         }
     }

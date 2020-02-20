@@ -28,8 +28,8 @@ repositories {
 
 dependencies {
     compile 'org.spigotmc:spigot:1.14.4-R0.1-20191211.040645-13'
-    compile 'io.izzel.taboolib:TabooLib:5.13:all'
-    compile 'io.izzel.taboolib.loader:TabooLibloader:1.2:all'
+    compile 'io.izzel.taboolib:TabooLib:5.17:all'
+    compile 'io.izzel.taboolib.loader:TabooLibloader:1.5:all'
     compile "org.jetbrains.kotlin:kotlin-stdlib:1.2.41"
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.2.41"
 	compileOnly fileTree(dir: 'libs', includes: ['*.jar'])

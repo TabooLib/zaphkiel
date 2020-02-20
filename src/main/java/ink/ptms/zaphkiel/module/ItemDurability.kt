@@ -7,16 +7,12 @@ import ink.ptms.zaphkiel.api.event.ItemBuildEvent
 import ink.ptms.zaphkiel.api.event.ItemReleaseEvent
 import ink.ptms.zaphkiel.api.event.PluginReloadEvent
 import io.izzel.taboolib.module.inject.TListener
-import io.izzel.taboolib.module.inject.TSchedule
 import io.izzel.taboolib.module.nms.nbt.NBTBase
-import net.minecraft.server.v1_14_R1.ItemStack
 import org.bukkit.Bukkit
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerItemDamageEvent
-import org.bukkit.event.player.PlayerMoveEvent
-import org.bukkit.inventory.meta.Damageable
 
 /**
  * @Author sky
@@ -52,13 +48,11 @@ private class ItemDurability : Listener {
 
     @EventHandler(priority = EventPriority.HIGH)
     fun e(e: ItemReleaseEvent) {
-        if (e.itemMeta is Damageable) {
-            val current = e.itemStream.getZaphkielData()["durability_current"] ?: return
-            val dMax = e.itemStream.itemStack.type.maxDurability
-            val dPercent = current.asInt() / dMax.toDouble()
-            val dScaled = dMax - (dMax * dPercent)
-            (e.itemMeta as Damageable).damage = dScaled.toInt()
-        }
+        val current = e.itemStream.getZaphkielData()["durability_current"] ?: return
+        val dMax = e.itemStream.itemStack.type.maxDurability
+        val dPercent = current.asInt() / dMax.toDouble()
+        val dScaled = dMax - (dMax * dPercent)
+        e.data = dScaled.toInt()
     }
 
     @EventHandler(priority = EventPriority.HIGH)

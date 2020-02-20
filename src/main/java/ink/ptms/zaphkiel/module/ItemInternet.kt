@@ -45,10 +45,10 @@ class ItemInternet : Listener {
 
     @EventHandler
     fun e(e: PluginReloadEvent.Item) {
-        val countItem = ZaphkielAPI.registeredItem.size
-        val countModel = ZaphkielAPI.registeredModel.size
-        val countDisplay = ZaphkielAPI.registeredDisplay.size
         Bukkit.getScheduler().runTaskAsynchronously(Zaphkiel.getPlugin(), Runnable {
+            val countItem = ZaphkielAPI.registeredItem.size
+            val countModel = ZaphkielAPI.registeredModel.size
+            val countDisplay = ZaphkielAPI.registeredDisplay.size
             reloadItem()
             if (countItem < ZaphkielAPI.registeredItem.size || countModel > ZaphkielAPI.registeredModel.size) {
                 Zaphkiel.LOGS.info("Loaded ${ZaphkielAPI.registeredItem.size - countItem} item(s) and ${ZaphkielAPI.registeredModel.size - countModel} model(s). §6[Internet]")
