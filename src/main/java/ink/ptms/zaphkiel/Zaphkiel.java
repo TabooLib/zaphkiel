@@ -12,7 +12,7 @@ import java.io.File;
  * @Author sky
  * @Since 2019-12-15 20:09
  */
-@Plugin.Version(5.13)
+@Plugin.Version(5.17)
 public class Zaphkiel extends Plugin {
 
     @TInject

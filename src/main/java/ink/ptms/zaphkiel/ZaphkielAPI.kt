@@ -11,6 +11,7 @@ import ink.ptms.zaphkiel.api.event.ItemBuildEvent
 import ink.ptms.zaphkiel.api.event.PluginReloadEvent
 import io.izzel.taboolib.module.config.TConfigWatcher
 import io.izzel.taboolib.module.lite.SimpleReflection
+import io.izzel.taboolib.module.nms.nbt.NBTCompound
 import io.izzel.taboolib.util.Files
 import io.izzel.taboolib.util.item.Items
 import org.bukkit.Bukkit
@@ -43,6 +44,41 @@ object ZaphkielAPI {
             }
         }
         return@lazy DatabaseYML()
+    }
+
+    fun getItem(id: String): ItemStream? {
+        return registeredItem[id]?.build(null)
+    }
+
+    fun getItem(id: String, player: Player?): ItemStream? {
+        return registeredItem[id]?.build(player)
+    }
+
+    fun getName(item: ItemStack): String? {
+        val read = read(item)
+        return if (read.isExtension()) {
+            read.getZaphkielName()
+        } else {
+            null;
+        }
+    }
+
+    fun getData(item: ItemStack): NBTCompound? {
+        val read = read(item)
+        return if (read.isExtension()) {
+            read.getZaphkielData()
+        } else {
+            null;
+        }
+    }
+
+    fun getItem(item: ItemStack): Item? {
+        val read = read(item)
+        return if (read.isExtension()) {
+            read.getZaphkielItem()
+        } else {
+            null;
+        }
     }
 
     fun read(item: ItemStack): ItemStream {
