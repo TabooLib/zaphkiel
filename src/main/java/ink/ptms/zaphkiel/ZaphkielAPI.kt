@@ -9,6 +9,7 @@ import ink.ptms.zaphkiel.api.data.DatabaseSQL
 import ink.ptms.zaphkiel.api.data.DatabaseYML
 import ink.ptms.zaphkiel.api.event.ItemBuildEvent
 import ink.ptms.zaphkiel.api.event.PluginReloadEvent
+import ink.ptms.zaphkiel.api.internal.ItemKey
 import io.izzel.taboolib.module.config.TConfigWatcher
 import io.izzel.taboolib.module.lite.SimpleReflection
 import io.izzel.taboolib.module.nms.nbt.NBTCompound
@@ -67,6 +68,15 @@ object ZaphkielAPI {
         val read = read(item)
         return if (read.isExtension()) {
             read.getZaphkielData()
+        } else {
+            null;
+        }
+    }
+
+    fun getUnique(item: ItemStack): NBTCompound? {
+        val read = read(item)
+        return if (read.isExtension()) {
+            read.getZaphkielData().getDeep("zaphkiel.${ItemKey.UNIQUE.key}").asCompound()
         } else {
             null;
         }
