@@ -1,8 +1,11 @@
 package ink.ptms.zaphkiel.api
 
+import com.google.common.cache.CacheBuilder
 import ink.ptms.zaphkiel.api.internal.StructureList
 import ink.ptms.zaphkiel.api.internal.StructureSingle
 import org.bukkit.configuration.ConfigurationSection
+import java.util.*
+import java.util.concurrent.TimeUnit
 
 /**
  * @Author sky

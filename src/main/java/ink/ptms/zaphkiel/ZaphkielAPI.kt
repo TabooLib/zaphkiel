@@ -7,8 +7,9 @@ import ink.ptms.zaphkiel.api.ItemStream
 import ink.ptms.zaphkiel.api.Model
 import ink.ptms.zaphkiel.api.data.DatabaseSQL
 import ink.ptms.zaphkiel.api.data.DatabaseYML
-import ink.ptms.zaphkiel.api.event.ItemBuildEvent
+import ink.ptms.zaphkiel.api.event.single.ItemBuildEvent
 import ink.ptms.zaphkiel.api.event.PluginReloadEvent
+import ink.ptms.zaphkiel.api.event.single.Events
 import ink.ptms.zaphkiel.api.internal.ItemKey
 import io.izzel.taboolib.module.config.TConfigWatcher
 import io.izzel.taboolib.module.lite.SimpleReflection
@@ -21,6 +22,7 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
 import org.bukkit.potion.PotionEffectType
+import java.awt.Event
 import java.io.File
 import java.lang.RuntimeException
 
@@ -30,6 +32,7 @@ import java.lang.RuntimeException
  */
 object ZaphkielAPI {
 
+    val events = Events
     val loaded = ArrayList<File>()
     val folderItem = File(Zaphkiel.getPlugin().dataFolder, "item")
     val folderDisplay = File(Zaphkiel.getPlugin().dataFolder, "display")
@@ -119,7 +122,7 @@ object ZaphkielAPI {
         if (itemStream.isVanilla()) {
             return itemStream
         }
-        val pre = ItemBuildEvent.Rebuild(player, itemStream, itemStream.shouldRefresh()).call()
+        val pre = Events.call(ItemBuildEvent.Rebuild(player, itemStream, itemStream.shouldRefresh()))
         if (pre.isCancelled) {
             return itemStream
         }

@@ -1,7 +1,6 @@
 package ink.ptms.zaphkiel;
 
-import ink.ptms.zaphkiel.api.event.ItemBuildEvent;
-import ink.ptms.zaphkiel.api.event.ItemRebuildEvent;
+import ink.ptms.zaphkiel.api.event.single.ItemBuildEvent;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
@@ -11,8 +10,8 @@ import org.bukkit.event.Listener;
  */
 public class WeightHook implements Listener {
 
-    @EventHandler
-    public void e(ItemBuildEvent.Pre e) {
-        e.addLore("WEIGHT", e.getItemStream().getZaphkielData().get("weight").asDouble());
-    }
+//    @EventHandler
+//    public void e(ItemBuildEvent.Pre e) {
+//        e.addLore("WEIGHT", e.getItemStream().getZaphkielData().get("weight").asDouble());
+//    }
 }

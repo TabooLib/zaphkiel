@@ -1,7 +1,7 @@
 package ink.ptms.zaphkiel.module.meta
 
 import ink.ptms.zaphkiel.api.Item
-import ink.ptms.zaphkiel.api.event.ItemReleaseEvent
+import ink.ptms.zaphkiel.api.event.single.ItemReleaseEvent
 
 @MetaKey("data")
 class MetaData(item: Item) : Meta(item) {

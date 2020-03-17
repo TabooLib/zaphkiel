@@ -1,7 +1,8 @@
 package ink.ptms.zaphkiel.api
 
 import ink.ptms.zaphkiel.ZaphkielAPI
-import ink.ptms.zaphkiel.api.event.ItemReleaseEvent
+import ink.ptms.zaphkiel.api.event.single.Events
+import ink.ptms.zaphkiel.api.event.single.ItemReleaseEvent
 import ink.ptms.zaphkiel.api.internal.ItemKey
 import io.izzel.taboolib.module.nms.NMS
 import io.izzel.taboolib.module.nms.nbt.NBTBase
@@ -52,7 +53,7 @@ open class ItemStream(
     fun save(): ItemStack {
         val itemMeta = NMS.handle().saveNBT(itemStack, compound).itemMeta
         if (itemMeta != null) {
-            val event = ItemReleaseEvent(itemStack.type, itemStack.durability.toInt(), itemMeta, this).call()
+            val event = Events.call(ItemReleaseEvent(itemStack.type, itemStack.durability.toInt(), itemMeta, this))
             itemStack.type = event.icon
             itemStack.itemMeta = event.itemMeta
             itemStack.durability = event.data.toShort()
@@ -108,11 +109,9 @@ open class ItemStream(
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is ItemStream) return false
-
         if (itemStack != other.itemStack) return false
         if (compound != other.compound) return false
         if (isFromRebuild != other.isFromRebuild) return false
-
         return true
     }
 

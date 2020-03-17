@@ -1,9 +1,8 @@
-package ink.ptms.zaphkiel.api.event
+package ink.ptms.zaphkiel.api.event.single
 
 import io.izzel.taboolib.module.event.EventNormal
 import ink.ptms.zaphkiel.api.ItemStream
 import io.izzel.taboolib.module.event.EventCancellable
-import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 
 /**
@@ -16,18 +15,9 @@ class ItemBuildEvent {
      * 构建之前
      * 可被取消
      */
-    class Pre(
-            val player: Player?,
-            val itemStream: ItemStream,
-            val name: MutableMap<String, String>,
-            val lore: MutableMap<String, List<String>>
-    ) : EventCancellable<Pre>() {
+    class Pre(val player: Player?, val itemStream: ItemStream, val name: MutableMap<String, String>, val lore: MutableMap<String, List<String>>) : EventCancellable<Pre>() {
 
         val item = itemStream.getZaphkielItem()
-
-        init {
-            async(!Bukkit.isPrimaryThread())
-        }
 
         fun addName(key: String, value: Any) {
             name[key] = value.toString()
@@ -48,18 +38,9 @@ class ItemBuildEvent {
      * 不可取消
      * 名称、描述、数据已就绪
      */
-    class Post(
-            val player: Player?,
-            val itemStream: ItemStream,
-            val name: Map<String, String>,
-            val lore: Map<String, List<String>>
-    ) : EventNormal<Post>() {
+    class Post(val player: Player?, val itemStream: ItemStream, val name: Map<String, String>, val lore: Map<String, List<String>>) : EventNormal<Post>() {
 
         val item = itemStream.getZaphkielItem()
-
-        init {
-            async(!Bukkit.isPrimaryThread())
-        }
     }
 
     /**
@@ -67,17 +48,12 @@ class ItemBuildEvent {
      * 可被取消
      * 递交至构建事件之前
      */
-    class Rebuild(
-            val player: Player?,
-            val itemStream: ItemStream,
-            fromRefresh: Boolean
-    ) : EventCancellable<Rebuild>() {
+    class Rebuild(val player: Player?, val itemStream: ItemStream, fromRefresh: Boolean) : EventCancellable<Rebuild>() {
 
         val item = itemStream.getZaphkielItem()
 
         init {
             isCancelled = !fromRefresh
-            async(!Bukkit.isPrimaryThread())
         }
     }
 }

@@ -2,7 +2,8 @@ package ink.ptms.zaphkiel.api
 
 import ink.ptms.zaphkiel.Zaphkiel
 import ink.ptms.zaphkiel.ZaphkielAPI
-import ink.ptms.zaphkiel.api.event.ItemBuildEvent
+import ink.ptms.zaphkiel.api.event.single.Events
+import ink.ptms.zaphkiel.api.event.single.ItemBuildEvent
 import ink.ptms.zaphkiel.api.internal.ItemKey
 import ink.ptms.zaphkiel.api.internal.Translator
 import ink.ptms.zaphkiel.module.meta.MetaBuilder
@@ -52,13 +53,15 @@ class Item(
         } else {
             map.putAll(parseEvent(this, config))
         }
-        return@run map
+        map
     }
 
     val hash = YamlConfiguration().run {
         this.set("value", config)
         Strings.hashKeyForDisk(this.saveToString())
     }!!
+
+    val dataCache = refreshData(HashMap(), data)
 
     fun eval(key: String, playerEvent: PlayerEvent, itemStack: ItemStack) {
         eventMap[key]?.eval(playerEvent, itemStack, eventData)
@@ -74,26 +77,27 @@ class Item(
 
     fun build(player: Player?, itemStream: ItemStream): ItemStream {
         val pre = if (itemStream is ItemStreamGenerated) {
-            ItemBuildEvent.Pre(player, itemStream, itemStream.name, itemStream.lore).call()
+            Events.call(ItemBuildEvent.Pre(player, itemStream, itemStream.name, itemStream.lore))
         } else {
-            ItemBuildEvent.Pre(player, itemStream, name.toMutableMap(), lore.toMutableMap()).call()
+            Events.call(ItemBuildEvent.Pre(player, itemStream, name.toMutableMap(), lore.toMutableMap()))
         }
         if (pre.isCancelled) {
             return itemStream
         }
-        updateData(itemStream.getZaphkielData(), data)
+        dataCache.forEach { k, v -> itemStream.getZaphkielData().putDeep(k, v) }
         pre.itemStream.compound["zaphkiel"]!!.asCompound()[ItemKey.HASH.key] = NBTBase(hash)
-        return ItemBuildEvent.Post(player, pre.itemStream, pre.name, pre.lore).call().itemStream
+        return Events.call(ItemBuildEvent.Post(player, pre.itemStream, pre.name, pre.lore)).itemStream
     }
 
-    private fun updateData(compound: NBTCompound, section: ConfigurationSection, path: String = "") {
+    private fun refreshData(map: MutableMap<String, NBTBase?>, section: ConfigurationSection, path: String = ""): MutableMap<String, NBTBase?> {
         section.getKeys(false).forEach { key ->
             if (key.endsWith("!!")) {
-                compound.putDeep(path + key.substring(0, key.length - 2), Translator.toNBTBase(config.get("data.$path$key")))
+                map[path + key.substring(0, key.length - 2)] = Translator.toNBTBase(config.get("data.$path$key"))
             } else if (section.isConfigurationSection(key)) {
-                updateData(compound, section.getConfigurationSection(key)!!, "$path$key.")
+                refreshData(map, section.getConfigurationSection(key)!!, "$path$key.")
             }
         }
+        return map
     }
 
     override fun equals(other: Any?): Boolean {
