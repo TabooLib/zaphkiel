@@ -1,6 +1,7 @@
 package ink.ptms.zaphkiel.api.event.single
 
 import com.google.common.collect.Maps
+import ink.ptms.zaphkiel.Zaphkiel
 import io.izzel.taboolib.util.Ref
 import org.bukkit.plugin.Plugin
 
@@ -22,7 +23,15 @@ object Events {
     }
 
     fun <T> listen(event: Class<out T>, priority: Int, listener: (T) -> (Unit)) {
-        Events.listener.computeIfAbsent(Ref.getCallerPlugin().name) { ArrayList() }.run {
+        listen(Zaphkiel.getPlugin(), event, priority, listener)
+    }
+
+    fun <T> listen(plugin: Plugin, event: Class<out T>, listener: (T) -> Unit) {
+        listen(plugin, event, 0, listener)
+    }
+
+    fun <T> listen(plugin: Plugin, event: Class<out T>, priority: Int, listener: (T) -> (Unit)) {
+        Events.listener.computeIfAbsent(plugin.name) { ArrayList() }.run {
             this.add(SingeListener(priority, event) { listener.invoke(it as T) })
             this.sortBy { it.priority }
         }
