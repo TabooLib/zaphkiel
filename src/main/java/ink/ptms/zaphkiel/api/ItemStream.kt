@@ -95,6 +95,13 @@ open class ItemStream(
         return zaphkielCompound()!![ItemKey.DATA.key]!!.asCompound()
     }
 
+    fun getZaphkielUniqueData(): NBTCompound? {
+        if (isVanilla()) {
+            throw RuntimeException("This item is not extension item.")
+        }
+        return zaphkielCompound()!![ItemKey.UNIQUE.key]?.asCompound()
+    }
+
     fun shouldRefresh(): Boolean {
         if (isVanilla()) {
             throw RuntimeException("This item is not extension item.")
