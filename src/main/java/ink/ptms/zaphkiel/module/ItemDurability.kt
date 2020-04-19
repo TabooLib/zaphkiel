@@ -26,7 +26,7 @@ private class ItemDurability : Listener {
     var durabilitySymbol: List<String>? = null
 
     init {
-        Events.listen(ItemBuildEvent.Pre::class.java, 1) { e ->
+        Events.listen(ItemReleaseEvent.Display::class.java, 1) { e ->
             val max = e.itemStream.getZaphkielData()["durability"] ?: return@listen
             val current = e.itemStream.getZaphkielData()["durability_current"] ?: NBTBase(max.asInt())
             e.name["DURABILITY"] = toDisplay(current.asInt(), max.asInt())
