@@ -19,6 +19,7 @@ import org.bukkit.event.player.PlayerEvent
 import org.bukkit.inventory.ItemStack
 import org.bukkit.util.NumberConversions
 import java.util.*
+import kotlin.collections.HashMap
 
 /**
  * @Author sky
@@ -30,12 +31,12 @@ class Item(
         val display: String = config.getString("display") ?: "null",
         val icon: ItemStack = parseIcon(config),
         val iconLocked: Boolean = config.contains("icon!!"),
-        val name: Map<String, String> = parseName(config),
+        val name: MutableMap<String, String> = parseName(config),
         val nameLocked: Boolean = config.contains("name!!"),
-        val lore: Map<String, List<String>> = parseLore(config),
+        val lore: MutableMap<String, MutableList<String>> = parseLore(config),
         val loreLocked: Boolean = config.contains("lore!!"),
         val data: ConfigurationSection = config.getConfigurationSection("data") ?: config.createSection("data"),
-        val model: List<String> = config.getString("event.from")?.split(",")?.map { it.trim() } ?: emptyList()) {
+        val model: MutableList<String> = config.getString("event.from")?.split(",")?.map { it.trim() }?.toMutableList() ?: ArrayList()) {
 
     val meta = MetaBuilder.getBuilders(this)
     val eventData: Map<String, Any> = config.getConfigurationSection("event.data")?.getValues(false) ?: emptyMap()
@@ -84,7 +85,7 @@ class Item(
         if (pre.isCancelled) {
             return itemStream
         }
-        dataCache.forEach { k, v -> itemStream.getZaphkielData().putDeep(k, v) }
+        dataCache.forEach { (k, v) -> itemStream.getZaphkielData().putDeep(k, v) }
         pre.itemStream.compound["zaphkiel"]!!.asCompound()[ItemKey.HASH.key] = NBTBase(hash)
         return Events.call(ItemBuildEvent.Post(player, pre.itemStream, pre.name, pre.lore)).itemStream
     }
@@ -146,33 +147,33 @@ class Item(
             return ItemStack(Items.asMaterial(args[0]), 1, NumberConversions.toShort(args.getOrElse(1) { "0" }))
         }
 
-        fun parseName(config: ConfigurationSection): Map<String, String> {
+        fun parseName(config: ConfigurationSection): MutableMap<String, String> {
             val map = HashMap<String, String>()
             val node = if (config.contains("name!!")) "name!!" else "name"
-            val name = config.getConfigurationSection(node) ?: return emptyMap()
+            val name = config.getConfigurationSection(node) ?: return HashMap()
             name.getKeys(false).forEach { key ->
                 map[key] = config.getString("$node.$key")!!
             }
             return map
         }
 
-        fun parseLore(config: ConfigurationSection): Map<String, List<String>> {
-            val map = HashMap<String, List<String>>()
+        fun parseLore(config: ConfigurationSection): MutableMap<String, MutableList<String>> {
+            val map = HashMap<String, MutableList<String>>()
             val node = if (config.contains("lore!!")) "lore!!" else "lore"
-            val lore = config.getConfigurationSection(node) ?: return emptyMap()
+            val lore = config.getConfigurationSection(node) ?: return HashMap()
             lore.getKeys(false).forEach { key ->
                 if (config.isList("$node.$key")) {
                     map[key] = config.getStringList("$node.$key")
                 } else {
-                    map[key] = listOf(config.getString("$node.$key")!!)
+                    map[key] = mutableListOf(config.getString("$node.$key")!!)
                 }
             }
             return map
         }
 
-        fun parseEvent(item: Item, config: ConfigurationSection): Map<String, ItemEvent> {
+        fun parseEvent(item: Item, config: ConfigurationSection): MutableMap<String, ItemEvent> {
             val map = HashMap<String, ItemEvent>()
-            val event = config.getConfigurationSection("event") ?: return emptyMap()
+            val event = config.getConfigurationSection("event") ?: return HashMap()
             event.getKeys(false).forEach { key ->
                 map[key] = ItemEvent(item, key, Scripts.compile(config.getString("event.$key")!!))
             }

@@ -15,7 +15,7 @@ class ItemBuildEvent {
      * 构建之前
      * 可被取消
      */
-    class Pre(val player: Player?, val itemStream: ItemStream, val name: MutableMap<String, String>, val lore: MutableMap<String, List<String>>) : EventCancellable<Pre>() {
+    class Pre(val player: Player?, val itemStream: ItemStream, val name: MutableMap<String, String>, val lore: MutableMap<String, MutableList<String>>) : EventCancellable<Pre>() {
 
         val item = itemStream.getZaphkielItem()
 
@@ -38,7 +38,7 @@ class ItemBuildEvent {
      * 不可取消
      * 名称、描述、数据已就绪
      */
-    class Post(val player: Player?, val itemStream: ItemStream, val name: Map<String, String>, val lore: Map<String, List<String>>) : EventNormal<Post>() {
+    class Post(val player: Player?, val itemStream: ItemStream, val name: Map<String, String>, val lore: Map<String, MutableList<String>>) : EventNormal<Post>() {
 
         val item = itemStream.getZaphkielItem()
     }

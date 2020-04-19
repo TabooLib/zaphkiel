@@ -8,7 +8,7 @@ import org.bukkit.inventory.ItemStack
  * @Author sky
  * @Since 2019-12-26 10:59
  */
-class ItemStreamGenerated(itemStack: ItemStack, val name: MutableMap<String, String>, val lore: MutableMap<String, List<String>>, compound: NBTCompound = NMS.handle().loadNBT(itemStack)) : ItemStream(itemStack, compound) {
+class ItemStreamGenerated(itemStack: ItemStack, val name: MutableMap<String, String>, val lore: MutableMap<String, MutableList<String>>, compound: NBTCompound = NMS.handle().loadNBT(itemStack)) : ItemStream(itemStack, compound) {
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
