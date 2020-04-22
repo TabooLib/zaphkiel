@@ -63,7 +63,7 @@ class DatabaseSQL : Database() {
 
     fun get(player: Player): FileConfiguration {
         val yaml = YamlConfiguration()
-        val data = table.select(Where.`is`("name", player.name)).to(dataSource).result { it.getString("data") }.run("", "")
+        val data = table.select(Where.`is`("name", player.name)).to(dataSource).resultNext { it.getString("data") }.run("", "")
         yaml.loadFromString(Base64.getDecoder().decode(data).toString(StandardCharsets.UTF_8))
         return yaml
     }
