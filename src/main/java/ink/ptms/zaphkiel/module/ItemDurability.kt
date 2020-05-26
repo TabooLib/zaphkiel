@@ -29,15 +29,17 @@ private class ItemDurability : Listener {
         Events.listen(ItemReleaseEvent.Display::class.java, 1) { e ->
             val max = e.itemStream.getZaphkielData()["durability"] ?: return@listen
             val current = e.itemStream.getZaphkielData()["durability_current"] ?: NBTBase(max.asInt())
-            e.name["DURABILITY"] = toDisplay(current.asInt(), max.asInt())
-            e.lore["DURABILITY"] = arrayListOf(toDisplay(current.asInt(), max.asInt()))
+            val display = toDisplay(current.asInt(), max.asInt())
+            e.addName("DURABILITY", display)
+            e.addLore("DURABILITY", display)
         }
         Events.listen(ItemReleaseEvent::class.java, 1) { e ->
-            val current = e.itemStream.getZaphkielData()["durability_current"] ?: return@listen
-            val dMax = e.itemStream.itemStack.type.maxDurability
-            val dPercent = current.asInt() / dMax.toDouble()
-            val dScaled = dMax - (dMax * dPercent)
-            e.data = dScaled.toInt()
+            val dMax = e.itemStream.getZaphkielData()["durability"] ?: return@listen
+            val dCurrent = e.itemStream.getZaphkielData()["durability_current"] ?: return@listen
+            val dPercent = dCurrent.asDouble() / dMax.asDouble()
+            val iMax = e.itemStream.itemStack.type.maxDurability
+            val iScaled = iMax - (iMax * dPercent)
+            e.data = iScaled.toInt()
         }
     }
 
@@ -55,11 +57,10 @@ private class ItemDurability : Listener {
         durabilitySymbol = Lists.newArrayList<String>(Zaphkiel.CONF.getString("Durability.display-symbol.0"), Zaphkiel.CONF.getString("Durability.display-symbol.1"))
     }
 
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     fun e(e: PlayerItemDamageEvent) {
         val itemStream = ItemStream(e.item)
         if (itemStream.isExtension() && itemStream.getZaphkielData().containsKey("durability")) {
-            Bukkit.getScheduler().runTask(Zaphkiel.getPlugin(), Runnable { e.player.updateInventory() })
             e.isCancelled = true
         }
     }

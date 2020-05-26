@@ -94,10 +94,12 @@ open class ItemAPI(val item: Item, val itemStack: ItemStack, val player: Player)
         } else {
             val itemStackFinal = itemStack.clone()
             Bukkit.getPluginManager().callEvent(PlayerItemBreakEvent(player, itemStack))
-            Bukkit.getScheduler().runTaskAsynchronously(Zaphkiel.getPlugin(), Runnable {
-                player.world.playSound(player.location, Sound.ENTITY_ITEM_BREAK, 1f, Numbers.getRandomDouble(0.5, 1.5).toFloat())
+            Bukkit.getScheduler().runTaskLaterAsynchronously(Zaphkiel.getPlugin(), Runnable {
+                if (itemStackFinal.type.maxDurability > 0) {
+                    player.playSound(player.location, Sound.ENTITY_ITEM_BREAK, 1f, Numbers.getRandomDouble(0.5, 1.5).toFloat())
+                }
                 Effects.create(Particle.ITEM_CRACK, player.location.add(0.0, 1.0, 0.0)).speed(0.1).data(itemStackFinal).count(15).range(50.0).play()
-            })
+            }, 1)
             itemStack.amount = 0
             false
         }
