@@ -28,7 +28,7 @@ public class Zaphkiel extends Plugin {
         if (!ZaphkielAPI.INSTANCE.getFolderDisplay().exists()) {
             getPlugin().saveResource("display/def.yml", true);
         }
-        ZaphkielAPI.INSTANCE.reloadItem();
         ZaphkielAPI.INSTANCE.reloadDisplay();
+        ZaphkielAPI.INSTANCE.reloadItem();
     }
 }

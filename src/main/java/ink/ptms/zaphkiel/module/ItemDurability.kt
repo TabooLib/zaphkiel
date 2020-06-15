@@ -29,9 +29,15 @@ private class ItemDurability : Listener {
         Events.listen(ItemReleaseEvent.Display::class.java, 1) { e ->
             val max = e.itemStream.getZaphkielData()["durability"] ?: return@listen
             val current = e.itemStream.getZaphkielData()["durability_current"] ?: NBTBase(max.asInt())
-            val display = toDisplay(current.asInt(), max.asInt())
-            e.addName("DURABILITY", display)
-            e.addLore("DURABILITY", display)
+            val displayInfo = e.itemStream.getZaphkielItem().config.getString("meta.durability_display.${current.asInt()}")
+            if (displayInfo != null) {
+                e.addName("DURABILITY", displayInfo)
+                e.addLore("DURABILITY", displayInfo)
+            } else {
+                val display = toDisplay(current.asInt(), max.asInt())
+                e.addName("DURABILITY", display)
+                e.addLore("DURABILITY", display)
+            }
         }
         Events.listen(ItemReleaseEvent::class.java, 1) { e ->
             val dMax = e.itemStream.getZaphkielData()["durability"] ?: return@listen

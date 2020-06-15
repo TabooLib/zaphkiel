@@ -59,6 +59,11 @@ class Item(
 
     val hash = YamlConfiguration().run {
         this.set("value", config)
+        val display = ZaphkielAPI.registeredDisplay[display]
+        if (display != null) {
+            this.set("display.name", display.name)
+            this.set("display.lore", display.lore)
+        }
         Strings.hashKeyForDisk(this.saveToString())
     }!!
 
