@@ -1,14 +1,11 @@
 package ink.ptms.zaphkiel.api.data
 
 import ink.ptms.zaphkiel.Zaphkiel
-import ink.ptms.zaphkiel.ZaphkielAPI
 import io.izzel.taboolib.module.db.source.DBSource
-import io.izzel.taboolib.module.db.sql.SQLColumn
 import io.izzel.taboolib.module.db.sql.SQLHost
 import io.izzel.taboolib.module.db.sql.SQLTable
 import io.izzel.taboolib.module.db.sql.query.Where
 import io.izzel.taboolib.module.inject.PlayerContainer
-import org.bukkit.Bukkit
 import org.bukkit.configuration.file.FileConfiguration
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
@@ -24,8 +21,8 @@ import javax.sql.DataSource
  */
 class DatabaseSQL : Database() {
 
-    val host = SQLHost(Zaphkiel.CONF.getConfigurationSection("Database"), Zaphkiel.getPlugin(), true)
-    val table = SQLTable(Zaphkiel.CONF.getString("Database.table")).column("\$primary_key_id", "text:name", "text:data")!!
+    val host = SQLHost(Zaphkiel.conf.getConfigurationSection("Database"), Zaphkiel.getPlugin(), true)
+    val table = SQLTable(Zaphkiel.conf.getString("Database.table")).column("\$primary_key_id", "text:name", "text:data")!!
     val dataSource: DataSource = DBSource.create(host)
 
     init {

@@ -48,7 +48,7 @@ class Item(
                 if (model != null) {
                     map.putAll(parseEvent(this, model.config))
                 } else {
-                    Zaphkiel.LOGS.error("Model ${this.model} not found.")
+                    Zaphkiel.logger.error("Model ${this.model} not found.")
                 }
             }
         } else {

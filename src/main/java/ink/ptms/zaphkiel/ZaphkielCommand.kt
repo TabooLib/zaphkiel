@@ -1,6 +1,5 @@
 package ink.ptms.zaphkiel
 
-import ink.ptms.zaphkiel.api.Display
 import ink.ptms.zaphkiel.api.ItemStream
 import ink.ptms.zaphkiel.api.internal.ItemList
 import io.izzel.taboolib.cronus.CronusUtils
@@ -111,7 +110,7 @@ class ZaphkielCommand : BaseMainCommand() {
         override fun getDescription(): String = "重载插件"
 
         override fun onCommand(sender: CommandSender, command: Command?, label: String, args: Array<String>) {
-            Zaphkiel.CONF.reload()
+            Zaphkiel.conf.reload()
             Zaphkiel.reload()
             notify(sender, "插件已重载.")
         }

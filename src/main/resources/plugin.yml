@@ -1,6 +1,13 @@
-name: Zaphkiel
-main: ink.ptms.zaphkiel.Zaphkiel
-author: 坏黑
-api-version: 1.13
 
+
+#         Powered by TabooLib 5.0         #
+
+
+name: ${name}
+main: ${main}
 version: ${version}
+authors:
+  - Bkm016
+
+lib-version: ${libVersion}
+api-version: 1.13

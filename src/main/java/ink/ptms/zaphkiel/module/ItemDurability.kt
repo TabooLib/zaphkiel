@@ -3,13 +3,11 @@ package ink.ptms.zaphkiel.module
 import com.google.common.collect.Lists
 import ink.ptms.zaphkiel.Zaphkiel
 import ink.ptms.zaphkiel.api.ItemStream
-import ink.ptms.zaphkiel.api.event.single.ItemBuildEvent
 import ink.ptms.zaphkiel.api.event.single.ItemReleaseEvent
 import ink.ptms.zaphkiel.api.event.PluginReloadEvent
 import ink.ptms.zaphkiel.api.event.single.Events
 import io.izzel.taboolib.module.inject.TListener
 import io.izzel.taboolib.module.nms.nbt.NBTBase
-import org.bukkit.Bukkit
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
@@ -59,8 +57,8 @@ private class ItemDurability : Listener {
 
     @EventHandler
     fun e(e: PluginReloadEvent.Item) {
-        durability = Zaphkiel.CONF.getString("Durability.display")
-        durabilitySymbol = Lists.newArrayList<String>(Zaphkiel.CONF.getString("Durability.display-symbol.0"), Zaphkiel.CONF.getString("Durability.display-symbol.1"))
+        durability = Zaphkiel.conf.getString("Durability.display")
+        durabilitySymbol = Lists.newArrayList<String>(Zaphkiel.conf.getString("Durability.display-symbol.0"), Zaphkiel.conf.getString("Durability.display-symbol.1"))
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)

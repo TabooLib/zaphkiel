@@ -24,7 +24,6 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.potion.PotionEffectType
 import org.bukkit.util.io.BukkitObjectInputStream
 import org.bukkit.util.io.BukkitObjectOutputStream
-import java.awt.Event
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -40,13 +39,13 @@ object ZaphkielAPI {
 
     val events = Events
     val loaded = ArrayList<File>()
-    val folderItem = File(Zaphkiel.getPlugin().dataFolder, "item")
-    val folderDisplay = File(Zaphkiel.getPlugin().dataFolder, "display")
+    val folderItem = File(Zaphkiel.plugin.dataFolder, "item")
+    val folderDisplay = File(Zaphkiel.plugin.dataFolder, "display")
     val registeredItem = Maps.newHashMap<String, Item>()!!
     val registeredModel = Maps.newHashMap<String, Model>()!!
     val registeredDisplay = Maps.newHashMap<String, Display>()!!
     val database by lazy {
-        if (Zaphkiel.CONF.contains("Database.host")) {
+        if (Zaphkiel.conf.contains("Database.host")) {
             try {
                 return@lazy DatabaseSQL()
             } catch (t: Throwable) {
@@ -69,7 +68,7 @@ object ZaphkielAPI {
         return if (read.isExtension()) {
             read.getZaphkielName()
         } else {
-            null;
+            null
         }
     }
 
@@ -78,7 +77,7 @@ object ZaphkielAPI {
         return if (read.isExtension()) {
             read.getZaphkielData()
         } else {
-            null;
+            null
         }
     }
 
@@ -87,7 +86,7 @@ object ZaphkielAPI {
         return if (read.isExtension()) {
             read.getZaphkielData().getDeep("zaphkiel.${ItemKey.UNIQUE.key}").asCompound()
         } else {
-            null;
+            null
         }
     }
 
@@ -96,13 +95,13 @@ object ZaphkielAPI {
         return if (read.isExtension()) {
             read.getZaphkielItem()
         } else {
-            null;
+            null
         }
     }
 
     fun read(item: ItemStack): ItemStream {
         if (Items.isNull(item)) {
-            throw RuntimeException("Could not read empty item.");
+            throw RuntimeException("Could not read empty item.")
         }
         return ItemStream(item)
     }
@@ -122,7 +121,7 @@ object ZaphkielAPI {
 
     fun rebuild(player: Player?, item: ItemStack): ItemStream {
         if (Items.isNull(item)) {
-            throw RuntimeException("Could not read empty item.");
+            throw RuntimeException("Could not read empty item.")
         }
         val itemStream = ItemStream(item)
         if (itemStream.isVanilla()) {
@@ -142,7 +141,7 @@ object ZaphkielAPI {
         reloadModel(folderItem)
         reloadItem(folderItem)
         PluginReloadEvent.Item().call()
-        Zaphkiel.LOGS.info("Loaded ${registeredItem.size} item(s) and ${registeredModel.size} model(s).")
+        Zaphkiel.logger.info("Loaded ${registeredItem.size} item(s) and ${registeredModel.size} model(s).")
     }
 
     fun reloadItem(file: File) {
@@ -191,7 +190,7 @@ object ZaphkielAPI {
         registeredDisplay.clear()
         reloadDisplay(folderDisplay)
         PluginReloadEvent.Display().call()
-        Zaphkiel.LOGS.info("Loaded ${registeredDisplay.size} display plan(s).")
+        Zaphkiel.logger.info("Loaded ${registeredDisplay.size} display plan(s).")
     }
 
     fun reloadDisplay(file: File) {

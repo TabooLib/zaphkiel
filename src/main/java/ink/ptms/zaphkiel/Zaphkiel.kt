@@ -1,34 +1,38 @@
-package ink.ptms.zaphkiel;
+package ink.ptms.zaphkiel
 
-import io.izzel.taboolib.loader.Plugin;
-import io.izzel.taboolib.module.config.TConfig;
-import io.izzel.taboolib.module.inject.TInject;
-import io.izzel.taboolib.module.inject.TSchedule;
-import io.izzel.taboolib.module.locale.logger.TLogger;
-
-import java.io.File;
+import ink.ptms.zaphkiel.ZaphkielAPI.folderDisplay
+import ink.ptms.zaphkiel.ZaphkielAPI.folderItem
+import ink.ptms.zaphkiel.ZaphkielAPI.reloadDisplay
+import ink.ptms.zaphkiel.ZaphkielAPI.reloadItem
+import io.izzel.taboolib.loader.Plugin
+import io.izzel.taboolib.module.config.TConfig
+import io.izzel.taboolib.module.inject.TInject
+import io.izzel.taboolib.module.inject.TSchedule
+import io.izzel.taboolib.module.locale.logger.TLogger
 
 /**
  * @Author sky
  * @Since 2019-12-15 20:09
  */
-@Plugin.Version(5.17)
-public class Zaphkiel extends Plugin {
+object Zaphkiel : Plugin() {
 
     @TInject
-    public static final TLogger LOGS = null;
+    lateinit var conf: TConfig
+        private set
+
     @TInject
-    public static final TConfig CONF = null;
+    lateinit var logger: TLogger
+        private set
 
     @TSchedule(delay = 20)
-    public static void reload() {
-        if (!ZaphkielAPI.INSTANCE.getFolderItem().exists()) {
-            getPlugin().saveResource("item/def.yml", true);
+    fun reload() {
+        if (!folderItem.exists()) {
+            plugin.saveResource("item/def.yml", true)
         }
-        if (!ZaphkielAPI.INSTANCE.getFolderDisplay().exists()) {
-            getPlugin().saveResource("display/def.yml", true);
+        if (!folderDisplay.exists()) {
+            plugin.saveResource("display/def.yml", true)
         }
-        ZaphkielAPI.INSTANCE.reloadDisplay();
-        ZaphkielAPI.INSTANCE.reloadItem();
+        reloadDisplay()
+        reloadItem()
     }
 }

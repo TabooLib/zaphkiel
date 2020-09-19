@@ -26,7 +26,7 @@ class ItemInternet : Listener {
 
     fun reloadItem() {
         val folder = File(ZaphkielAPI.folderItem, "__cache__")
-        val files = Zaphkiel.CONF.getStringList("InternetItem.item").map { host ->
+        val files = Zaphkiel.conf.getStringList("InternetItem.item").map { host ->
             Files.toFile(Files.readFromURL(host, StandardCharsets.UTF_8).toString(), File(folder, Strings.hashKeyForDisk(host)))
         }
         files.forEach { ZaphkielAPI.reloadModel(it) }
@@ -35,7 +35,7 @@ class ItemInternet : Listener {
 
     fun reloadDisplay() {
         val folder = File(ZaphkielAPI.folderDisplay, "__cache__")
-        Zaphkiel.CONF.getStringList("InternetItem.display").forEach { host ->
+        Zaphkiel.conf.getStringList("InternetItem.display").forEach { host ->
             ZaphkielAPI.reloadDisplay(Files.toFile(Files.readFromURL(host, StandardCharsets.UTF_8).toString(), File(folder, Strings.hashKeyForDisk(host))))
         }
     }
@@ -48,11 +48,11 @@ class ItemInternet : Listener {
             val countDisplay = ZaphkielAPI.registeredDisplay.size
             reloadItem()
             if (countItem < ZaphkielAPI.registeredItem.size || countModel > ZaphkielAPI.registeredModel.size) {
-                Zaphkiel.LOGS.info("Loaded ${ZaphkielAPI.registeredItem.size - countItem} item(s) and ${ZaphkielAPI.registeredModel.size - countModel} model(s). §6[Internet]")
+                Zaphkiel.logger.info("Loaded ${ZaphkielAPI.registeredItem.size - countItem} item(s) and ${ZaphkielAPI.registeredModel.size - countModel} model(s). §6[Internet]")
             }
             reloadDisplay()
             if (countDisplay < ZaphkielAPI.registeredDisplay.size) {
-                Zaphkiel.LOGS.info("Loaded ${ZaphkielAPI.registeredDisplay.size - countDisplay} display plan(s). §6[Internet]")
+                Zaphkiel.logger.info("Loaded ${ZaphkielAPI.registeredDisplay.size - countDisplay} display plan(s). §6[Internet]")
             }
         })
     }
