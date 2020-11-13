@@ -25,7 +25,7 @@ class ZaphkielCommand : BaseMainCommand() {
 
         override fun getDescription(): String = "赋予物品"
 
-        override fun onCommand(sender: CommandSender, command: Command?, label: String, args: Array<String>) {
+        override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<String>) {
             val item = ZaphkielAPI.registeredItem[args[0]]
             if (item == null) {
                 notify(sender, "物品 \"&f${args[0]}&7\" 不存在.")
@@ -55,7 +55,7 @@ class ZaphkielCommand : BaseMainCommand() {
 
         override fun getDescription(): String = "测试耗能"
 
-        override fun onCommand(sender: CommandSender, command: Command?, label: String, args: Array<String>) {
+        override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<String>) {
             val item = ZaphkielAPI.registeredItem[args[0]]
             if (item == null) {
                 notify(sender, "物品 \"&f${args[0]}&7\" 不存在.")
@@ -94,7 +94,7 @@ class ZaphkielCommand : BaseMainCommand() {
 
         override fun getDescription(): String = "列出物品"
 
-        override fun onCommand(sender: CommandSender, command: Command?, label: String, args: Array<String>) {
+        override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<String>) {
             val player = sender as Player
             if (args.isEmpty()) {
                 ItemList.open(player, 0)
@@ -109,7 +109,7 @@ class ZaphkielCommand : BaseMainCommand() {
 
         override fun getDescription(): String = "重载插件"
 
-        override fun onCommand(sender: CommandSender, command: Command?, label: String, args: Array<String>) {
+        override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<String>) {
             Zaphkiel.conf.reload()
             Zaphkiel.reload()
             notify(sender, "插件已重载.")

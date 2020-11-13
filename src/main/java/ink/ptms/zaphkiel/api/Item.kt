@@ -12,6 +12,7 @@ import io.izzel.taboolib.module.nms.nbt.NBTCompound
 import io.izzel.taboolib.util.Strings
 import io.izzel.taboolib.util.item.Items
 import io.izzel.taboolib.util.lite.Scripts
+import org.bukkit.Material
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
@@ -36,7 +37,8 @@ class Item(
         val lore: MutableMap<String, MutableList<String>> = parseLore(config),
         val loreLocked: Boolean = config.contains("lore!!"),
         val data: ConfigurationSection = config.getConfigurationSection("data") ?: config.createSection("data"),
-        val model: MutableList<String> = config.getString("event.from")?.split(",")?.map { it.trim() }?.toMutableList() ?: ArrayList()) {
+        val model: MutableList<String> = config.getString("event.from")?.split(",")?.map { it.trim() }?.toMutableList() ?: ArrayList(),
+        val group: Group? = null) {
 
     val meta = MetaBuilder.getBuilders(this)
     val eventData: Map<String, Any> = config.getConfigurationSection("event.data")?.getValues(false) ?: emptyMap()
@@ -149,7 +151,7 @@ class Item(
         fun parseIcon(config: ConfigurationSection): ItemStack {
             val node = if (config.contains("icon!!")) "icon!!" else "icon"
             val args = config.getString(node, "STONE")!!.split("~")
-            return ItemStack(Items.asMaterial(args[0]), 1, NumberConversions.toShort(args.getOrElse(1) { "0" }))
+            return ItemStack(Items.asMaterial(args[0]) ?: Material.STONE, 1, NumberConversions.toShort(args.getOrElse(1) { "0" }))
         }
 
         fun parseName(config: ConfigurationSection): MutableMap<String, String> {

@@ -31,7 +31,7 @@ private class ItemBuilder : Listener {
                 if (display != null) {
                     val event = Events.call(ItemReleaseEvent.Display(e.itemStream, e.itemStream.name, e.itemStream.lore))
                     val product = display.toProductTrim(event.name, event.lore)
-                    e.itemMeta.setDisplayName(TLocale.Translate.setColored(product.name))
+                    e.itemMeta.setDisplayName(TLocale.Translate.setColored(product.name ?: ""))
                     e.itemMeta.lore = TLocale.Translate.setColored(product.lore)
                 } else {
                     e.itemMeta.setDisplayName("§c${e.item.id}")
@@ -48,7 +48,7 @@ private class ItemBuilder : Listener {
                         val event = Events.call(ItemReleaseEvent.Display(e.itemStream, e.item.name.toMutableMap(), e.item.lore.toMutableMap()))
                         val product = display.toProductTrim(event.name, event.lore)
                         if (e.item.nameLocked) {
-                            e.itemMeta.setDisplayName(TLocale.Translate.setColored(product.name))
+                            e.itemMeta.setDisplayName(TLocale.Translate.setColored(product.name ?: ""))
                         }
                         if (e.item.loreLocked) {
                             e.itemMeta.lore = TLocale.Translate.setColored(product.lore)

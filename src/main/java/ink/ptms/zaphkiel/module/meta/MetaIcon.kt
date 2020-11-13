@@ -3,11 +3,12 @@ package ink.ptms.zaphkiel.module.meta
 import ink.ptms.zaphkiel.api.Item
 import ink.ptms.zaphkiel.api.event.single.ItemReleaseEvent
 import io.izzel.taboolib.util.item.Items
+import org.bukkit.Material
 
 @MetaKey("icon")
 class MetaIcon(item: Item) : Meta(item) {
 
-    val icon = Items.asMaterial(item.config.getString("meta.icon"))
+    val icon = Items.asMaterial(item.config.getString("meta.icon")) ?: Material.STONE
 
     override fun build(itemReleaseEvent: ItemReleaseEvent) {
         itemReleaseEvent.icon = icon

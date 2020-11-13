@@ -1,10 +1,7 @@
 package ink.ptms.zaphkiel
 
 import com.google.common.collect.Maps
-import ink.ptms.zaphkiel.api.Item
-import ink.ptms.zaphkiel.api.Display
-import ink.ptms.zaphkiel.api.ItemStream
-import ink.ptms.zaphkiel.api.Model
+import ink.ptms.zaphkiel.api.*
 import ink.ptms.zaphkiel.api.data.DatabaseSQL
 import ink.ptms.zaphkiel.api.data.DatabaseYML
 import ink.ptms.zaphkiel.api.event.single.ItemBuildEvent
@@ -44,6 +41,7 @@ object ZaphkielAPI {
     val registeredItem = Maps.newHashMap<String, Item>()!!
     val registeredModel = Maps.newHashMap<String, Model>()!!
     val registeredDisplay = Maps.newHashMap<String, Display>()!!
+    val registeredGroup = Maps.newHashMap<String, Group>()!!
     val database by lazy {
         if (Zaphkiel.conf.contains("Database.host")) {
             try {
@@ -151,10 +149,16 @@ object ZaphkielAPI {
             val keys = ArrayList<String>()
             val task = Runnable {
                 keys.forEach { registeredItem.remove(it) }
+                var group: Group? = null
                 val conf = Files.load(file)
-                conf.getKeys(false).filter { !it.endsWith("$") }.forEach { key ->
+                if (conf.contains("__group__")) {
+                    val name = file.name.substring(0, file.name.indexOf("."))
+                    group = Group(name, file, conf.getConfigurationSection("__group__")!!)
+                    registeredGroup[name] = group
+                }
+                conf.getKeys(false).filter { !it.endsWith("$") && it != "__group__" }.forEach { key ->
                     try {
-                        registeredItem[key] = Item(conf.getConfigurationSection(key)!!)
+                        registeredItem[key] = Item(conf.getConfigurationSection(key)!!, group = group)
                     } catch (t: Throwable) {
                         t.printStackTrace()
                     }
@@ -168,7 +172,7 @@ object ZaphkielAPI {
                 TConfigWatcher.getInst().addSimpleListener(file) {
                     task.run()
                     Bukkit.getOnlinePlayers().forEach { player ->
-                        ZaphkielAPI.rebuild(player, player.inventory)
+                        rebuild(player, player.inventory)
                     }
                 }
             }
