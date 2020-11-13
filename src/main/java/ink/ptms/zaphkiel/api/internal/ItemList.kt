@@ -30,8 +30,8 @@ object ItemList {
 
     fun open(player: Player, page: Int) {
         val objectsMap = HashMap<Int, Group>()
-        val itemsAll = ZaphkielAPI.registeredItem.values.groupBy { it.group ?: Group.NO_GROUP }.toSortedMap(Comparator { a, b -> a.priority.compareTo(b.priority) })
-        val items = Indexed.subMap(itemsAll, page * 28, (page + 1) * 28 - 1)
+        val itemsAll = ZaphkielAPI.registeredItem.values.groupBy { it.group ?: Group.NO_GROUP }.toList().sortedByDescending { it.first.priority }
+        val items = Indexed.subList(itemsAll, page * 28, (page + 1) * 28 - 1)
         MenuBuilder.builder()
                 .title("Zaphkiel Items - ${page + 1}")
                 .rows(6)
@@ -49,8 +49,8 @@ object ItemList {
                 }
                 .build { inventory ->
                     items.forEachIndexed { index, item ->
-                        objectsMap[Items.INVENTORY_CENTER[index]] = item.key
-                        inventory.setItem(Items.INVENTORY_CENTER[index], ItemBuilder(item.key.display)
+                        objectsMap[Items.INVENTORY_CENTER[index]] = item.first
+                        inventory.setItem(Items.INVENTORY_CENTER[index], ItemBuilder(item.first.display)
                                 .flags(ItemFlag.HIDE_ATTRIBUTES)
                                 .build())
                     }
@@ -70,7 +70,7 @@ object ItemList {
 
     fun open(player: Player, group: Group, page: Int) {
         val objectsMap = HashMap<Int, Item>()
-        val itemsAll = ZaphkielAPI.registeredItem.values.filter { it.group == group }.sortedBy { it.icon.type.name }
+        val itemsAll = ZaphkielAPI.registeredItem.values.filter { (it.group ?: Group.NO_GROUP) == group }.sortedBy { it.icon.type.name }
         val items = Indexed.subList(itemsAll, page * 28, (page + 1) * 28 - 1)
         MenuBuilder.builder()
                 .title("Zaphkiel Items - ${page + 1} (${group.name})")
