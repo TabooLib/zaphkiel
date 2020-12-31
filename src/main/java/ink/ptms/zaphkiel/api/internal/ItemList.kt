@@ -38,7 +38,7 @@ object ItemList {
                 .event { e ->
                     e.isCancelled = true
                     if (e.clickType == ClickType.CLICK) {
-                        if (e.rawSlot == 47 && e.currentItem!!.type == Material.SPECTRAL_ARROW) {
+                         if (e.rawSlot == 47 && e.currentItem!!.type == Material.SPECTRAL_ARROW) {
                             open(player, page - 1)
                         } else if (e.rawSlot == 51 && e.currentItem!!.type == Material.SPECTRAL_ARROW) {
                             open(player, page + 1)
