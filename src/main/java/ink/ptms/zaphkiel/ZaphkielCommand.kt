@@ -2,8 +2,11 @@ package ink.ptms.zaphkiel
 
 import ink.ptms.zaphkiel.api.ItemStream
 import ink.ptms.zaphkiel.api.internal.ItemList
+import ink.ptms.zaphkiel.mirror.Mirror
 import io.izzel.taboolib.cronus.CronusUtils
+import io.izzel.taboolib.kotlin.Tasks
 import io.izzel.taboolib.module.command.base.*
+import io.izzel.taboolib.module.locale.TLocale
 import org.bukkit.Bukkit
 import org.bukkit.Sound
 import org.bukkit.command.Command
@@ -48,43 +51,6 @@ class ZaphkielCommand : BaseMainCommand() {
         }
     }
 
-    @SubCommand(priority = 0.01)
-    val test = object : BaseSubCommand() {
-
-        override fun getArguments(): Array<Argument> = arrayOf(Argument("节点") { ZaphkielAPI.registeredItem.keys.toList() })
-
-        override fun getDescription(): String = "测试耗能"
-
-        override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<String>) {
-            val item = ZaphkielAPI.registeredItem[args[0]]
-            if (item == null) {
-                notify(sender, "物品 \"&f${args[0]}&7\" 不存在.")
-                return
-            }
-            val build = ItemStream(item.build(null).save())
-            val time1 = System.currentTimeMillis()
-            for (i in 0..10000) {
-                item.build(null)
-            }
-            notify(sender, "构建 10000 次耗能 ${System.currentTimeMillis() - time1}ms")
-            val time2 = System.currentTimeMillis()
-            for (i in 0..10000) {
-                item.build(null).save()
-            }
-            notify(sender, "构建+写入 10000 次耗能 ${System.currentTimeMillis() - time2}ms")
-            val time3 = System.currentTimeMillis()
-            for (i in 0..10000) {
-                item.build(null, build)
-            }
-            notify(sender, "重构 10000 次耗能 ${System.currentTimeMillis() - time3}ms")
-            val time4 = System.currentTimeMillis()
-            for (i in 0..10000) {
-                item.build(null, build).save()
-            }
-            notify(sender, "重构+写入 10000 次耗能 ${System.currentTimeMillis() - time4}ms")
-        }
-    }
-
     @SubCommand(priority = 0.1)
     val list = object : BaseSubCommand() {
 
@@ -104,6 +70,23 @@ class ZaphkielCommand : BaseMainCommand() {
         }
     }
 
+    @SubCommand(priority = 0.11)
+    val mirror = object : BaseSubCommand() {
+
+        override fun getDescription(): String = "性能监控"
+
+        override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<String>) {
+            notify(sender, "正在创建统计...")
+            notify(sender, "---")
+            Tasks.task(true) {
+                Mirror.collect().run {
+                    print(sender, getTotal(), 0)
+                }
+                notify(sender, "---")
+            }
+        }
+    }
+
     @SubCommand(priority = 0.2)
     val reload = object : BaseSubCommand() {
 
@@ -117,11 +100,9 @@ class ZaphkielCommand : BaseMainCommand() {
     }
 
     fun notify(sender: CommandSender, value: String) {
-        sender.sendMessage("§c[Zaphkiel] §7${value.replace("&", "§")}")
-    }
-
-    fun notify(player: Player, value: String) {
-        player.sendMessage("§c[Zaphkiel] §7${value.replace("&", "§")}")
-        player.playSound(player.location, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 2f)
+        sender.sendMessage("§c[Zaphkiel] §7${TLocale.Translate.setColored(value)}")
+        if (sender is Player) {
+            sender.playSound(sender.location, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 2f)
+        }
     }
 }

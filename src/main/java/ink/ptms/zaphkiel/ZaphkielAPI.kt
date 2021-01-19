@@ -8,6 +8,7 @@ import ink.ptms.zaphkiel.api.event.single.ItemBuildEvent
 import ink.ptms.zaphkiel.api.event.PluginReloadEvent
 import ink.ptms.zaphkiel.api.event.single.Events
 import ink.ptms.zaphkiel.api.internal.ItemKey
+import ink.ptms.zaphkiel.mirror.Mirror
 import io.izzel.taboolib.module.config.TConfigWatcher
 import io.izzel.taboolib.module.lite.SimpleReflection
 import io.izzel.taboolib.module.nms.nbt.NBTCompound
@@ -101,10 +102,14 @@ object ZaphkielAPI {
         if (Items.isNull(item)) {
             throw RuntimeException("Could not read empty item.")
         }
-        return ItemStream(item)
+        Mirror.define("ZaphkielAPI:read")
+        return ItemStream(item).also {
+            Mirror.define("ZaphkielAPI:read")
+        }
     }
 
     fun rebuild(player: Player?, inventory: Inventory) {
+        Mirror.define("ZaphkielAPI:rebuild:inventory")
         for (i in 0 until inventory.size) {
             val item = inventory.getItem(i)
             if (Items.isNull(item)) {
@@ -115,6 +120,7 @@ object ZaphkielAPI {
                 rebuild.save()
             }
         }
+        Mirror.finish("ZaphkielAPI:rebuild:inventory")
     }
 
     fun rebuild(player: Player?, item: ItemStack): ItemStream {
@@ -125,11 +131,14 @@ object ZaphkielAPI {
         if (itemStream.isVanilla()) {
             return itemStream
         }
+        Mirror.define("ZaphkielAPI:rebuild:item")
         val pre = Events.call(ItemBuildEvent.Rebuild(player, itemStream, itemStream.shouldRefresh()))
         if (pre.isCancelled) {
             return itemStream
         }
-        return itemStream.fromRebuild().getZaphkielItem().build(player, itemStream)
+        return itemStream.fromRebuild().getZaphkielItem().build(player, itemStream).also {
+            Mirror.finish("ZaphkielAPI:rebuild:item")
+        }
     }
 
     fun reloadItem() {

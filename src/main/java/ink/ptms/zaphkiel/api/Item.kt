@@ -6,6 +6,7 @@ import ink.ptms.zaphkiel.api.event.single.Events
 import ink.ptms.zaphkiel.api.event.single.ItemBuildEvent
 import ink.ptms.zaphkiel.api.internal.ItemKey
 import ink.ptms.zaphkiel.api.internal.Translator
+import ink.ptms.zaphkiel.mirror.Mirror
 import ink.ptms.zaphkiel.module.meta.MetaBuilder
 import io.izzel.taboolib.module.nms.nbt.NBTBase
 import io.izzel.taboolib.module.nms.nbt.NBTCompound
@@ -72,29 +73,38 @@ class Item(
     val dataCache = refreshData(HashMap(), data)
 
     fun eval(key: String, playerEvent: PlayerEvent, itemStack: ItemStack) {
+        Mirror.define("Item:eval")
         eventMap[key]?.eval(playerEvent, itemStack, eventData)
+        Mirror.finish("Item:eval")
     }
 
     fun build(player: Player?): ItemStream {
+        Mirror.define("Item:build:generated")
         val itemStream = ItemStreamGenerated(icon.clone(), name.toMutableMap(), lore.toMutableMap())
         val compound = itemStream.compound.computeIfAbsent("zaphkiel") { NBTCompound() }.asCompound()
         compound[ItemKey.ID.key] = NBTBase(id)
         compound[ItemKey.DATA.key] = Translator.toNBTCompound(NBTCompound(), data)
-        return build(player, itemStream)
+        return build(player, itemStream).also {
+            Mirror.finish("Item:build:generated")
+        }
     }
 
     fun build(player: Player?, itemStream: ItemStream): ItemStream {
+        Mirror.define("Item:build:itemStream")
         val pre = if (itemStream is ItemStreamGenerated) {
             Events.call(ItemBuildEvent.Pre(player, itemStream, itemStream.name, itemStream.lore))
         } else {
             Events.call(ItemBuildEvent.Pre(player, itemStream, name.toMutableMap(), lore.toMutableMap()))
         }
         if (pre.isCancelled) {
+            Mirror.finish("Item:build:itemStream")
             return itemStream
         }
         dataCache.forEach { (k, v) -> itemStream.getZaphkielData().putDeep(k, v) }
         pre.itemStream.compound["zaphkiel"]!!.asCompound()[ItemKey.HASH.key] = NBTBase(hash)
-        return Events.call(ItemBuildEvent.Post(player, pre.itemStream, pre.name, pre.lore)).itemStream
+        return Events.call(ItemBuildEvent.Post(player, pre.itemStream, pre.name, pre.lore)).itemStream.also {
+            Mirror.finish("Item:build:itemStream")
+        }
     }
 
     private fun refreshData(map: MutableMap<String, NBTBase?>, section: ConfigurationSection, path: String = ""): MutableMap<String, NBTBase?> {

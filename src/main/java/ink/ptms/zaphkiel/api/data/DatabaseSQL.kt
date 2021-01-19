@@ -2,8 +2,7 @@ package ink.ptms.zaphkiel.api.data
 
 import ink.ptms.zaphkiel.Zaphkiel
 import io.izzel.taboolib.module.db.source.DBSource
-import io.izzel.taboolib.module.db.sql.SQLHost
-import io.izzel.taboolib.module.db.sql.SQLTable
+import io.izzel.taboolib.module.db.sql.*
 import io.izzel.taboolib.module.db.sql.query.Where
 import io.izzel.taboolib.module.inject.PlayerContainer
 import org.bukkit.configuration.file.FileConfiguration
@@ -21,8 +20,12 @@ import javax.sql.DataSource
  */
 class DatabaseSQL : Database() {
 
-    val host = SQLHost(Zaphkiel.conf.getConfigurationSection("Database"), Zaphkiel.getPlugin(), true)
-    val table = SQLTable(Zaphkiel.conf.getString("Database.table")).column("\$primary_key_id", "text:name", "text:data")!!
+    val host = SQLHost(Zaphkiel.conf.getConfigurationSection("Database"), Zaphkiel.plugin, true)
+    val table = SQLTable(Zaphkiel.conf.getString("Database.table"))
+        .column(SQLColumn.PRIMARY_KEY_ID)
+        .column(SQLColumnType.VARCHAR.toColumn(32, "name").columnOptions(SQLColumnOption.KEY))
+        .column(SQLColumnType.TEXT.toColumn("data"))!!
+
     val dataSource: DataSource = DBSource.create(host)
 
     init {
@@ -48,7 +51,8 @@ class DatabaseSQL : Database() {
             return
         }
         if (isExists(player)) {
-            table.update(Where.`is`("name", player.name)).set("data", Base64.getEncoder().encodeToString(data.saveToString().toByteArray(StandardCharsets.UTF_8))).run(dataSource)
+            table.update(Where.`is`("name", player.name))
+                .set("data", Base64.getEncoder().encodeToString(data.saveToString().toByteArray(StandardCharsets.UTF_8))).run(dataSource)
         } else {
             table.insert(null, player.name, Base64.getEncoder().encodeToString(data.saveToString().toByteArray(StandardCharsets.UTF_8))).run(dataSource)
         }
