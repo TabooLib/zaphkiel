@@ -22,6 +22,9 @@ private class ItemEvents : Listener {
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         fun e(e: ink.ptms.sandalphon.module.impl.blockmine.event.BlockBreakEvent) {
+            if (Items.isNull(e.player.inventory.itemInMainHand)) {
+                return
+            }
             val itemStream = ZaphkielAPI.read(e.player.inventory.itemInMainHand)
             if (itemStream.isExtension()) {
                 itemStream.getZaphkielItem().eval("onBlockBreak", e.player, e, e.player.inventory.itemInMainHand)
@@ -31,6 +34,9 @@ private class ItemEvents : Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     fun e(e: BlockBreakEvent) {
+        if (Items.isNull(e.player.inventory.itemInMainHand)) {
+            return
+        }
         val itemStream = ZaphkielAPI.read(e.player.inventory.itemInMainHand)
         if (itemStream.isExtension()) {
             itemStream.getZaphkielItem().eval("onBlockBreak", e.player, e, e.player.inventory.itemInMainHand)
