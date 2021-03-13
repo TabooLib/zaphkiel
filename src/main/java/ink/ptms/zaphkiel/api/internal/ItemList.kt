@@ -25,38 +25,40 @@ object ItemList {
         val itemsAll = ZaphkielAPI.registeredItem.values.groupBy { it.group ?: Group.NO_GROUP }.toList().sortedByDescending { it.first.priority }
         val items = Indexed.subList(itemsAll, page * 28, (page + 1) * 28 - 1)
         MenuBuilder.builder()
-                .title("Zaphkiel Items - ${page + 1}")
-                .rows(6)
-                .event { e ->
-                    e.isCancelled = true
-                    if (e.clickType == ClickType.CLICK) {
-                         if (e.rawSlot == 47 && e.currentItem!!.type == Material.SPECTRAL_ARROW) {
-                            open(player, page - 1)
-                        } else if (e.rawSlot == 51 && e.currentItem!!.type == Material.SPECTRAL_ARROW) {
-                            open(player, page + 1)
-                        } else if (objectsMap.containsKey(e.rawSlot)) {
-                            open(player, objectsMap[e.rawSlot]!!, 0)
-                        }
+            .title("Zaphkiel Items - ${page + 1}")
+            .rows(6)
+            .event { e ->
+                e.isCancelled = true
+                if (e.clickType == ClickType.CLICK) {
+                    if (e.rawSlot == 47 && e.currentItem!!.type == Material.SPECTRAL_ARROW) {
+                        open(player, page - 1)
+                    } else if (e.rawSlot == 51 && e.currentItem!!.type == Material.SPECTRAL_ARROW) {
+                        open(player, page + 1)
+                    } else if (objectsMap.containsKey(e.rawSlot)) {
+                        open(player, objectsMap[e.rawSlot]!!, 0)
                     }
                 }
-                .build { inventory ->
-                    items.forEachIndexed { index, item ->
-                        objectsMap[Items.INVENTORY_CENTER[index]] = item.first
-                        inventory.setItem(Items.INVENTORY_CENTER[index], ItemBuilder(item.first.display)
-                                .flags(ItemFlag.HIDE_ATTRIBUTES)
-                                .build())
-                    }
-                    if (page > 0) {
-                        inventory.setItem(47, ItemBuilder(Material.SPECTRAL_ARROW).name("§e上一页").build())
-                    } else {
-                        inventory.setItem(47, ItemBuilder(Material.ARROW).name("§8上一页").build())
-                    }
-                    if (CronusUtils.next(page, itemsAll.size, 28)) {
-                        inventory.setItem(51, ItemBuilder(Material.SPECTRAL_ARROW).name("§e下一页").build())
-                    } else {
-                        inventory.setItem(51, ItemBuilder(Material.ARROW).name("§8下一页").build())
-                    }
-                }.open(player)
+            }
+            .build { inventory ->
+                items.forEachIndexed { index, item ->
+                    objectsMap[Items.INVENTORY_CENTER[index]] = item.first
+                    inventory.setItem(
+                        Items.INVENTORY_CENTER[index], ItemBuilder(item.first.display)
+                            .flags(ItemFlag.HIDE_ATTRIBUTES)
+                            .build()
+                    )
+                }
+                if (page > 0) {
+                    inventory.setItem(47, ItemBuilder(Material.SPECTRAL_ARROW).name("§e上一页").build())
+                } else {
+                    inventory.setItem(47, ItemBuilder(Material.ARROW).name("§8上一页").build())
+                }
+                if (CronusUtils.next(page, itemsAll.size, 28)) {
+                    inventory.setItem(51, ItemBuilder(Material.SPECTRAL_ARROW).name("§e下一页").build())
+                } else {
+                    inventory.setItem(51, ItemBuilder(Material.ARROW).name("§8下一页").build())
+                }
+            }.open(player)
         player.playSound(player.location, Sound.UI_BUTTON_CLICK, 1f, 2f)
     }
 
@@ -65,47 +67,47 @@ object ItemList {
         val itemsAll = ZaphkielAPI.registeredItem.values.filter { (it.group ?: Group.NO_GROUP) == group }.sortedBy { it.icon.type.name }
         val items = Indexed.subList(itemsAll, page * 28, (page + 1) * 28 - 1)
         MenuBuilder.builder()
-                .title("Zaphkiel Items - ${page + 1} (${group.name})")
-                .rows(6)
-                .event { e ->
-                    e.isCancelled = true
-                    if (e.clickType == ClickType.CLICK) {
-                        if (e.rawSlot == 49) {
-                            open(player, 0)
-                        } else if (e.rawSlot == 47 && e.currentItem!!.type == Material.SPECTRAL_ARROW) {
-                            open(player, group, page - 1)
-                        } else if (e.rawSlot == 51 && e.currentItem!!.type == Material.SPECTRAL_ARROW) {
-                            open(player, group, page + 1)
-                        } else if (objectsMap.containsKey(e.rawSlot)) {
-                            e.clicker.inventory.addItem(objectsMap[e.rawSlot]!!.build(e.clicker).save().also {
-                                it.amount = if (e.castClick().isShiftClick) it.type.maxStackSize else 1
-                            })
-                        }
-                    }
-                }
-                .build { inventory ->
-                    items.forEachIndexed { index, item ->
-                        objectsMap[Items.INVENTORY_CENTER[index]] = item
-                        inventory.setItem(Items.INVENTORY_CENTER[index], item.build(player).save().also {
-                            val itemMeta = it.itemMeta!!
-                            itemMeta.lore = itemMeta.lore!!.also { lore ->
-                                lore.add("")
-                                lore.add("§7序号: §f${item.id}")
-                            }
+            .title("Zaphkiel Items - ${page + 1} (${group.name})")
+            .rows(6)
+            .event { e ->
+                e.isCancelled = true
+                if (e.clickType == ClickType.CLICK) {
+                    if (e.rawSlot == 49) {
+                        open(player, 0)
+                    } else if (e.rawSlot == 47 && e.currentItem!!.type == Material.SPECTRAL_ARROW) {
+                        open(player, group, page - 1)
+                    } else if (e.rawSlot == 51 && e.currentItem!!.type == Material.SPECTRAL_ARROW) {
+                        open(player, group, page + 1)
+                    } else if (objectsMap.containsKey(e.rawSlot)) {
+                        e.clicker.inventory.addItem(objectsMap[e.rawSlot]!!.build(e.clicker).save().also {
+                            it.amount = if (e.castClick().isShiftClick) it.type.maxStackSize else 1
                         })
                     }
-                    if (page > 0) {
-                        inventory.setItem(47, ItemBuilder(Material.SPECTRAL_ARROW).name("§e上一页").build())
-                    } else {
-                        inventory.setItem(47, ItemBuilder(Material.ARROW).name("§8上一页").build())
-                    }
-                    if (CronusUtils.next(page, itemsAll.size, 28)) {
-                        inventory.setItem(51, ItemBuilder(Material.SPECTRAL_ARROW).name("§e下一页").build())
-                    } else {
-                        inventory.setItem(51, ItemBuilder(Material.ARROW).name("§8下一页").build())
-                    }
-                    inventory.setItem(49, ItemBuilder(Material.REDSTONE).name("§c返回").build())
-                }.open(player)
+                }
+            }
+            .build { inventory ->
+                items.forEachIndexed { index, item ->
+                    objectsMap[Items.INVENTORY_CENTER[index]] = item
+                    inventory.setItem(Items.INVENTORY_CENTER[index], item.build(player).save().also {
+                        val itemMeta = it.itemMeta!!
+                        itemMeta.lore = (itemMeta.lore ?: ArrayList<String>()).also { lore ->
+                            lore.add("")
+                            lore.add("§7序号: §f${item.id}")
+                        }
+                    })
+                }
+                if (page > 0) {
+                    inventory.setItem(47, ItemBuilder(Material.SPECTRAL_ARROW).name("§e上一页").build())
+                } else {
+                    inventory.setItem(47, ItemBuilder(Material.ARROW).name("§8上一页").build())
+                }
+                if (CronusUtils.next(page, itemsAll.size, 28)) {
+                    inventory.setItem(51, ItemBuilder(Material.SPECTRAL_ARROW).name("§e下一页").build())
+                } else {
+                    inventory.setItem(51, ItemBuilder(Material.ARROW).name("§8下一页").build())
+                }
+                inventory.setItem(49, ItemBuilder(Material.REDSTONE).name("§c返回").build())
+            }.open(player)
         player.playSound(player.location, Sound.UI_BUTTON_CLICK, 1f, 2f)
     }
 }
