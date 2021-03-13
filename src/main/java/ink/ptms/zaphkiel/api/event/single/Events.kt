@@ -1,9 +1,8 @@
 package ink.ptms.zaphkiel.api.event.single
 
-import com.google.common.collect.Maps
 import ink.ptms.zaphkiel.Zaphkiel
-import io.izzel.taboolib.util.Ref
 import org.bukkit.plugin.Plugin
+import java.util.concurrent.ConcurrentHashMap
 
 /**
  * @Author sky
@@ -12,7 +11,7 @@ import org.bukkit.plugin.Plugin
 @Suppress("UNCHECKED_CAST")
 object Events {
 
-    val listener = Maps.newConcurrentMap<String, MutableList<SingeListener>>()
+    private val listener = ConcurrentHashMap<String, MutableList<SingeListener>>()
 
     fun cancel(plugin: Plugin) {
         listener.remove(plugin.name)

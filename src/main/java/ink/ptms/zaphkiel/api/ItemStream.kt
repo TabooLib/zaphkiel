@@ -10,7 +10,6 @@ import io.izzel.taboolib.module.nms.nbt.NBTCompound
 import io.izzel.taboolib.module.nms.nbt.NBTList
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
-import java.lang.RuntimeException
 
 /**
  * @Author sky
@@ -107,6 +106,10 @@ open class ItemStream(
             throw RuntimeException("This item is not extension item.")
         }
         return getZaphkielHash() != getZaphkielItem().hash
+    }
+
+    fun getItemAPI(player: Player): ItemAPI {
+        return ItemAPI(getZaphkielItem(), itemStack, player)
     }
 
     private fun zaphkielCompound(): NBTCompound? {

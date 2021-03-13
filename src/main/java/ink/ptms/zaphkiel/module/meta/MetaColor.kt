@@ -2,7 +2,6 @@ package ink.ptms.zaphkiel.module.meta
 
 import ink.ptms.zaphkiel.api.Item
 import org.bukkit.Color
-import org.bukkit.Material
 import org.bukkit.inventory.meta.ItemMeta
 import org.bukkit.inventory.meta.LeatherArmorMeta
 import org.bukkit.inventory.meta.PotionMeta

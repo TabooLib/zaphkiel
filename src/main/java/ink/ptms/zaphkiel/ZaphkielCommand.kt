@@ -1,6 +1,5 @@
 package ink.ptms.zaphkiel
 
-import ink.ptms.zaphkiel.api.ItemStream
 import ink.ptms.zaphkiel.api.internal.ItemList
 import ink.ptms.zaphkiel.mirror.Mirror
 import io.izzel.taboolib.cronus.CronusUtils

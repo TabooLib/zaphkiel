@@ -17,6 +17,7 @@ import org.bukkit.Material
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
+import org.bukkit.event.Event
 import org.bukkit.event.player.PlayerEvent
 import org.bukkit.inventory.ItemStack
 import org.bukkit.util.NumberConversions
@@ -72,9 +73,15 @@ class Item(
 
     val dataCache = refreshData(HashMap(), data)
 
-    fun eval(key: String, playerEvent: PlayerEvent, itemStack: ItemStack) {
+    fun eval(key: String, player: Player, event: Event, itemStack: ItemStack) {
         Mirror.define("Item:eval")
-        eventMap[key]?.eval(playerEvent, itemStack, eventData)
+        eventMap[key]?.eval(player, event, itemStack, eventData)
+        Mirror.finish("Item:eval")
+    }
+
+    fun eval(key: String, event: PlayerEvent, itemStack: ItemStack) {
+        Mirror.define("Item:eval")
+        eventMap[key]?.eval(event.player, event, itemStack, eventData)
         Mirror.finish("Item:eval")
     }
 

@@ -2,9 +2,6 @@ package ink.ptms.zaphkiel.module.meta
 
 import ink.ptms.zaphkiel.ZaphkielAPI
 import ink.ptms.zaphkiel.api.Item
-import io.izzel.taboolib.util.item.Items
-import org.bukkit.Material
-import org.bukkit.inventory.meta.EnchantmentStorageMeta
 import org.bukkit.inventory.meta.ItemMeta
 import org.bukkit.inventory.meta.PotionMeta
 import org.bukkit.potion.PotionEffect

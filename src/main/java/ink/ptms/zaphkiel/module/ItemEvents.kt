@@ -2,13 +2,13 @@ package ink.ptms.zaphkiel.module
 
 import ink.ptms.zaphkiel.ZaphkielAPI
 import io.izzel.taboolib.module.inject.TListener
-import io.izzel.taboolib.module.lite.SimpleReflection
 import io.izzel.taboolib.util.item.Items
 import org.bukkit.event.EventHandler
+import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
+import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.player.*
-import org.bukkit.inventory.ItemStack
 
 /**
  * @Author sky
@@ -16,6 +16,26 @@ import org.bukkit.inventory.ItemStack
  */
 @TListener
 private class ItemEvents : Listener {
+
+    @TListener(depend = ["Sandalphon"])
+    class SandalphonHook : Listener {
+
+        @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+        fun e(e: ink.ptms.sandalphon.module.impl.blockmine.event.BlockBreakEvent) {
+            val itemStream = ZaphkielAPI.read(e.player.inventory.itemInMainHand)
+            if (itemStream.isExtension()) {
+                itemStream.getZaphkielItem().eval("onBlockBreak", e.player, e, e.player.inventory.itemInMainHand)
+            }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    fun e(e: BlockBreakEvent) {
+        val itemStream = ZaphkielAPI.read(e.player.inventory.itemInMainHand)
+        if (itemStream.isExtension()) {
+            itemStream.getZaphkielItem().eval("onBlockBreak", e.player, e, e.player.inventory.itemInMainHand)
+        }
+    }
 
     @EventHandler(ignoreCancelled = true)
     fun e(e: PlayerItemBreakEvent) {
@@ -25,7 +45,7 @@ private class ItemEvents : Listener {
         }
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     fun e(e: PlayerItemDamageEvent) {
         val itemStream = ZaphkielAPI.read(e.item)
         if (itemStream.isExtension()) {
@@ -33,7 +53,7 @@ private class ItemEvents : Listener {
         }
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     fun e(e: PlayerItemConsumeEvent) {
         val itemStack = e.item
         val itemStream = ZaphkielAPI.read(itemStack)
@@ -47,7 +67,7 @@ private class ItemEvents : Listener {
         }
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     fun e(e: PlayerSwapHandItemsEvent) {
         if (Items.nonNull(e.offHandItem)) {
             val itemStream = ZaphkielAPI.read(e.offHandItem!!)

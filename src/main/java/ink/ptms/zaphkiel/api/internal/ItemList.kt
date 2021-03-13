@@ -1,25 +1,17 @@
 package ink.ptms.zaphkiel.api.internal
 
-import com.google.common.collect.Maps
 import ink.ptms.zaphkiel.ZaphkielAPI
 import ink.ptms.zaphkiel.api.Group
 import ink.ptms.zaphkiel.api.Item
 import io.izzel.taboolib.cronus.CronusUtils
 import io.izzel.taboolib.kotlin.Indexed
-import io.izzel.taboolib.module.inject.TListener
 import io.izzel.taboolib.util.item.ItemBuilder
 import io.izzel.taboolib.util.item.Items
 import io.izzel.taboolib.util.item.inventory.ClickType
 import io.izzel.taboolib.util.item.inventory.MenuBuilder
-import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.Sound
 import org.bukkit.entity.Player
-import org.bukkit.event.EventHandler
-import org.bukkit.event.Listener
-import org.bukkit.event.inventory.InventoryClickEvent
-import org.bukkit.inventory.Inventory
-import org.bukkit.inventory.InventoryHolder
 import org.bukkit.inventory.ItemFlag
 
 /**

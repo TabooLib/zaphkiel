@@ -17,7 +17,7 @@ class Group(
         val name: String,
         val file: File,
         val config: ConfigurationSection,
-        val display: ItemStack = Items.loadItem(config),
+        val display: ItemStack = Items.loadItem(config)!!,
         val priority: Int = 0
 ) {
 

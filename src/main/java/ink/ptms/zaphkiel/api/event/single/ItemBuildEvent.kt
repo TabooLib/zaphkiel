@@ -1,8 +1,8 @@
 package ink.ptms.zaphkiel.api.event.single
 
-import io.izzel.taboolib.module.event.EventNormal
 import ink.ptms.zaphkiel.api.ItemStream
 import io.izzel.taboolib.module.event.EventCancellable
+import io.izzel.taboolib.module.event.EventNormal
 import org.bukkit.entity.Player
 
 /**

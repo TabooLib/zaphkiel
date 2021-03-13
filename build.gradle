@@ -5,14 +5,14 @@ plugins {
 }
 
 group = 'ink.ptms.zaphkiel'
-version = '1.4'
+version = '1.4.1'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 taboolib {
-    tabooLibVersion = '5.43'
-    loaderVersion = '2.6'
+    tabooLibVersion = '5.58'
+    loaderVersion = '2.12'
     classifier = null
 }
 
@@ -21,9 +21,10 @@ repositories {
 }
 
 dependencies {
-    compile 'ink.ptms.core:v11600:11600:all'
-    compile 'org.jetbrains.kotlin:kotlin-stdlib'
-    compileOnly fileTree(dir: 'libs', includes: ['*.jar'])
+    implementation 'ink.ptms:Sandalphon:1.2.7'
+    implementation 'ink.ptms.core:v11600:11600:all'
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib'
+    implementation fileTree(dir: 'libs', includes: ['*.jar'])
 }
 
 processResources {

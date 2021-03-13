@@ -1,6 +1,5 @@
 package ink.ptms.zaphkiel.api.internal
 
-import ink.ptms.zaphkiel.ZaphkielAPI
 import io.izzel.taboolib.TabooLib
 import io.izzel.taboolib.module.nms.nbt.NBTBase
 import io.izzel.taboolib.module.nms.nbt.NBTCompound

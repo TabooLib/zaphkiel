@@ -2,8 +2,6 @@ package ink.ptms.zaphkiel.module.meta
 
 import ink.ptms.zaphkiel.api.Item
 import io.izzel.taboolib.util.item.Items
-import org.bukkit.inventory.ItemFlag
-import org.bukkit.inventory.meta.Damageable
 import org.bukkit.inventory.meta.ItemMeta
 import java.util.*
 
