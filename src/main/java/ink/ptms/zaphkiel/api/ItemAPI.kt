@@ -133,7 +133,7 @@ open class ItemAPI(val item: Item, val itemStack: ItemStack, val player: Player)
             val replaceItem = if (replace.startsWith("minecraft:")) {
                 ItemStack(Items.asMaterial(replace.substring("minecraft:".length))!!)
             } else {
-                ZaphkielAPI.getItem(replace, player)!!.itemStack
+                ZaphkielAPI.getItem(replace, player)!!.save()
             }
             itemStack.type = replaceItem.type
             itemStack.itemMeta = replaceItem.itemMeta
