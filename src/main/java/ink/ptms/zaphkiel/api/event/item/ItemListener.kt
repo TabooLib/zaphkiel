@@ -1,6 +1,5 @@
 package ink.ptms.zaphkiel.api.event.item
 
-import ink.ptms.atlantis.api.ItemEvents
 import ink.ptms.zaphkiel.ZaphkielAPI
 import ink.ptms.zaphkiel.api.ItemStream
 import io.izzel.taboolib.module.inject.TListener
