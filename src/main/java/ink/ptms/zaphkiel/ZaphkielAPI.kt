@@ -160,7 +160,7 @@ object ZaphkielAPI {
                 var group: Group? = null
                 val conf = Files.load(file)
                 if (conf.contains("__group__")) {
-                    val name = file.path.substring(0, file.name.indexOf("."))
+                    val name = file.name.substring(0, file.name.indexOf("."))
                     group = Group(name, file, conf.getConfigurationSection("__group__")!!, priority = conf.getInt("__group__.priority"))
                     registeredGroup[name] = group
                 }
