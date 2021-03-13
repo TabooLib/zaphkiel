@@ -1,6 +1,5 @@
 package ink.ptms.zaphkiel.api
 
-import com.google.common.collect.Maps
 import org.bukkit.entity.Player
 import org.bukkit.event.Event
 import org.bukkit.inventory.ItemStack
@@ -11,13 +10,14 @@ data class ItemEvent(val item: Item, val name: String, val script: CompiledScrip
 
     fun eval(player: Player, event: Event, itemStack: ItemStack, data: Map<String, Any>) {
         val itemAPI = ItemAPI.get(ItemAPI(item, itemStack, player))
+        itemAPI.data.putAll(data)
         try {
-            val map = Maps.newHashMap(data)
-            map["player"] = player
-            map["event"] = event
-            map["item"] = itemStack
-            map["api"] = itemAPI
-            script.eval(SimpleBindings(map))
+            script.eval(SimpleBindings(mapOf(
+                "player" to player,
+                "event" to event,
+                "item" to itemStack,
+                "api" to itemAPI
+            )))
         } catch (t: Throwable) {
             t.printStackTrace()
         }

@@ -21,6 +21,7 @@ repositories {
 }
 
 dependencies {
+    implementation 'public:Tiphareth:1.0.0'
     implementation 'ink.ptms:Sandalphon:1.2.7'
     implementation 'ink.ptms.core:v11600:11600:all'
     implementation 'org.jetbrains.kotlin:kotlin-stdlib'

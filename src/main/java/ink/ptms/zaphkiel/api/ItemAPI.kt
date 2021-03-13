@@ -29,6 +29,9 @@ open class ItemAPI(val item: Item, val itemStack: ItemStack, val player: Player)
     val itemStream = ItemStream(itemStack)
     var isChanged = false
     var isReplaced = false
+    val data = HashMap<String, Any>()
+
+    fun data(data: String) = this.data[data]
 
     fun command(sender: CommandSender, command: String) {
         Commands.dispatchCommand(sender, command)
@@ -93,16 +96,13 @@ open class ItemAPI(val item: Item, val itemStack: ItemStack, val player: Player)
         val max = data["durability"] ?: return true
         val current = data["durability_current"] ?: NBTBase(max.asInt())
         val currentLatest = max(min(current.asInt() + value, max.asInt()), 0)
-        return when {
-            currentLatest > 0 -> {
-                data["durability_current"] = NBTBase(currentLatest)
-                true
-            }
-            data.containsKey("durability_replace") -> {
+        return if (currentLatest > 0) {
+            data["durability_current"] = NBTBase(currentLatest)
+            true
+        } else {
+            if (data.containsKey("durability_replace")) {
                 replace()
-                true
-            }
-            else -> {
+            } else {
                 val itemStackFinal = itemStack.clone()
                 Bukkit.getPluginManager().callEvent(PlayerItemBreakEvent(player, itemStack))
                 Bukkit.getScheduler().runTaskLaterAsynchronously(Zaphkiel.plugin, Runnable {
@@ -112,8 +112,8 @@ open class ItemAPI(val item: Item, val itemStack: ItemStack, val player: Player)
                     Effects.create(Particle.ITEM_CRACK, player.location.add(0.0, 1.0, 0.0)).speed(0.1).data(itemStackFinal).count(15).range(50.0).play()
                 }, 1)
                 itemStack.amount = 0
-                false
             }
+            false
         }
     }
 
