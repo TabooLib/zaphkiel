@@ -52,14 +52,6 @@ private class ItemEvents : Listener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    fun e(e: PlayerItemDamageEvent) {
-        val itemStream = ZaphkielAPI.read(e.item)
-        if (itemStream.isExtension()) {
-            itemStream.getZaphkielItem().eval("onDamage", e, e.item)
-        }
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     fun e(e: PlayerItemConsumeEvent) {
         val itemStack = e.item
         val itemStream = ZaphkielAPI.read(itemStack)

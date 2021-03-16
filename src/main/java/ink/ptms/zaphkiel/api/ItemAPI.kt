@@ -2,6 +2,7 @@ package ink.ptms.zaphkiel.api
 
 import ink.ptms.zaphkiel.Zaphkiel
 import ink.ptms.zaphkiel.ZaphkielAPI
+import io.izzel.taboolib.module.db.local.LocalPlayer
 import io.izzel.taboolib.module.locale.TLocale
 import io.izzel.taboolib.module.nms.nbt.NBTBase
 import io.izzel.taboolib.util.Commands
@@ -57,19 +58,19 @@ open class ItemAPI(val item: Item, val itemStack: ItemStack, val player: Player)
     }
 
     fun toCooldown(player: Player, gameTick: Int) {
-        ZaphkielAPI.database.getData(player).set("Zaphkiel.cooldown.${item.id}", System.currentTimeMillis() + (gameTick * 50L))
+        LocalPlayer.get(player).set("Zaphkiel.cooldown.${item.id}", System.currentTimeMillis() + (gameTick * 50L))
     }
 
     fun toCooldown(player: Player, index: String, gameTick: Int) {
-        ZaphkielAPI.database.getData(player).set("Zaphkiel.cooldown.$index", System.currentTimeMillis() + (gameTick * 50L))
+        LocalPlayer.get(player).set("Zaphkiel.cooldown.$index", System.currentTimeMillis() + (gameTick * 50L))
     }
 
     fun isCooldown(player: Player): Boolean {
-        return ZaphkielAPI.database.getData(player).getLong("Zaphkiel.cooldown.${item.id}") > System.currentTimeMillis()
+        return LocalPlayer.get(player).getLong("Zaphkiel.cooldown.${item.id}") > System.currentTimeMillis()
     }
 
     fun isCooldown(player: Player, index: String): Boolean {
-        return ZaphkielAPI.database.getData(player).getLong("Zaphkiel.cooldown.$index") > System.currentTimeMillis()
+        return LocalPlayer.get(player).getLong("Zaphkiel.cooldown.$index") > System.currentTimeMillis()
     }
 
     fun toCooldown(gameTick: Int) {

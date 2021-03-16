@@ -1,5 +1,5 @@
 item_intensify_sword:
-  display: display_weapon
+  display: DISPLAY_ITEM
   icon: GOLDEN_SWORD
   name:
     NAME: '&eIntensify Sword'
@@ -10,11 +10,9 @@ item_intensify_sword:
   meta:
     unbreakable: true
     unique: true
-  data:
-    weight: 0.45
 
 item_wooden_sword:
-  display: display_weapon
+  display: DISPLAY_ITEM
   icon: WOODEN_SWORD
   name:
     NAME: '&7Wooden Sword'
@@ -28,15 +26,14 @@ item_wooden_sword:
         damage: +7
         attackspeed: +10%
   data:
-    weight: 0.25
-    durability!!: 127
+    durability: 10
+    durability_replace: minecraft:stick
   event:
-    onDamage: |-
-      event.setCancelled(true)
-      api.toRepair(-1)
+    onDamage!!: |-
+      item damage *1
 
 item_enchanted_book:
-  display: display_item
+  display: DISPLAY_ITEM
   icon: ENCHANTED_BOOK
   name:
     NAME: '&7Enchanted Book'
@@ -49,11 +46,9 @@ item_enchanted_book:
       DAMAGE_ALL: 1
     itemflag:
       - HIDE_POTION_EFFECTS
-  data:
-    weight: 0.10
 
 item_slowness_potion:
-  display: display_item
+  display: DISPLAY_ITEM
   icon: POTION
   name:
     NAME: '&7Slowness Potion'
@@ -64,11 +59,9 @@ item_slowness_potion:
   meta:
     potion:
       slow: 60-1
-  data:
-    weight: 0.01
 
 item_leather_armor:
-  display: display_armor
+  display: DISPLAY_ITEM
   icon: LEATHER_CHESTPLATE
   name:
     NAME: '&7Leather Armor'
@@ -78,12 +71,9 @@ item_leather_armor:
       - '&fCan be bought everywhere.'
   meta:
     color: 255-255-255
-  data:
-    weight: 0.50
-    durability!!: 100
 
 item_rotten_flesh:
-  display: display_consumable
+  display: DISPLAY_CONSUMEABLE
   icon: ROTTEN_FLESH
   name:
     NAME: '&7Rotten Flesh'
@@ -92,26 +82,38 @@ item_rotten_flesh:
     LORE:
       - '&fRipped flesh from black sheep.'
   data:
-    weight: 0.01
-    durability!!: 3
+    durability: 3
+    durability_replace: minecraft:bone
   event:
     from: base_food
     data:
       cooldown: 100
-      regain_health: 1
-      regain_hunger: 2
+      regain_health: 2
+      regain_hunger: 6
 
 base_food$:
   event:
-    onConsume: |-
-      if (api.isCooldown()) {
-          event.setCancelled(true)
-          event.getPlayer().sendMessage("§cYou are temporarily unable to use it.")
+    onConsume!!: |-
+      if cooldown check then {
+          tell *"You are temporarily unable to use it."
       } else {
-          event.setCancelled(true)
-          event.getPlayer().sendMessage("§7Your health and satiety have recovered.")
-          event.getPlayer().setHealth(Math.min(event.getPlayer().getHealth() + regain_health, event.getPlayer().getMaxHealth()))
-          event.getPlayer().setFoodLevel(Math.min(event.getPlayer().getFoodLevel() + regain_hunger, 20))
-          api.toCooldown(cooldown)
-          api.toRepair(-1)
+          item damage *1
+          cooldown set &cooldown
+          if check &regain_health not null then {
+              player health add &regain_health
+          }
+          if check &regain_hunger not null then {
+              player food level add &regain_hunger
+          }
+          if check &effect not null then {
+              for e in &effect then {
+                  set i to split &e with " "
+                  effect give elem *0 in &i elem *1 in &i elem *2 in &i
+              }
+          }
+          if check &effect_remove not null then {
+              for e in &effect_remove then {
+                  effect remove &e
+              }
+          }
       }

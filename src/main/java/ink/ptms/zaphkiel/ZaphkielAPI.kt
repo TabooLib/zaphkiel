@@ -2,15 +2,13 @@ package ink.ptms.zaphkiel
 
 import com.google.common.collect.Maps
 import ink.ptms.zaphkiel.api.*
-import ink.ptms.zaphkiel.api.data.DatabaseSQL
-import ink.ptms.zaphkiel.api.data.DatabaseYML
 import ink.ptms.zaphkiel.api.event.PluginReloadEvent
 import ink.ptms.zaphkiel.api.event.single.Events
 import ink.ptms.zaphkiel.api.event.single.ItemBuildEvent
 import ink.ptms.zaphkiel.api.internal.ItemKey
-import ink.ptms.zaphkiel.mirror.Mirror
+import io.izzel.taboolib.kotlin.Mirror
+import io.izzel.taboolib.kotlin.Reflex.Companion.static
 import io.izzel.taboolib.module.config.TConfigWatcher
-import io.izzel.taboolib.module.lite.SimpleReflection
 import io.izzel.taboolib.module.nms.nbt.NBTCompound
 import io.izzel.taboolib.util.Files
 import io.izzel.taboolib.util.item.Items
@@ -34,6 +32,7 @@ import kotlin.collections.ArrayList
  */
 object ZaphkielAPI {
 
+    val mirror = Mirror()
     val events = Events
     val loaded = ArrayList<File>()
     val folderItem = File(Zaphkiel.plugin.dataFolder, "item")
@@ -42,15 +41,9 @@ object ZaphkielAPI {
     val registeredModel = Maps.newHashMap<String, Model>()!!
     val registeredDisplay = Maps.newHashMap<String, Display>()!!
     val registeredGroup = Maps.newHashMap<String, Group>()!!
-    val database by lazy {
-        if (Zaphkiel.conf.contains("Database.host")) {
-            try {
-                return@lazy DatabaseSQL()
-            } catch (t: Throwable) {
-                t.printStackTrace()
-            }
-        }
-        return@lazy DatabaseYML()
+
+    fun mirrorFuture(id: String, func: Mirror.MirrorFuture.() -> Unit) {
+        mirror.mirrorFuture(id, func)
     }
 
     fun getItem(id: String): ItemStream? {
@@ -101,25 +94,20 @@ object ZaphkielAPI {
         if (Items.isNull(item)) {
             throw RuntimeException("Could not read empty item.")
         }
-        Mirror.define("ZaphkielAPI:read")
-        return ItemStream(item).also {
-            Mirror.define("ZaphkielAPI:read")
-        }
+        return ItemStream(item)
     }
 
     fun rebuild(player: Player?, inventory: Inventory) {
-        Mirror.define("ZaphkielAPI:rebuild:inventory")
-        for (i in 0 until inventory.size) {
+        (0 until inventory.size).forEach { i ->
             val item = inventory.getItem(i)
             if (Items.isNull(item)) {
-                continue
+                return@forEach
             }
             val rebuild = rebuild(player, item!!)
             if (rebuild.isFromRebuild) {
                 rebuild.save()
             }
         }
-        Mirror.finish("ZaphkielAPI:rebuild:inventory")
     }
 
     fun rebuild(player: Player?, item: ItemStack): ItemStream {
@@ -130,14 +118,11 @@ object ZaphkielAPI {
         if (itemStream.isVanilla()) {
             return itemStream
         }
-        Mirror.define("ZaphkielAPI:rebuild:item")
         val pre = Events.call(ItemBuildEvent.Rebuild(player, itemStream, itemStream.shouldRefresh()))
         if (pre.isCancelled) {
             return itemStream
         }
-        return itemStream.fromRebuild().getZaphkielItem().build(player, itemStream).also {
-            Mirror.finish("ZaphkielAPI:rebuild:item")
-        }
+        return itemStream.fromRebuild().getZaphkielItem().build(player, itemStream)
     }
 
     fun reloadItem() {
@@ -216,19 +201,17 @@ object ZaphkielAPI {
         }
     }
 
-    fun asPotionEffect(name: String): PotionEffectType? {
-        SimpleReflection.checkAndSave(PotionEffectType::class.java)
+    fun asEnchantment(name: String): Enchantment? {
         try {
-            return SimpleReflection.getFieldValue(PotionEffectType::class.java, null, name.toUpperCase()) as PotionEffectType
+            return Enchantment::class.java.static(name.toUpperCase())
         } catch (t: Throwable) {
         }
         return null
     }
 
-    fun asEnchantment(name: String): Enchantment? {
-        SimpleReflection.checkAndSave(Enchantment::class.java)
+    fun asPotionEffect(name: String): PotionEffectType? {
         try {
-            return SimpleReflection.getFieldValue(Enchantment::class.java, null, name.toUpperCase()) as Enchantment
+            return PotionEffectType::class.java.static(name.toUpperCase())
         } catch (t: Throwable) {
         }
         return null

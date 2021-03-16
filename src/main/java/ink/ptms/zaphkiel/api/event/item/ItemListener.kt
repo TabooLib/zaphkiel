@@ -36,18 +36,27 @@ class ItemListener : Listener {
         }
     }
 
-    @EventHandler
-    fun e(e: PlayerJoinEvent) {
-        e.player.inventory.filter { Items.nonNull(it) }.forEach {
-            ItemEvents.Select(ZaphkielAPI.read(it), e.player).call().run {
+    fun Player.select() {
+        inventory.filter { Items.nonNull(it) }.forEach {
+            ItemEvents.Select(ZaphkielAPI.read(it), this).call().run {
                 if (save) {
-                    itemStream.rebuild(e.player)
+                    itemStream.rebuild(this@select)
                 }
             }
         }
     }
 
     @EventHandler
+    fun e(e: PlayerJoinEvent) {
+        e.player.select()
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    fun e(e: PlayerChangedWorldEvent) {
+        e.player.select()
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     fun e(e: PlayerItemConsumeEvent) {
         if (Items.nonNull(e.item)) {
             ItemEvents.Consume(ZaphkielAPI.read(e.item), e).call().run {

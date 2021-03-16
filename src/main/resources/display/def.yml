@@ -1,27 +1,11 @@
-display_item:
+DISPLAY_ITEM:
   name: '&7<NAME>'
   lore:
-    - '&9<TYPE> &8<WEIGHT>'
-    - ''
-    - '&f<LORE>'
+    - '&9<TYPE>'
+    - '&f<LORE...>'
 
-display_armor:
-  name: '&7<NAME>'
-  lore:
-    - '&9<TYPE> &8<WEIGHT>'
-    - ''
-    - '&f<LORE>'
-
-display_weapon:
-  name: '&7<NAME>'
-  lore:
-    - '&9<TYPE> &8<WEIGHT>'
-    - ''
-    - '&f<LORE>'
-
-display_consumable:
+DISPLAY_CONSUMEABLE:
   name: '&7<NAME> <DURABILITY>'
   lore:
-    - '&9<TYPE> &8<WEIGHT>'
-    - ''
+    - '&9<TYPE>'
     - '&f<LORE...>'

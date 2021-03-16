@@ -12,6 +12,7 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerItemDamageEvent
+import org.bukkit.inventory.meta.Damageable
 
 /**
  * @Author sky
@@ -38,12 +39,13 @@ private class ItemDurability : Listener {
             }
         }
         Events.listen(ItemReleaseEvent::class.java, 1) { e ->
-            val dMax = e.itemStream.getZaphkielData()["durability"] ?: return@listen
-            val dCurrent = e.itemStream.getZaphkielData()["durability_current"] ?: return@listen
-            val dPercent = dCurrent.asDouble() / dMax.asDouble()
-            val iMax = e.itemStream.itemStack.type.maxDurability
-            val iScaled = iMax - (iMax * dPercent)
-            e.data = iScaled.toInt()
+            if (e.itemMeta is Damageable) {
+                val max = e.itemStream.getZaphkielData()["durability"] ?: return@listen
+                val current = e.itemStream.getZaphkielData()["durability_current"] ?: return@listen
+                val percent = current.asDouble() / max.asDouble()
+                val durability = e.itemStream.itemStack.type.maxDurability
+                (e.itemMeta as Damageable).damage = (durability - (durability * percent)).toInt()
+            }
         }
     }
 
@@ -64,8 +66,11 @@ private class ItemDurability : Listener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     fun e(e: PlayerItemDamageEvent) {
         val itemStream = ItemStream(e.item)
-        if (itemStream.isExtension() && itemStream.getZaphkielData().containsKey("durability")) {
-            e.isCancelled = true
+        if (itemStream.isExtension()) {
+            if (itemStream.getZaphkielData().containsKey("durability")) {
+                e.isCancelled = true
+            }
+            itemStream.getZaphkielItem().eval("onDamage", e, e.item)
         }
     }
 }

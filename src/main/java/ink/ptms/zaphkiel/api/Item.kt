@@ -6,8 +6,8 @@ import ink.ptms.zaphkiel.api.event.single.Events
 import ink.ptms.zaphkiel.api.event.single.ItemBuildEvent
 import ink.ptms.zaphkiel.api.internal.ItemKey
 import ink.ptms.zaphkiel.api.internal.Translator
-import ink.ptms.zaphkiel.mirror.Mirror
 import ink.ptms.zaphkiel.module.meta.MetaBuilder
+import io.izzel.taboolib.kotlin.asList
 import io.izzel.taboolib.module.nms.nbt.NBTBase
 import io.izzel.taboolib.module.nms.nbt.NBTCompound
 import io.izzel.taboolib.util.Strings
@@ -17,6 +17,7 @@ import org.bukkit.Material
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
+import org.bukkit.event.Cancellable
 import org.bukkit.event.Event
 import org.bukkit.event.player.PlayerEvent
 import org.bukkit.inventory.ItemStack
@@ -74,44 +75,43 @@ class Item(
     val dataCache = refreshData(HashMap(), data)
 
     fun eval(key: String, player: Player, event: Event, itemStack: ItemStack) {
-        Mirror.define("Item:eval")
-        eventMap[key]?.eval(player, event, itemStack, eventData)
-        Mirror.finish("Item:eval")
+        eventMap[key]?.run {
+            if (cancel && event is Cancellable) {
+                event.isCancelled = true
+            }
+            eval(player, event, itemStack, eventData)
+        }
     }
 
     fun eval(key: String, event: PlayerEvent, itemStack: ItemStack) {
-        Mirror.define("Item:eval")
-        eventMap[key]?.eval(event.player, event, itemStack, eventData)
-        Mirror.finish("Item:eval")
+        eventMap[key]?.run {
+            if (cancel && event is Cancellable) {
+                event.isCancelled = true
+            }
+            eval(event.player, event, itemStack, eventData)
+        }
     }
 
     fun build(player: Player?): ItemStream {
-        Mirror.define("Item:build:generated")
         val itemStream = ItemStreamGenerated(icon.clone(), name.toMutableMap(), lore.toMutableMap())
         val compound = itemStream.compound.computeIfAbsent("zaphkiel") { NBTCompound() }.asCompound()
         compound[ItemKey.ID.key] = NBTBase(id)
         compound[ItemKey.DATA.key] = Translator.toNBTCompound(NBTCompound(), data)
-        return build(player, itemStream).also {
-            Mirror.finish("Item:build:generated")
-        }
+        return build(player, itemStream)
     }
 
     fun build(player: Player?, itemStream: ItemStream): ItemStream {
-        Mirror.define("Item:build:itemStream")
         val pre = if (itemStream is ItemStreamGenerated) {
             Events.call(ItemBuildEvent.Pre(player, itemStream, itemStream.name, itemStream.lore))
         } else {
             Events.call(ItemBuildEvent.Pre(player, itemStream, name.toMutableMap(), lore.toMutableMap()))
         }
         if (pre.isCancelled) {
-            Mirror.finish("Item:build:itemStream")
             return itemStream
         }
         dataCache.forEach { (k, v) -> itemStream.getZaphkielData().putDeep(k, v) }
         pre.itemStream.compound["zaphkiel"]!!.asCompound()[ItemKey.HASH.key] = NBTBase(hash)
-        return Events.call(ItemBuildEvent.Post(player, pre.itemStream, pre.name, pre.lore)).itemStream.also {
-            Mirror.finish("Item:build:itemStream")
-        }
+        return Events.call(ItemBuildEvent.Post(player, pre.itemStream, pre.name, pre.lore)).itemStream
     }
 
     private fun refreshData(map: MutableMap<String, NBTBase?>, section: ConfigurationSection, path: String = ""): MutableMap<String, NBTBase?> {
@@ -199,7 +199,12 @@ class Item(
             val map = HashMap<String, ItemEvent>()
             val event = config.getConfigurationSection("event") ?: return HashMap()
             event.getKeys(false).forEach { key ->
-                map[key] = ItemEvent(item, key, Scripts.compile(config.getString("event.$key")!!))
+                if (key.endsWith("!!")) {
+                    val substring = key.substring(0, key.length - 2)
+                    map[substring] = ItemEvent(item, substring, config.get("event.$key")!!.asList(), true)
+                } else {
+                    map[key] = ItemEvent(item, key, config.get("event.$key")!!.asList())
+                }
             }
             return map
         }

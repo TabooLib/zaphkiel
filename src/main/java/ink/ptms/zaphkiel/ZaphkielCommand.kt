@@ -1,9 +1,7 @@
 package ink.ptms.zaphkiel
 
-import ink.ptms.zaphkiel.api.internal.ItemList
-import ink.ptms.zaphkiel.mirror.Mirror
+import ink.ptms.zaphkiel.api.internal.openGroupMenu
 import io.izzel.taboolib.cronus.CronusUtils
-import io.izzel.taboolib.kotlin.Tasks
 import io.izzel.taboolib.module.command.base.*
 import io.izzel.taboolib.module.locale.TLocale
 import org.bukkit.Bukkit
@@ -20,12 +18,14 @@ import org.bukkit.util.NumberConversions
 @BaseCommand(name = "Zaphkiel", aliases = ["zl", "item"], permission = "*")
 class ZaphkielCommand : BaseMainCommand() {
 
-    @SubCommand(priority = 0.0)
+    @SubCommand(priority = 0.0, description = "赋予物品")
     val give = object : BaseSubCommand() {
 
-        override fun getArguments(): Array<Argument> = arrayOf(Argument("节点") { ZaphkielAPI.registeredItem.keys.toList() }, Argument("玩家", false), Argument("数量", false))
-
-        override fun getDescription(): String = "赋予物品"
+        override fun getArguments() = of(
+            Argument("节点") { ZaphkielAPI.registeredItem.keys.toList() },
+            Argument("玩家", false),
+            Argument("数量", false)
+        )
 
         override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<String>) {
             val item = ZaphkielAPI.registeredItem[args[0]]
@@ -50,46 +50,16 @@ class ZaphkielCommand : BaseMainCommand() {
         }
     }
 
-    @SubCommand(priority = 0.1)
+    @SubCommand(priority = 0.1, description = "列出物品", type = CommandType.PLAYER)
     val list = object : BaseSubCommand() {
 
-        override fun getType(): CommandType = CommandType.PLAYER
-
-        override fun getArguments(): Array<Argument> = arrayOf(Argument("页数", false))
-
-        override fun getDescription(): String = "列出物品"
-
         override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<String>) {
-            val player = sender as Player
-            if (args.isEmpty()) {
-                ItemList.open(player, 0)
-            } else {
-                ItemList.open(player, NumberConversions.toInt(args[0]) - 1)
-            }
+            (sender as Player).openGroupMenu()
         }
     }
 
-    @SubCommand(priority = 0.11)
-    val mirror = object : BaseSubCommand() {
-
-        override fun getDescription(): String = "性能监控"
-
-        override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<String>) {
-            notify(sender, "正在创建统计...")
-            notify(sender, "---")
-            Tasks.task(true) {
-                Mirror.collect().run {
-                    print(sender, getTotal(), 0)
-                }
-                notify(sender, "---")
-            }
-        }
-    }
-
-    @SubCommand(priority = 0.2)
+    @SubCommand(priority = 0.2, description = "重载插件")
     val reload = object : BaseSubCommand() {
-
-        override fun getDescription(): String = "重载插件"
 
         override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<String>) {
             Zaphkiel.conf.reload()

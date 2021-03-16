@@ -1,32 +1,44 @@
 package ink.ptms.zaphkiel.api
 
+import ink.ptms.zaphkiel.ZaphkielAPI
+import io.izzel.taboolib.kotlin.kether.KetherShell
+import io.izzel.taboolib.kotlin.kether.printMessage
+import io.izzel.taboolib.util.Coerce
 import org.bukkit.entity.Player
 import org.bukkit.event.Event
 import org.bukkit.inventory.ItemStack
+import java.util.concurrent.CompletableFuture
 import javax.script.CompiledScript
 import javax.script.SimpleBindings
 
-data class ItemEvent(val item: Item, val name: String, val script: CompiledScript) {
+data class ItemEvent(
+    val item: Item,
+    val name: String,
+    val script: List<String>,
+    val cancel: Boolean = false
+) {
 
     fun eval(player: Player, event: Event, itemStack: ItemStack, data: Map<String, Any>) {
-        val itemAPI = ItemAPI.get(ItemAPI(item, itemStack, player))
-        itemAPI.data.putAll(data)
         try {
-            script.eval(SimpleBindings(mapOf(
-                "player" to player,
-                "event" to event,
-                "item" to itemStack,
-                "api" to itemAPI
-            )))
-        } catch (t: Throwable) {
-            t.printStackTrace()
-        }
-        try {
-            if (itemAPI.isChanged) {
-                itemAPI.save()
+            val itemStream = ZaphkielAPI.read(itemStack)
+            val itemAPI = itemStream.getItemAPI(player)
+            KetherShell.eval(script, namespace = listOf("zaphkiel")) {
+                this.sender = player
+                this.event = event
+                this.rootFrame().variables().also { vars ->
+                    data.forEach { (k, v) ->
+                        vars.set(k, v)
+                    }
+                    vars.set("@ItemAPI", itemAPI)
+                    vars.set("@ItemStream", itemStream)
+                }
+            }.thenRun {
+                if (itemAPI.isChanged) {
+                    itemAPI.save()
+                }
             }
-        } catch (t: Throwable) {
-            t.printStackTrace()
+        } catch (e: Throwable) {
+            e.printMessage()
         }
     }
 }
