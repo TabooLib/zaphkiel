@@ -6,6 +6,7 @@ import ink.ptms.zaphkiel.api.ItemStream
 import ink.ptms.zaphkiel.api.event.PluginReloadEvent
 import ink.ptms.zaphkiel.api.event.single.Events
 import ink.ptms.zaphkiel.api.event.single.ItemReleaseEvent
+import io.izzel.taboolib.Version
 import io.izzel.taboolib.module.inject.TListener
 import io.izzel.taboolib.module.nms.nbt.NBTBase
 import org.bukkit.event.EventHandler
@@ -39,13 +40,11 @@ private class ItemDurability : Listener {
             }
         }
         Events.listen(ItemReleaseEvent::class.java, 1) { e ->
-            if (e.itemMeta is Damageable) {
-                val max = e.itemStream.getZaphkielData()["durability"] ?: return@listen
-                val current = e.itemStream.getZaphkielData()["durability_current"] ?: return@listen
-                val percent = current.asDouble() / max.asDouble()
-                val durability = e.itemStream.itemStack.type.maxDurability
-                (e.itemMeta as Damageable).damage = (durability - (durability * percent)).toInt()
-            }
+            val max = e.itemStream.getZaphkielData()["durability"] ?: return@listen
+            val current = e.itemStream.getZaphkielData()["durability_current"] ?: return@listen
+            val percent = current.asDouble() / max.asDouble()
+            val durability = e.itemStream.itemStack.type.maxDurability
+            e.data = (durability - (durability * percent)).toInt()
         }
     }
 
@@ -60,7 +59,8 @@ private class ItemDurability : Listener {
     @EventHandler
     fun e(e: PluginReloadEvent.Item) {
         durability = Zaphkiel.conf.getString("Durability.display")
-        durabilitySymbol = Lists.newArrayList<String>(Zaphkiel.conf.getString("Durability.display-symbol.0"), Zaphkiel.conf.getString("Durability.display-symbol.1"))
+        durabilitySymbol =
+            Lists.newArrayList<String>(Zaphkiel.conf.getString("Durability.display-symbol.0"), Zaphkiel.conf.getString("Durability.display-symbol.1"))
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
