@@ -15,6 +15,6 @@ class MetaItemflag(item: Item) : Meta(item) {
     }
 
     override fun toString(): String {
-        return "MetaItemflag(itemflag=${Arrays.toString(itemflag)})"
+        return "MetaItemflag(itemflag=${itemflag.contentToString()})"
     }
 }

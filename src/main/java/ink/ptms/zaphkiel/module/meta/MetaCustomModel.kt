@@ -4,6 +4,7 @@ import ink.ptms.zaphkiel.api.Item
 import org.bukkit.inventory.meta.ItemMeta
 
 @MetaKey("custommodel")
+@Deprecated("legacy")
 class MetaCustomModel(item: Item) : Meta(item) {
 
     val custommodel = item.config.getInt("meta.custommodel")

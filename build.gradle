@@ -5,13 +5,13 @@ plugins {
 }
 
 group = 'ink.ptms.zaphkiel'
-version = '1.4.3'
+version = '1.4.4'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 taboolib {
-    tabooLibVersion = '5.59'
+    tabooLibVersion = '5.62'
     loaderVersion = '2.12'
     classifier = null
 }
