@@ -12,7 +12,7 @@ targetCompatibility = 1.8
 
 taboolib {
     tabooLibVersion = '5.7.1'
-    loaderVersion = '3.0.1'
+    loaderVersion = '3.0.2'
     classifier = null
 }
 
