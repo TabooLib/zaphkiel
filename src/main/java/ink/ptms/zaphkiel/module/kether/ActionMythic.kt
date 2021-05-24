@@ -12,7 +12,7 @@ import io.izzel.taboolib.kotlin.kether.common.loader.types.ArgTypes
 import io.lumine.xikage.mythicmobs.MythicMobs
 import org.bukkit.entity.Player
 
-class ActionCastSkill {
+class ActionMythic {
 
     class CastSkill(val skill: ParsedAction<*>) : QuestAction<Void>() {
 
@@ -26,7 +26,7 @@ class ActionCastSkill {
     }
 
     companion object {
-        
+
         @KetherParser(["mm"], namespace = "zaphkiel")
         fun parser() = ScriptParser.parser {
             when (it.expects("castskill", "taunt")) {
