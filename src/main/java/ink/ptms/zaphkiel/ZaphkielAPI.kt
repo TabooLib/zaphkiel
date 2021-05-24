@@ -54,6 +54,14 @@ object ZaphkielAPI {
         return registeredItem[id]?.build(player)
     }
 
+    fun getItemStack(id: String): ItemStack? {
+        return registeredItem[id]?.build(null)?.save()
+    }
+
+    fun getItemStack(id: String, player: Player?): ItemStack? {
+        return registeredItem[id]?.build(player)?.save()
+    }
+
     fun getName(item: ItemStack): String? {
         val read = read(item)
         return if (read.isExtension()) {
