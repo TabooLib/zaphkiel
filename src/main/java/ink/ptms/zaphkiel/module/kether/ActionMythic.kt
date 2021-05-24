@@ -27,7 +27,7 @@ class ActionMythic {
 
     companion object {
 
-        @KetherParser(["mm"], namespace = "zaphkiel")
+//        @KetherParser(["mm"], namespace = "zaphkiel")
         fun parser() = ScriptParser.parser {
             when (it.expects("castskill", "taunt")) {
                 "castskill" -> {

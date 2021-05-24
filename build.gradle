@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    id 'maven'
     id 'io.izzel.taboolib' version '1.2'
     id 'org.jetbrains.kotlin.jvm' version '1.4.0-rc'
 }
@@ -33,5 +34,19 @@ processResources {
     from(sourceSets.main.resources.srcDirs) {
         include "plugin.yml"
         expand name: rootProject.name, main: project.group + ".boot.PluginBoot", version: project.version, "libVersion": taboolib.tabooLibVersion
+    }
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: project.findProperty('repository')) {
+                authentication(userName: project.findProperty('user'), password: project.findProperty('password'))
+            }
+            pom.artifactId = rootProject.name
+            pom.groupId = 'ink.ptms'
+            pom.version = project.version
+            pom.packaging = 'jar'
+        }
     }
 }
