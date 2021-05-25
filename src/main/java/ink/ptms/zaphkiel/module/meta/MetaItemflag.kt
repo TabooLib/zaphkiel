@@ -8,7 +8,10 @@ import java.util.*
 @MetaKey("itemflag")
 class MetaItemflag(item: Item) : Meta(item) {
 
-    val itemflag = item.config.getStringList("meta.itemflag").mapNotNull { Items.asItemFlag(it.toString().toUpperCase()) }.toTypedArray()
+    val itemflag = item.config.getStringList("meta.itemflag")
+        .mapNotNull { Items.asItemFlag(it.toString().toUpperCase()) }
+        .toSet()
+        .toTypedArray()
 
     override fun build(itemMeta: ItemMeta) {
         itemMeta.addItemFlags(*itemflag)
