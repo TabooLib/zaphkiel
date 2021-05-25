@@ -5,14 +5,19 @@ import ink.ptms.zaphkiel.api.*
 import ink.ptms.zaphkiel.api.event.PluginReloadEvent
 import ink.ptms.zaphkiel.api.event.single.Events
 import ink.ptms.zaphkiel.api.event.single.ItemBuildEvent
-import ink.ptms.zaphkiel.api.internal.ItemKey
+import ink.ptms.zaphkiel.module.meta.Meta
+import ink.ptms.zaphkiel.module.meta.MetaKey
+import io.izzel.taboolib.TabooLibLoader
 import io.izzel.taboolib.kotlin.Mirror
 import io.izzel.taboolib.kotlin.Reflex.Companion.static
 import io.izzel.taboolib.module.config.TConfigWatcher
 import io.izzel.taboolib.module.nms.nbt.NBTCompound
 import io.izzel.taboolib.util.Files
+import io.izzel.taboolib.util.Reflection
+import io.izzel.taboolib.util.item.Equipments
 import io.izzel.taboolib.util.item.Items
 import org.bukkit.Bukkit
+import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Player
 import org.bukkit.inventory.Inventory
@@ -24,12 +29,16 @@ import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.util.*
+import java.util.zip.GZIPInputStream
+import java.util.zip.GZIPOutputStream
 import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 /**
  * @Author sky
  * @Since 2019-12-15 20:14
  */
+@Suppress("UNCHECKED_CAST")
 object ZaphkielAPI {
 
     val mirror = Mirror()
@@ -41,6 +50,10 @@ object ZaphkielAPI {
     val registeredModel = Maps.newHashMap<String, Model>()!!
     val registeredDisplay = Maps.newHashMap<String, Display>()!!
     val registeredGroup = Maps.newHashMap<String, Group>()!!
+    val registeredMeta = TabooLibLoader.getPluginClassSafely(Zaphkiel.plugin)
+        .filter { it.isAnnotationPresent(MetaKey::class.java) }
+        .map { it.getAnnotation(MetaKey::class.java).value to it }
+        .toMap(HashMap())
 
     fun mirrorFuture(id: String, func: Mirror.MirrorFuture.() -> Unit) {
         mirror.mirrorFuture(id, func)
@@ -83,7 +96,7 @@ object ZaphkielAPI {
     fun getUnique(item: ItemStack): NBTCompound? {
         val read = read(item)
         return if (read.isExtension()) {
-            read.getZaphkielData().getDeep("zaphkiel.${ItemKey.UNIQUE.key}").asCompound()
+            read.getZaphkielUniqueData()
         } else {
             null
         }
@@ -112,7 +125,7 @@ object ZaphkielAPI {
                 return@forEach
             }
             val rebuild = rebuild(player, item!!)
-            if (rebuild.isFromRebuild) {
+            if (rebuild.rebuild) {
                 rebuild.save()
             }
         }
@@ -122,7 +135,7 @@ object ZaphkielAPI {
         if (Items.isNull(item)) {
             throw RuntimeException("Could not read empty item.")
         }
-        val itemStream = ItemStream(item)
+        val itemStream = ItemStream(item, rebuild = true)
         if (itemStream.isVanilla()) {
             return itemStream
         }
@@ -130,7 +143,7 @@ object ZaphkielAPI {
         if (pre.isCancelled) {
             return itemStream
         }
-        return itemStream.fromRebuild().getZaphkielItem().build(player, itemStream)
+        return itemStream.getZaphkielItem().build(player, itemStream)
     }
 
     fun reloadItem() {
@@ -225,27 +238,35 @@ object ZaphkielAPI {
         return null
     }
 
-    @Suppress("UNCHECKED_CAST")
-    fun toItemStack(data: String): ItemStack {
-        ByteArrayInputStream(Base64.getDecoder().decode(data)).use { byteArrayInputStream ->
+    fun asEquipmentSlot(id: String) = when (id.toLowerCase()) {
+        "0", "mainhand", "hand" -> Equipments.HAND
+        "1", "head", "helmet" -> Equipments.HEAD
+        "2", "chest", "chestplate" -> Equipments.CHEST
+        "3", "legs", "leggings" -> Equipments.LEGS
+        "4", "feet", "boots" -> Equipments.FEET
+        "-1", "offhand" -> Equipments.OFF_HAND
+        else -> null
+    }
+
+    fun toItemStack(data: ByteArray): ItemStack {
+        ByteArrayInputStream(fromZip(data)).use { byteArrayInputStream ->
             BukkitObjectInputStream(byteArrayInputStream).use { bukkitObjectInputStream ->
                 return bukkitObjectInputStream.readObject() as ItemStack
             }
         }
     }
 
-    fun fromItemStack(itemStack: ItemStack): String {
+    fun fromItemStack(itemStack: ItemStack): ByteArray {
         ByteArrayOutputStream().use { byteArrayOutputStream ->
             BukkitObjectOutputStream(byteArrayOutputStream).use { bukkitObjectOutputStream ->
                 bukkitObjectOutputStream.writeObject(itemStack)
-                return Base64.getEncoder().encodeToString(byteArrayOutputStream.toByteArray())
+                return toZip(byteArrayOutputStream.toByteArray())
             }
         }
     }
 
-    @Suppress("UNCHECKED_CAST")
-    fun toInventory(inventory: Inventory, data: String) {
-        ByteArrayInputStream(Base64.getDecoder().decode(data)).use { byteArrayInputStream ->
+    fun toInventory(inventory: Inventory, data: ByteArray) {
+        ByteArrayInputStream(fromZip(data)).use { byteArrayInputStream ->
             BukkitObjectInputStream(byteArrayInputStream).use { bukkitObjectInputStream ->
                 val index = bukkitObjectInputStream.readObject() as Array<Int>
                 index.indices.forEach {
@@ -255,7 +276,7 @@ object ZaphkielAPI {
         }
     }
 
-    fun fromInventory(inventory: Inventory, size: Int): String {
+    fun fromInventory(inventory: Inventory, size: Int): ByteArray {
         ByteArrayOutputStream().use { byteArrayOutputStream ->
             BukkitObjectOutputStream(byteArrayOutputStream).use { bukkitObjectOutputStream ->
                 (0..size).map { it to inventory.getItem(it) }.filter { Items.nonNull(it.second) }.toMap().run {
@@ -265,7 +286,42 @@ object ZaphkielAPI {
                     }
                 }
             }
-            return Base64.getEncoder().encodeToString(byteArrayOutputStream.toByteArray())
+            return toZip(byteArrayOutputStream.toByteArray())
         }
+    }
+
+    fun toZip(byteArray: ByteArray): ByteArray {
+        ByteArrayOutputStream().use { byteArrayOutputStream ->
+            GZIPOutputStream(byteArrayOutputStream).use { gzipOutputStream ->
+                gzipOutputStream.write(byteArray)
+                gzipOutputStream.flush()
+            }
+            return byteArrayOutputStream.toByteArray()
+        }
+    }
+
+    fun fromZip(byteArray: ByteArray): ByteArray {
+        ByteArrayInputStream(byteArray).use { byteArrayOutputStream ->
+            GZIPInputStream(byteArrayOutputStream).use { gzipInputStream ->
+                return gzipInputStream.readBytes()
+            }
+        }
+    }
+
+    fun getMeta(root: ConfigurationSection): MutableList<Meta> {
+        return root.getConfigurationSection("meta")?.getKeys(false)?.mapNotNull { id ->
+            val locked: Boolean
+            val meta = Reflection.instantiateObject(
+                if (id.endsWith("!!")) {
+                    locked = true
+                    registeredMeta[id.substring(0, id.length - 2)]
+                } else {
+                    locked = false
+                    registeredMeta[id]
+                } ?: return@mapNotNull null, root
+            ) as Meta
+            meta.locked = locked
+            meta
+        }?.toMutableList() ?: ArrayList()
     }
 }

@@ -3,13 +3,9 @@ package ink.ptms.zaphkiel.api
 import ink.ptms.zaphkiel.ZaphkielAPI
 import io.izzel.taboolib.kotlin.kether.KetherShell
 import io.izzel.taboolib.kotlin.kether.printMessage
-import io.izzel.taboolib.util.Coerce
 import org.bukkit.entity.Player
 import org.bukkit.event.Event
 import org.bukkit.inventory.ItemStack
-import java.util.concurrent.CompletableFuture
-import javax.script.CompiledScript
-import javax.script.SimpleBindings
 
 data class ItemEvent(
     val item: Item,

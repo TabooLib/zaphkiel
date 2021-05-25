@@ -35,7 +35,7 @@ private class ItemRefresher : Listener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     fun e(e: PlayerDropItemEvent) {
         ZaphkielAPI.rebuild(e.player, e.itemDrop.itemStack).run {
-            if (this.isFromRebuild) {
+            if (this.rebuild) {
                 e.itemDrop.setItemStack(this.save())
             }
         }
@@ -44,7 +44,7 @@ private class ItemRefresher : Listener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     fun e(e: PlayerPickupItemEvent) {
         ZaphkielAPI.rebuild(e.player, e.item.itemStack).run {
-            if (this.isFromRebuild) {
+            if (this.rebuild) {
                 e.item.setItemStack(this.save())
             }
         }

@@ -12,7 +12,6 @@ import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
-import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 
 /**
@@ -52,47 +51,11 @@ class MythicHook : Listener {
             } else {
                 ZaphkielAPI.getItemStack(item.toString()) ?: ItemStack(Material.AIR)
             }
-            when (getEquipmentSlot(slot)) {
-                EquipmentSlot.HEAD -> {
-                    entity.equipment!!.helmet = itemStack
-                    entity.equipment!!.helmetDropChance = 0f
-                }
-                EquipmentSlot.CHEST -> {
-                    entity.equipment!!.chestplate = itemStack
-                    entity.equipment!!.chestplateDropChance = 0f
-                }
-                EquipmentSlot.LEGS -> {
-                    entity.equipment!!.leggings = itemStack
-                    entity.equipment!!.leggingsDropChance = 0f
-                }
-                EquipmentSlot.FEET -> {
-                    entity.equipment!!.boots = itemStack
-                    entity.equipment!!.bootsDropChance = 0f
-                }
-                EquipmentSlot.HAND -> {
-                    entity.equipment!!.setItemInMainHand(itemStack)
-                    entity.equipment!!.itemInMainHandDropChance = 0f
-                }
-                EquipmentSlot.OFF_HAND -> {
-                    entity.equipment!!.setItemInOffHand(itemStack)
-                    entity.equipment!!.itemInOffHandDropChance = 0f
-                }
-                else -> {
-                }
+            val equipments = ZaphkielAPI.asEquipmentSlot(slot)
+            if (equipments != null) {
+                equipments.setItem(entity, itemStack)
+                equipments.setItemDropChance(entity, 0f)
             }
-        }
-    }
-
-
-    fun getEquipmentSlot(id: String): EquipmentSlot? {
-        return when (id.toLowerCase()) {
-            "0", "hand" -> EquipmentSlot.HAND
-            "1", "head", "helmet" -> EquipmentSlot.HEAD
-            "2", "chest", "chestplate" -> EquipmentSlot.CHEST
-            "3", "legs", "leggings" -> EquipmentSlot.LEGS
-            "4", "feet", "boots" -> EquipmentSlot.FEET
-            "-1", "offhand" -> EquipmentSlot.OFF_HAND
-            else -> null
         }
     }
 }

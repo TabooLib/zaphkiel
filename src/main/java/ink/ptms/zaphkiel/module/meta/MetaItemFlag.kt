@@ -1,20 +1,24 @@
 package ink.ptms.zaphkiel.module.meta
 
-import ink.ptms.zaphkiel.api.Item
 import io.izzel.taboolib.util.item.Items
+import org.bukkit.configuration.ConfigurationSection
+import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.meta.ItemMeta
-import java.util.*
 
 @MetaKey("itemflag")
-class MetaItemflag(item: Item) : Meta(item) {
+class MetaItemFlag(root: ConfigurationSection) : Meta(root) {
 
-    val itemflag = item.config.getStringList("meta.itemflag")
+    val itemflag = root.getStringList("meta.itemflag")
         .mapNotNull { Items.asItemFlag(it.toString().toUpperCase()) }
         .toSet()
         .toTypedArray()
 
     override fun build(itemMeta: ItemMeta) {
         itemMeta.addItemFlags(*itemflag)
+    }
+
+    override fun drop(itemMeta: ItemMeta) {
+        itemMeta.removeItemFlags(*ItemFlag.values())
     }
 
     override fun toString(): String {

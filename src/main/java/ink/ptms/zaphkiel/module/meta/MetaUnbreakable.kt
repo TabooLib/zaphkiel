@@ -1,15 +1,19 @@
 package ink.ptms.zaphkiel.module.meta
 
-import ink.ptms.zaphkiel.api.Item
+import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.inventory.meta.ItemMeta
 
 @MetaKey("unbreakable")
-class MetaUnbreakable(item: Item) : Meta(item) {
+class MetaUnbreakable(root: ConfigurationSection) : Meta(root) {
 
-    val unbreakable = item.config.getBoolean("meta.unbreakable")
+    val unbreakable = root.getBoolean("meta.unbreakable")
 
     override fun build(itemMeta: ItemMeta) {
         itemMeta.isUnbreakable = unbreakable
+    }
+
+    override fun drop(itemMeta: ItemMeta) {
+        itemMeta.isUnbreakable = false
     }
 
     override fun toString(): String {

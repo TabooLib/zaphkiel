@@ -1,15 +1,19 @@
 package ink.ptms.zaphkiel.module.meta
 
-import ink.ptms.zaphkiel.api.Item
 import ink.ptms.zaphkiel.api.event.single.ItemReleaseEvent
+import org.bukkit.configuration.ConfigurationSection
 
 @MetaKey("data")
-class MetaData(item: Item) : Meta(item) {
+class MetaData(root: ConfigurationSection) : Meta(root) {
 
-    val data = item.config.getInt("meta.data")
+    val data = root.getInt("meta.data")
 
     override fun build(itemReleaseEvent: ItemReleaseEvent) {
         itemReleaseEvent.data = data
+    }
+
+    override fun drop(itemReleaseEvent: ItemReleaseEvent) {
+        itemReleaseEvent.data = 0
     }
 
     override fun toString(): String {

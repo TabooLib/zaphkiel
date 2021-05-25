@@ -16,25 +16,35 @@ import org.bukkit.inventory.ItemStack
  * @Since 2019-12-15 16:58
  */
 open class ItemStream(
-        val itemStack: ItemStack,
-        val compound: NBTCompound = NMS.handle().loadNBT(itemStack)) {
+    val itemStack: ItemStack,
+    val compound: NBTCompound = NMS.handle().loadNBT(itemStack),
+    val rebuild: Boolean = false
+) {
 
-    var isFromRebuild: Boolean = false
-        private set
-
-    fun fromRebuild(): ItemStream {
-        isFromRebuild = true
-        return this
+    /**
+     * 内部属性，已删除的 Meta 名称
+     * 这组数据在物品流被创建时就已确立，无法修改。
+     */
+    val dropMeta by lazy {
+        val metaItem = getZaphkielItem().meta
+        val metaHistory = getZaphkielMetaHistory()
+        metaHistory.filter { id -> metaItem.none { it.id == id } }
     }
 
+    /**
+     * 是否为 Zaphkiel 物品
+     */
     fun isExtension(): Boolean {
-        val compound = zaphkielCompound() ?: return false
+        val compound = getZaphkielCompound() ?: return false
         if (compound.containsKey(ItemKey.ID.key)) {
             return ZaphkielAPI.registeredItem.containsKey(compound[ItemKey.ID.key]!!.asString())
         }
         return false
     }
 
+    /**
+     * 是否为非 Zaphkiel 物品（即原版物品）
+     */
     fun isVanilla(): Boolean {
         return !isExtension()
     }
@@ -49,6 +59,9 @@ open class ItemStream(
         display["Lore"] = lore.map { NBTBase(it) }.toCollection(NBTList())
     }
 
+    /**
+     * 保存为物品实例
+     */
     fun save(): ItemStack {
         val itemMeta = NMS.handle().saveNBT(itemStack, compound).itemMeta
         if (itemMeta != null) {
@@ -77,28 +90,46 @@ open class ItemStream(
         if (isVanilla()) {
             throw RuntimeException("This item is not extension item.")
         }
-        return zaphkielCompound()!![ItemKey.ID.key]!!.asString()
+        return getZaphkielCompound()!![ItemKey.ID.key]!!.asString()
     }
 
     fun getZaphkielHash(): String {
         if (isVanilla()) {
             throw RuntimeException("This item is not extension item.")
         }
-        return zaphkielCompound()!![ItemKey.HASH.key]!!.asString()
+        return getZaphkielCompound()!![ItemKey.HASH.key]!!.asString()
     }
 
     fun getZaphkielData(): NBTCompound {
         if (isVanilla()) {
             throw RuntimeException("This item is not extension item.")
         }
-        return zaphkielCompound()!![ItemKey.DATA.key]!!.asCompound()
+        return getZaphkielCompound()!![ItemKey.DATA.key]!!.asCompound()
     }
 
     fun getZaphkielUniqueData(): NBTCompound? {
         if (isVanilla()) {
             throw RuntimeException("This item is not extension item.")
         }
-        return zaphkielCompound()!![ItemKey.UNIQUE.key]?.asCompound()
+        return getZaphkielCompound()!![ItemKey.UNIQUE.key]?.asCompound()
+    }
+
+    fun getZaphkielMetaHistory(): List<String> {
+        if (isVanilla()) {
+            throw RuntimeException("This item is not extension item.")
+        }
+        return getZaphkielCompound()!![ItemKey.META_HISTORY.key]?.asList()?.map { it.asString() }?.toList() ?: emptyList()
+    }
+
+    fun setZaphkielMetaHistory(meta: List<String>) {
+        if (isVanilla()) {
+            throw RuntimeException("This item is not extension item.")
+        }
+        getZaphkielCompound()!![ItemKey.META_HISTORY.key] = NBTList.of(meta.map { NBTBase(it) })
+    }
+
+    fun getZaphkielCompound(): NBTCompound? {
+        return compound["zaphkiel"]?.asCompound()
     }
 
     fun shouldRefresh(): Boolean {
@@ -112,27 +143,23 @@ open class ItemStream(
         return ItemAPI(getZaphkielItem(), itemStack, player)
     }
 
-    private fun zaphkielCompound(): NBTCompound? {
-        return compound["zaphkiel"]?.asCompound()
-    }
-
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is ItemStream) return false
         if (itemStack != other.itemStack) return false
         if (compound != other.compound) return false
-        if (isFromRebuild != other.isFromRebuild) return false
+        if (rebuild != other.rebuild) return false
         return true
     }
 
     override fun hashCode(): Int {
         var result = itemStack.hashCode()
         result = 31 * result + compound.hashCode()
-        result = 31 * result + isFromRebuild.hashCode()
+        result = 31 * result + rebuild.hashCode()
         return result
     }
 
     override fun toString(): String {
-        return "ItemStream(itemStack=$itemStack, compound=$compound, isFromRebuild=$isFromRebuild)"
+        return "ItemStream(itemStack=$itemStack, compound=$compound, rebuild=$rebuild)"
     }
 }

@@ -1,16 +1,20 @@
 package ink.ptms.zaphkiel.module.meta
 
-import ink.ptms.zaphkiel.api.Item
+import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.inventory.meta.ItemMeta
 
 @MetaKey("custommodel")
 @Deprecated("legacy")
-class MetaCustomModel(item: Item) : Meta(item) {
+class MetaCustomModel(root: ConfigurationSection) : Meta(root) {
 
-    val custommodel = item.config.getInt("meta.custommodel")
+    val custommodel = root.getInt("meta.custommodel")
 
     override fun build(itemMeta: ItemMeta) {
         itemMeta.setCustomModelData(custommodel)
+    }
+
+    override fun drop(itemMeta: ItemMeta) {
+        itemMeta.setCustomModelData(null)
     }
 
     override fun toString(): String {

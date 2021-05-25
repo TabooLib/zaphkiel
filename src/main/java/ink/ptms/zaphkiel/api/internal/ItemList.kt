@@ -5,14 +5,10 @@ import ink.ptms.zaphkiel.api.Group
 import ink.ptms.zaphkiel.api.Item
 import io.izzel.taboolib.cronus.CronusUtils
 import io.izzel.taboolib.internal.xseries.XMaterial
-import io.izzel.taboolib.kotlin.Indexed
 import io.izzel.taboolib.util.item.ItemBuilder
 import io.izzel.taboolib.util.item.Items
 import io.izzel.taboolib.util.item.inventory.ClickEvent
-import io.izzel.taboolib.util.item.inventory.ClickType
-import io.izzel.taboolib.util.item.inventory.MenuBuilder
 import io.izzel.taboolib.util.item.inventory.linked.MenuLinked
-import org.bukkit.Material
 import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.inventory.Inventory

@@ -2,11 +2,13 @@ package ink.ptms.zaphkiel
 
 import ink.ptms.zaphkiel.api.internal.openGroupMenu
 import io.izzel.taboolib.cronus.CronusUtils
-import io.izzel.taboolib.module.command.base.*
+import io.izzel.taboolib.kotlin.Serializer
+import io.izzel.taboolib.module.command.base.BaseCommand
+import io.izzel.taboolib.module.command.base.BaseMainCommand
+import io.izzel.taboolib.module.command.base.SubCommand
 import io.izzel.taboolib.module.locale.TLocale
 import org.bukkit.Bukkit
 import org.bukkit.Sound
-import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import org.bukkit.util.NumberConversions

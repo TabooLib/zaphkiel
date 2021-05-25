@@ -8,7 +8,7 @@ item_intensify_sword:
     LORE:
       - '&6An indestructible golden sword.'
   meta:
-    unbreakable: true
+    unbreakable!!: true
     unique: true
 
 item_wooden_sword:
@@ -45,7 +45,7 @@ item_enchanted_book:
     enchantment:
       DAMAGE_ALL: 1
     itemflag:
-      - HIDE_POTION_EFFECTS
+      - HIDE_ENCHANTS
 
 item_slowness_potion:
   display: DISPLAY_ITEM

@@ -6,13 +6,11 @@ import ink.ptms.zaphkiel.api.event.single.Events
 import ink.ptms.zaphkiel.api.event.single.ItemBuildEvent
 import ink.ptms.zaphkiel.api.internal.ItemKey
 import ink.ptms.zaphkiel.api.internal.Translator
-import ink.ptms.zaphkiel.module.meta.MetaBuilder
 import io.izzel.taboolib.kotlin.asList
 import io.izzel.taboolib.module.nms.nbt.NBTBase
 import io.izzel.taboolib.module.nms.nbt.NBTCompound
 import io.izzel.taboolib.util.Strings
 import io.izzel.taboolib.util.item.Items
-import io.izzel.taboolib.util.lite.Scripts
 import org.bukkit.Material
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.configuration.file.YamlConfiguration
@@ -43,7 +41,8 @@ class Item(
         val model: MutableList<String> = config.getString("event.from")?.split(",")?.map { it.trim() }?.toMutableList() ?: ArrayList(),
         val group: Group? = null) {
 
-    val meta = MetaBuilder.getBuilders(this)
+    val displayInstance = ZaphkielAPI.registeredDisplay[display]
+    val updateData = getUpdateData(HashMap(), data)
     val eventData: Map<String, Any> = config.getConfigurationSection("event.data")?.getValues(false) ?: emptyMap()
     val eventMap: Map<String, ItemEvent> = run {
         val map = HashMap<String, ItemEvent>()
@@ -62,17 +61,19 @@ class Item(
         map
     }
 
+    val meta = ZaphkielAPI.getMeta(config).also {
+        it.addAll(displayInstance?.meta ?: emptyList())
+    }
+
     val hash = YamlConfiguration().run {
-        this.set("value", config)
+        set("value", config)
         val display = ZaphkielAPI.registeredDisplay[display]
         if (display != null) {
-            this.set("display.name", display.name)
-            this.set("display.lore", display.lore)
+            set("display.name", display.name)
+            set("display.lore", display.lore)
         }
-        Strings.hashKeyForDisk(this.saveToString())
+        Strings.hashKeyForDisk(saveToString())
     }!!
-
-    val dataCache = refreshData(HashMap(), data)
 
     fun eval(key: String, player: Player, event: Event, itemStack: ItemStack) {
         eventMap[key]?.run {
@@ -109,17 +110,17 @@ class Item(
         if (pre.isCancelled) {
             return itemStream
         }
-        dataCache.forEach { (k, v) -> itemStream.getZaphkielData().putDeep(k, v) }
+        updateData.forEach { (k, v) -> itemStream.getZaphkielData().putDeep(k, v) }
         pre.itemStream.compound["zaphkiel"]!!.asCompound()[ItemKey.HASH.key] = NBTBase(hash)
         return Events.call(ItemBuildEvent.Post(player, pre.itemStream, pre.name, pre.lore)).itemStream
     }
 
-    private fun refreshData(map: MutableMap<String, NBTBase?>, section: ConfigurationSection, path: String = ""): MutableMap<String, NBTBase?> {
+    private fun getUpdateData(map: MutableMap<String, NBTBase?>, section: ConfigurationSection, path: String = ""): MutableMap<String, NBTBase?> {
         section.getKeys(false).forEach { key ->
             if (key.endsWith("!!")) {
                 map[path + key.substring(0, key.length - 2)] = Translator.toNBTBase(config.get("data.$path$key"))
             } else if (section.isConfigurationSection(key)) {
-                refreshData(map, section.getConfigurationSection(key)!!, "$path$key.")
+                getUpdateData(map, section.getConfigurationSection(key)!!, "$path$key.")
             }
         }
         return map

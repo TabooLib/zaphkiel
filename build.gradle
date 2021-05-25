@@ -6,7 +6,7 @@ plugins {
 }
 
 group = 'ink.ptms.zaphkiel'
-version = '1.4.7'
+version = '1.5.0'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -25,7 +25,7 @@ dependencies {
     implementation 'public:MythicMobs:4.11.0'
     implementation 'public:Tiphareth:1.0.0'
     implementation 'ink.ptms:Sandalphon:1.2.7'
-    implementation 'ink.ptms.core:v11600:11600:all'
+    implementation 'ink.ptms.core:v11605:11605'
     implementation 'org.jetbrains.kotlin:kotlin-stdlib'
     implementation fileTree(dir: 'libs', includes: ['*.jar'])
 }

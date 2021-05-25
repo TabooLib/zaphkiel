@@ -1,17 +1,24 @@
 package ink.ptms.zaphkiel.module.meta
 
 import ink.ptms.tiphareth.TipharethAPI
-import ink.ptms.zaphkiel.api.Item
 import ink.ptms.zaphkiel.api.event.single.ItemReleaseEvent
+import org.bukkit.configuration.ConfigurationSection
 
 @MetaKey("tiphareth")
-class MetaTiphareth(item: Item) : Meta(item) {
+class MetaTiphareth(root: ConfigurationSection) : Meta(root) {
 
-    val tiphareth = TipharethAPI.LOADER.getByName(item.config.getString("meta.tiphareth")!!)!!.buildItem()
+    val tiphareth = root.getString("meta.tiphareth")?.run { TipharethAPI.LOADER.getByName(this)?.buildItem() }
 
     override fun build(itemReleaseEvent: ItemReleaseEvent) {
-        itemReleaseEvent.icon = tiphareth.type
-        itemReleaseEvent.itemMeta.setCustomModelData(tiphareth.itemMeta!!.customModelData)
+        if (tiphareth != null) {
+            itemReleaseEvent.icon = tiphareth.type
+            itemReleaseEvent.itemMeta.setCustomModelData(tiphareth.itemMeta!!.customModelData)
+        }
+    }
+
+    override fun drop(itemReleaseEvent: ItemReleaseEvent) {
+        itemReleaseEvent.icon = itemReleaseEvent.item.icon.type
+        itemReleaseEvent.itemMeta.setCustomModelData(null)
     }
 
     override fun toString(): String {

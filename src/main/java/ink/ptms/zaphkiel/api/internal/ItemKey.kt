@@ -6,5 +6,9 @@ package ink.ptms.zaphkiel.api.internal
  */
 enum class ItemKey(val key: String) {
 
-    ID("a"), HASH("b"), DATA("c"), UNIQUE("d")
+    ID("a"), HASH("b"), DATA("c"), UNIQUE("d"), META_HISTORY("e");
+
+    override fun toString(): String {
+        return key
+    }
 }
