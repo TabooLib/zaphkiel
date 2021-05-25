@@ -11,6 +11,7 @@ import io.izzel.taboolib.TabooLibLoader
 import io.izzel.taboolib.kotlin.Mirror
 import io.izzel.taboolib.kotlin.Reflex.Companion.static
 import io.izzel.taboolib.module.config.TConfigWatcher
+import io.izzel.taboolib.module.db.local.SecuredFile
 import io.izzel.taboolib.module.nms.nbt.NBTCompound
 import io.izzel.taboolib.util.Files
 import io.izzel.taboolib.util.Reflection
@@ -135,7 +136,7 @@ object ZaphkielAPI {
         if (Items.isNull(item)) {
             throw RuntimeException("Could not read empty item.")
         }
-        val itemStream = ItemStream(item, rebuild = true)
+        val itemStream = ItemStream(item)
         if (itemStream.isVanilla()) {
             return itemStream
         }
@@ -143,6 +144,7 @@ object ZaphkielAPI {
         if (pre.isCancelled) {
             return itemStream
         }
+        itemStream.rebuild = true
         return itemStream.getZaphkielItem().build(player, itemStream)
     }
 
@@ -178,17 +180,14 @@ object ZaphkielAPI {
                     }
                     keys.add(key)
                 }
-            }.run {
-                this.run()
-                this
-            }
-            if (loaded.add(file)) {
-                TConfigWatcher.getInst().addSimpleListener(file) {
-                    task.run()
-                    Bukkit.getOnlinePlayers().forEach { player ->
-                        rebuild(player, player.inventory)
-                    }
+                Bukkit.getOnlinePlayers().forEach { player ->
+                    rebuild(player, player.inventory)
                 }
+            }
+            task.run()
+            loaded.add(file)
+            TConfigWatcher.getInst().addSimpleListener(file) {
+                task.run()
             }
         }
     }
@@ -309,7 +308,13 @@ object ZaphkielAPI {
     }
 
     fun getMeta(root: ConfigurationSection): MutableList<Meta> {
+        val copy = SecuredFile()
         return root.getConfigurationSection("meta")?.getKeys(false)?.mapNotNull { id ->
+            if (id.endsWith("!!")) {
+                copy.set("meta.${id.substring(0, id.length - 2)}", root.get("meta.$id"))
+            } else {
+                copy.set("meta.$id", root.get("meta.$id"))
+            }
             val locked: Boolean
             val meta = Reflection.instantiateObject(
                 if (id.endsWith("!!")) {
@@ -318,7 +323,7 @@ object ZaphkielAPI {
                 } else {
                     locked = false
                     registeredMeta[id]
-                } ?: return@mapNotNull null, root
+                } ?: return@mapNotNull null, copy
             ) as Meta
             meta.locked = locked
             meta

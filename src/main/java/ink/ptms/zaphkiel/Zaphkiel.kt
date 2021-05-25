@@ -1,9 +1,5 @@
 package ink.ptms.zaphkiel
 
-import ink.ptms.zaphkiel.ZaphkielAPI.folderDisplay
-import ink.ptms.zaphkiel.ZaphkielAPI.folderItem
-import ink.ptms.zaphkiel.ZaphkielAPI.reloadDisplay
-import ink.ptms.zaphkiel.ZaphkielAPI.reloadItem
 import io.izzel.taboolib.loader.Plugin
 import io.izzel.taboolib.module.config.TConfig
 import io.izzel.taboolib.module.inject.TInject
@@ -26,13 +22,13 @@ object Zaphkiel : Plugin() {
 
     @TSchedule(delay = 20)
     fun reload() {
-        if (!folderItem.exists()) {
+        if (!ZaphkielAPI.folderItem.exists()) {
             plugin.saveResource("item/def.yml", true)
         }
-        if (!folderDisplay.exists()) {
+        if (!ZaphkielAPI.folderDisplay.exists()) {
             plugin.saveResource("display/def.yml", true)
         }
-        reloadDisplay()
-        reloadItem()
+        ZaphkielAPI.reloadDisplay()
+        ZaphkielAPI.reloadItem()
     }
 }

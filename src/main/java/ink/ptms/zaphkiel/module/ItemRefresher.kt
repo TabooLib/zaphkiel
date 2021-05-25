@@ -36,7 +36,7 @@ private class ItemRefresher : Listener {
     fun e(e: PlayerDropItemEvent) {
         ZaphkielAPI.rebuild(e.player, e.itemDrop.itemStack).run {
             if (this.rebuild) {
-                e.itemDrop.setItemStack(this.save())
+                e.itemDrop.itemStack = this.save()
             }
         }
     }
@@ -45,7 +45,7 @@ private class ItemRefresher : Listener {
     fun e(e: PlayerPickupItemEvent) {
         ZaphkielAPI.rebuild(e.player, e.item.itemStack).run {
             if (this.rebuild) {
-                e.item.setItemStack(this.save())
+                e.item.itemStack = this.save()
             }
         }
     }
@@ -53,7 +53,7 @@ private class ItemRefresher : Listener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     fun e(e: InventoryOpenEvent) {
         if (e.inventory.location != null) {
-            Bukkit.getScheduler().runTaskAsynchronously(Zaphkiel.getPlugin(), Runnable {
+            Bukkit.getScheduler().runTaskAsynchronously(Zaphkiel.plugin, Runnable {
                 ZaphkielAPI.rebuild(e.player as Player, e.inventory)
             })
         }

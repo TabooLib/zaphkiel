@@ -87,8 +87,12 @@ class MetaAttribute(root: ConfigurationSection) : Meta(root) {
 
     override fun build(itemMeta: ItemMeta) {
         if (Version.isAfter(Version.v1_16)) {
+            val modifiers = itemMeta.attributeModifiers
             attributeList.forEach {
-                itemMeta.addAttributeModifier(it.first, it.second)
+                // Cannot register AttributeModifier. Modifier is already applied!
+                if (modifiers == null || modifiers.values().none { a -> a.uniqueId == it.second.uniqueId }) {
+                    itemMeta.addAttributeModifier(it.first, it.second)
+                }
             }
         }
     }

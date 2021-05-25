@@ -4,6 +4,7 @@ import ink.ptms.zaphkiel.ZaphkielAPI
 import ink.ptms.zaphkiel.api.event.single.Events
 import ink.ptms.zaphkiel.api.event.single.ItemReleaseEvent
 import ink.ptms.zaphkiel.api.internal.ItemKey
+import io.izzel.taboolib.kotlin.getCompound
 import io.izzel.taboolib.module.nms.NMS
 import io.izzel.taboolib.module.nms.nbt.NBTBase
 import io.izzel.taboolib.module.nms.nbt.NBTCompound
@@ -15,11 +16,12 @@ import org.bukkit.inventory.ItemStack
  * @Author sky
  * @Since 2019-12-15 16:58
  */
-open class ItemStream(
-    val itemStack: ItemStack,
-    val compound: NBTCompound = NMS.handle().loadNBT(itemStack),
-    val rebuild: Boolean = false
-) {
+open class ItemStream(val itemStack: ItemStack, val compound: NBTCompound = itemStack.getCompound()) {
+
+    /**
+     * 是否重构
+     */
+    var rebuild: Boolean = false
 
     /**
      * 内部属性，已删除的 Meta 名称
@@ -125,7 +127,7 @@ open class ItemStream(
         if (isVanilla()) {
             throw RuntimeException("This item is not extension item.")
         }
-        getZaphkielCompound()!![ItemKey.META_HISTORY.key] = NBTList.of(meta.map { NBTBase(it) })
+        getZaphkielCompound()!![ItemKey.META_HISTORY.key] = NBTList.of(*meta.map { NBTBase(it) }.toTypedArray())
     }
 
     fun getZaphkielCompound(): NBTCompound? {

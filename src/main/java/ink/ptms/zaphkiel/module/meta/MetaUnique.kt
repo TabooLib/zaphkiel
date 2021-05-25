@@ -15,8 +15,8 @@ class MetaUnique(root: ConfigurationSection) : Meta(root) {
     val format = "yyyy-MM-dd HH:mm:ss"
 
     override fun build(player: Player?, compound: NBTCompound) {
+        val base = compound["zaphkiel"]!!.asCompound()
         if (unique) {
-            val base = compound["zaphkiel"]!!.asCompound()
             if (!base.containsKey(ItemKey.UNIQUE.key)) {
                 val unique = NBTCompound()
                 if (player != null) {
@@ -27,6 +27,8 @@ class MetaUnique(root: ConfigurationSection) : Meta(root) {
                 unique["uuid"] = NBTBase(UUID.randomUUID().toString())
                 base[ItemKey.UNIQUE.key] = unique
             }
+        } else {
+            base.remove(ItemKey.UNIQUE.key)
         }
     }
 
