@@ -62,7 +62,7 @@ open class ItemStream(val itemStack: ItemStack, val compound: NBTCompound = item
     }
 
     /**
-     * 保存为物品实例
+     * 保存物品实例
      */
     fun save(): ItemStack {
         val itemMeta = NMS.handle().saveNBT(itemStack, compound).itemMeta
@@ -75,6 +75,9 @@ open class ItemStream(val itemStack: ItemStack, val compound: NBTCompound = item
         return itemStack
     }
 
+    /**
+     * 重构物品实例
+     */
     fun rebuild(player: Player?): ItemStack {
         val item = getZaphkielItem()
         val itemStreamGenerated = ItemStreamGenerated(itemStack, item.name.toMutableMap(), item.lore.toMutableMap(), compound)

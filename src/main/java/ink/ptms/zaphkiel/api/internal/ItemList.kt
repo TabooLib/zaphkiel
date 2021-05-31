@@ -74,6 +74,9 @@ class MenuItem(player: Player, val group: Group) : MenuLinked<Item>(player) {
     init {
         addButtonPreviousPage(47)
         addButtonNextPage(51)
+        addButton(49) {
+            player.openGroupMenu()
+        }
     }
 
     override fun getTitle(): String {
@@ -103,6 +106,7 @@ class MenuItem(player: Player, val group: Group) : MenuLinked<Item>(player) {
         } else {
             inv.setItem(51, ItemBuilder(XMaterial.ARROW).name("&8下一页").colored().build())
         }
+        inv.setItem(49, ItemBuilder(XMaterial.BOOK).name("&8组").colored().build())
         player.playSound(player.location, Sound.UI_BUTTON_CLICK, 1f, 2f)
     }
 

@@ -93,6 +93,10 @@ class Item(
         }
     }
 
+    fun buildItemStack(player: Player?): ItemStack {
+        return build(player).save()
+    }
+
     fun build(player: Player?): ItemStream {
         val itemStream = ItemStreamGenerated(icon.clone(), name.toMutableMap(), lore.toMutableMap())
         val compound = itemStream.compound.computeIfAbsent("zaphkiel") { NBTCompound() }.asCompound()
