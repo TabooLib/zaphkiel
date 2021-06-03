@@ -9,7 +9,7 @@ import org.bukkit.entity.Player
 class MetaNative(root: ConfigurationSection) : Meta(root) {
 
     val nativeNBT = NBTCompound().also { nbt ->
-        root.getConfigurationSection("native")?.run {
+        root.getConfigurationSection("meta.native")?.run {
             getValues(false).forEach {
                 nbt[it.key] = NBTBase.toNBT(it.value)
             }
