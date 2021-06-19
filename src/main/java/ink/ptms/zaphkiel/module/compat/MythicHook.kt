@@ -2,6 +2,7 @@ package ink.ptms.zaphkiel.module.compat
 
 import ink.ptms.zaphkiel.ZaphkielAPI
 import io.izzel.taboolib.kotlin.Randoms
+import io.izzel.taboolib.kotlin.Tasks
 import io.izzel.taboolib.module.inject.TListener
 import io.izzel.taboolib.util.Coerce
 import io.lumine.xikage.mythicmobs.api.bukkit.events.MythicMobDeathEvent
@@ -27,12 +28,14 @@ class MythicHook : Listener {
     @EventHandler
     fun e(e: MythicMobSpawnEvent) {
         val section = e.mob.type.config.fileConfiguration.getConfigurationSection(e.mob.type.internalName + ".Zaphkiel.equipments") ?: return
-        equipment(section, e.entity as? LivingEntity ?: return)
+        Tasks.delay(5) {
+            equipment(section, e.entity as? LivingEntity ?: return@delay)
+        }
     }
 
     @EventHandler
     fun e(e: MythicMobDeathEvent) {
-        e.mob.type.config.getStringList("zaphkiel.drop").forEach {
+        e.mob.type.config.getStringList("Zaphkiel.drops").forEach {
             val args = it.split(" ")
             if (args.size == 3 && !Randoms.random(Coerce.toDouble(args[2]))) {
                 return@forEach
