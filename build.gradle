@@ -6,7 +6,7 @@ plugins {
 }
 
 group = 'ink.ptms.zaphkiel'
-version = '1.5.3'
+version = '1.5.4'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
