@@ -2,12 +2,10 @@ package ink.ptms.zaphkiel.module.meta
 
 import com.mojang.authlib.GameProfile
 import com.mojang.authlib.properties.Property
-import io.izzel.taboolib.kotlin.Reflex.Companion.reflex
-import org.bukkit.configuration.ConfigurationSection
-import org.bukkit.enchantments.Enchantment
-import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.meta.ItemMeta
 import org.bukkit.inventory.meta.SkullMeta
+import taboolib.common.reflect.Reflex.Companion.setProperty
+import taboolib.library.configuration.ConfigurationSection
 import java.util.*
 
 /**
@@ -28,7 +26,7 @@ class MetaSkull(root: ConfigurationSection) : Meta(root) {
                 itemMeta.owner = skullOwner
             }
             if (skullTexture != null) {
-                itemMeta.reflex("profile", GameProfile(skullTexture.uuid, null).also {
+                itemMeta.setProperty("profile", GameProfile(skullTexture.uuid, null).also {
                     it.properties.put("textures", Property("textures", skullTexture.textures))
                 })
             }
@@ -38,7 +36,7 @@ class MetaSkull(root: ConfigurationSection) : Meta(root) {
     override fun drop(itemMeta: ItemMeta) {
         if (itemMeta is SkullMeta) {
             itemMeta.owner = null
-            itemMeta.reflex("profile", null)
+            itemMeta.setProperty("profile", null)
         }
     }
 

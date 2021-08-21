@@ -1,6 +1,6 @@
 package ink.ptms.zaphkiel.api.event
 
-import io.izzel.taboolib.module.event.EventNormal
+import taboolib.platform.type.BukkitProxyEvent
 
 /**
  * @Author sky
@@ -8,7 +8,15 @@ import io.izzel.taboolib.module.event.EventNormal
  */
 class PluginReloadEvent {
 
-    class Item : EventNormal<Item>()
+    class Item : BukkitProxyEvent() {
 
-    class Display : EventNormal<Item>()
+        override val allowCancelled: Boolean
+            get() = false
+    }
+
+    class Display : BukkitProxyEvent() {
+
+        override val allowCancelled: Boolean
+            get() = false
+    }
 }

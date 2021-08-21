@@ -1,22 +1,17 @@
 package ink.ptms.zaphkiel.api
 
 import ink.ptms.zaphkiel.ZaphkielAPI
-import ink.ptms.zaphkiel.api.event.single.Events
-import ink.ptms.zaphkiel.api.event.single.ItemReleaseEvent
+import ink.ptms.zaphkiel.api.event.ItemReleaseEvent
 import ink.ptms.zaphkiel.api.internal.ItemKey
-import io.izzel.taboolib.kotlin.getCompound
-import io.izzel.taboolib.module.nms.NMS
-import io.izzel.taboolib.module.nms.nbt.NBTBase
-import io.izzel.taboolib.module.nms.nbt.NBTCompound
-import io.izzel.taboolib.module.nms.nbt.NBTList
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
+import taboolib.module.nms.*
 
 /**
  * @Author sky
  * @Since 2019-12-15 16:58
  */
-open class ItemStream(val itemStack: ItemStack, val compound: NBTCompound = itemStack.getCompound()) {
+open class ItemStream(val itemStack: ItemStack, val compound: ItemTag = itemStack.getItemTag()) {
 
     /**
      * 是否重构
@@ -52,22 +47,23 @@ open class ItemStream(val itemStack: ItemStack, val compound: NBTCompound = item
     }
 
     fun setDisplayName(displayName: String) {
-        val display = compound.computeIfAbsent("display") { NBTCompound() } as NBTCompound
-        display["Name"] = NBTBase(displayName)
+        val display = compound.computeIfAbsent("display") { ItemTag() } as ItemTag
+        display["Name"] = ItemTagData(displayName)
     }
 
     fun setLore(lore: List<String>) {
-        val display = compound.computeIfAbsent("display") { NBTCompound() } as NBTCompound
-        display["Lore"] = lore.map { NBTBase(it) }.toCollection(NBTList())
+        val display = compound.computeIfAbsent("display") { ItemTag() } as ItemTag
+        display["Lore"] = lore.map { ItemTagData(it) }.toCollection(ItemTagList())
     }
 
     /**
      * 保存物品实例
      */
     fun save(): ItemStack {
-        val itemMeta = NMS.handle().saveNBT(itemStack, compound).itemMeta
+        val itemMeta = itemStack.setItemTag(compound).itemMeta
         if (itemMeta != null) {
-            val event = Events.call(ItemReleaseEvent(itemStack.type, itemStack.durability.toInt(), itemMeta, this))
+            val event = ItemReleaseEvent(itemStack.type, itemStack.durability.toInt(), itemMeta, this)
+            event.call()
             itemStack.type = event.icon
             itemStack.itemMeta = event.itemMeta
             itemStack.durability = event.data.toShort()
@@ -86,60 +82,60 @@ open class ItemStream(val itemStack: ItemStack, val compound: NBTCompound = item
 
     fun getZaphkielItem(): Item {
         if (isVanilla()) {
-            throw RuntimeException("This item is not extension item.")
+            error("This item is not extension item.")
         }
         return ZaphkielAPI.registeredItem[getZaphkielName()]!!
     }
 
     fun getZaphkielName(): String {
         if (isVanilla()) {
-            throw RuntimeException("This item is not extension item.")
+            error("This item is not extension item.")
         }
         return getZaphkielCompound()!![ItemKey.ID.key]!!.asString()
     }
 
     fun getZaphkielHash(): String {
         if (isVanilla()) {
-            throw RuntimeException("This item is not extension item.")
+            error("This item is not extension item.")
         }
         return getZaphkielCompound()!![ItemKey.HASH.key]!!.asString()
     }
 
-    fun getZaphkielData(): NBTCompound {
+    fun getZaphkielData(): ItemTag {
         if (isVanilla()) {
-            throw RuntimeException("This item is not extension item.")
+            error("This item is not extension item.")
         }
         return getZaphkielCompound()!![ItemKey.DATA.key]!!.asCompound()
     }
 
-    fun getZaphkielUniqueData(): NBTCompound? {
+    fun getZaphkielUniqueData(): ItemTag? {
         if (isVanilla()) {
-            throw RuntimeException("This item is not extension item.")
+            error("This item is not extension item.")
         }
         return getZaphkielCompound()!![ItemKey.UNIQUE.key]?.asCompound()
     }
 
     fun getZaphkielMetaHistory(): List<String> {
         if (isVanilla()) {
-            throw RuntimeException("This item is not extension item.")
+            error("This item is not extension item.")
         }
         return getZaphkielCompound()!![ItemKey.META_HISTORY.key]?.asList()?.map { it.asString() }?.toList() ?: emptyList()
     }
 
     fun setZaphkielMetaHistory(meta: List<String>) {
         if (isVanilla()) {
-            throw RuntimeException("This item is not extension item.")
+            error("This item is not extension item.")
         }
-        getZaphkielCompound()!![ItemKey.META_HISTORY.key] = NBTList.of(*meta.map { NBTBase(it) }.toTypedArray())
+        getZaphkielCompound()!![ItemKey.META_HISTORY.key] = ItemTagList.of(*meta.map { ItemTagData(it) }.toTypedArray())
     }
 
-    fun getZaphkielCompound(): NBTCompound? {
+    fun getZaphkielCompound(): ItemTag? {
         return compound["zaphkiel"]?.asCompound()
     }
 
     fun shouldRefresh(): Boolean {
         if (isVanilla()) {
-            throw RuntimeException("This item is not extension item.")
+            error("This item is not extension item.")
         }
         return getZaphkielHash() != getZaphkielItem().hash
     }

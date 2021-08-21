@@ -17,7 +17,7 @@ class ActionMythic {
 
         override fun process(frame: QuestContext.Frame): CompletableFuture<Void> {
             frame.newFrame(skill).run<String>().thenApply { skill ->
-                val caster = (frame.context() as io.izzel.taboolib.kotlin.kether.ScriptContext).sender as? Player ?: throw RuntimeException("No player selected.")
+                val caster = (frame.context() as io.izzel.taboolib.kotlin.kether.ScriptContext).sender as? Player ?: error("No player selected.")
                 MythicMobs.inst().apiHelper.castSkill(caster, skill)
             }
             return CompletableFuture.completedFuture(null)

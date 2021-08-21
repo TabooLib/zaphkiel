@@ -28,7 +28,7 @@ class ActionEffect {
     class Give(val name: ParsedAction<*>, val duration: ParsedAction<*>, val amplifier: ParsedAction<*>) : QuestAction<Void>() {
 
         override fun process(frame: QuestContext.Frame): CompletableFuture<Void> {
-            val viewer = (frame.context() as ScriptContext).sender as? Player ?: throw RuntimeException("No player selected.")
+            val viewer = (frame.context() as ScriptContext).sender as? Player ?: error("No player selected.")
             frame.newFrame(name).run<Any>().thenApply { name ->
                 frame.newFrame(duration).run<Any>().thenApply { duration ->
                     frame.newFrame(amplifier).run<Any>().thenApplyAsync({ amplifier ->
@@ -46,7 +46,7 @@ class ActionEffect {
     class Remove(val name: ParsedAction<*>) : QuestAction<Void>() {
 
         override fun process(frame: QuestContext.Frame): CompletableFuture<Void> {
-            val viewer = (frame.context() as ScriptContext).sender as? Player ?: throw RuntimeException("No player selected.")
+            val viewer = (frame.context() as ScriptContext).sender as? Player ?: error("No player selected.")
             frame.newFrame(name).run<Any>().thenApplyAsync({ name ->
                 val effectType = PotionEffectType.getByName(name.toString().toUpperCase())
                 if (effectType != null) {
@@ -60,7 +60,7 @@ class ActionEffect {
     class Clear : QuestAction<Void>() {
 
         override fun process(frame: QuestContext.Frame): CompletableFuture<Void> {
-            val viewer = (frame.context() as ScriptContext).sender as? Player ?: throw RuntimeException("No player selected.")
+            val viewer = (frame.context() as ScriptContext).sender as? Player ?: error("No player selected.")
             Tasks.task {
                 viewer.activePotionEffects.toList().forEach { viewer.removePotionEffect(it.type) }
             }

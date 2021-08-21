@@ -1,7 +1,7 @@
 package ink.ptms.zaphkiel.module.meta
 
-import ink.ptms.zaphkiel.api.event.single.ItemReleaseEvent
-import org.bukkit.configuration.ConfigurationSection
+import ink.ptms.zaphkiel.api.event.ItemReleaseEvent
+import taboolib.library.configuration.ConfigurationSection
 
 @MetaKey("data")
 class MetaData(root: ConfigurationSection) : Meta(root) {

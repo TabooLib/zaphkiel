@@ -1,11 +1,12 @@
 package ink.ptms.zaphkiel.api
 
 import ink.ptms.zaphkiel.ZaphkielAPI
-import io.izzel.taboolib.kotlin.kether.KetherShell
-import io.izzel.taboolib.kotlin.kether.printMessage
 import org.bukkit.entity.Player
 import org.bukkit.event.Event
 import org.bukkit.inventory.ItemStack
+import taboolib.common.platform.function.adaptPlayer
+import taboolib.module.kether.KetherShell
+import taboolib.module.kether.printKetherErrorMessage
 
 data class ItemEvent(
     val item: Item,
@@ -18,9 +19,7 @@ data class ItemEvent(
         try {
             val itemStream = ZaphkielAPI.read(itemStack)
             val itemAPI = itemStream.getItemAPI(player)
-            KetherShell.eval(script, namespace = listOf("zaphkiel")) {
-                this.sender = player
-                this.event = event
+            KetherShell.eval(script, namespace = listOf("zaphkiel"), sender = adaptPlayer(player)) {
                 this.rootFrame().variables().also { vars ->
                     data.forEach { (k, v) ->
                         vars.set(k, v)
@@ -34,7 +33,7 @@ data class ItemEvent(
                 }
             }
         } catch (e: Throwable) {
-            e.printMessage()
+            e.printKetherErrorMessage()
         }
     }
 }

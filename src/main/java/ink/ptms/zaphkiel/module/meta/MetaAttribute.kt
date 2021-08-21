@@ -1,32 +1,28 @@
 package ink.ptms.zaphkiel.module.meta
 
 import ink.ptms.zaphkiel.ZaphkielAPI
-import io.izzel.taboolib.Version
-import io.izzel.taboolib.module.nms.nbt.Attribute
-import io.izzel.taboolib.module.nms.nbt.NBTBase
-import io.izzel.taboolib.module.nms.nbt.NBTCompound
-import io.izzel.taboolib.module.nms.nbt.NBTList
-import io.izzel.taboolib.util.Coerce
 import org.bukkit.attribute.AttributeModifier
-import org.bukkit.configuration.ConfigurationSection
+import taboolib.library.configuration.ConfigurationSection
 import org.bukkit.entity.Player
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.meta.ItemMeta
 import org.bukkit.util.NumberConversions
+import taboolib.common5.Coerce
+import taboolib.module.nms.*
 import java.util.*
 
 @MetaKey("attribute")
 class MetaAttribute(root: ConfigurationSection) : Meta(root) {
 
-    val attributeListLegacy = NBTList()
+    val attributeListLegacy = ItemTagList()
     val attributeList = ArrayList<Pair<org.bukkit.attribute.Attribute, AttributeModifier>>()
 
     init {
         root.getConfigurationSection("meta.attribute")?.getKeys(false)?.forEach { hand ->
             root.getConfigurationSection("meta.attribute.$hand")!!.getKeys(false).forEach { name ->
-                val attributeKey = Attribute.parse(name)
+                val attributeKey = BukkitAttribute.parse(name)
                 if (attributeKey != null) {
-                    if (Version.isAfter(Version.v1_16)) {
+                    if (MinecraftVersion.majorLegacy >= 11600) {
                         var equipmentSlot: EquipmentSlot? = null
                         if (hand != "all") {
                             equipmentSlot = ZaphkielAPI.asEquipmentSlot(hand)?.bukkit
@@ -51,21 +47,21 @@ class MetaAttribute(root: ConfigurationSection) : Meta(root) {
                     } else {
                         try {
                             val uuid = UUID.randomUUID()
-                            val attribute = NBTCompound()
+                            val attribute = ItemTag()
                             val attributeValue = root.getString("meta.attribute.$hand.$name")!!
                             if (attributeValue.endsWith("%")) {
-                                attribute["Amount"] = NBTBase(NumberConversions.toDouble(attributeValue.substring(0, attributeValue.length - 1)) / 100.0)
-                                attribute["Operation"] = NBTBase(1)
+                                attribute["Amount"] = ItemTagData(NumberConversions.toDouble(attributeValue.substring(0, attributeValue.length - 1)) / 100.0)
+                                attribute["Operation"] = ItemTagData(1)
                             } else {
-                                attribute["Amount"] = NBTBase(NumberConversions.toDouble(attributeValue))
-                                attribute["Operation"] = NBTBase(0)
+                                attribute["Amount"] = ItemTagData(NumberConversions.toDouble(attributeValue))
+                                attribute["Operation"] = ItemTagData(0)
                             }
-                            attribute["AttributeName"] = NBTBase(attributeKey.minecraftKey)
-                            attribute["UUIDMost"] = NBTBase(uuid.mostSignificantBits)
-                            attribute["UUIDLeast"] = NBTBase(uuid.leastSignificantBits)
-                            attribute["Name"] = NBTBase(attributeKey.minecraftKey)
+                            attribute["AttributeName"] = ItemTagData(attributeKey.minecraftKey)
+                            attribute["UUIDMost"] = ItemTagData(uuid.mostSignificantBits)
+                            attribute["UUIDLeast"] = ItemTagData(uuid.leastSignificantBits)
+                            attribute["Name"] = ItemTagData(attributeKey.minecraftKey)
                             if (hand != "all") {
-                                ZaphkielAPI.asEquipmentSlot(hand)?.run { attribute["Slot"] = NBTBase(nms) }
+                                ZaphkielAPI.asEquipmentSlot(hand)?.run { attribute["Slot"] = ItemTagData(nms) }
                             }
                             attributeListLegacy.add(attribute)
                         } catch (t: Throwable) {
@@ -77,8 +73,8 @@ class MetaAttribute(root: ConfigurationSection) : Meta(root) {
         }
     }
 
-    override fun build(player: Player?, compound: NBTCompound) {
-        if (Version.isBefore(Version.v1_16)) {
+    override fun build(player: Player?, compound: ItemTag) {
+        if (MinecraftVersion.majorLegacy < 11600) {
             compound["AttributeModifiers"] = attributeListLegacy
         } else {
             compound.remove("AttributeModifiers")
@@ -86,7 +82,7 @@ class MetaAttribute(root: ConfigurationSection) : Meta(root) {
     }
 
     override fun build(itemMeta: ItemMeta) {
-        if (Version.isAfter(Version.v1_16)) {
+        if (MinecraftVersion.majorLegacy >= 11600) {
             val modifiers = itemMeta.attributeModifiers
             attributeList.forEach {
                 // Cannot register AttributeModifier. Modifier is already applied!
@@ -97,7 +93,7 @@ class MetaAttribute(root: ConfigurationSection) : Meta(root) {
         }
     }
 
-    override fun drop(player: Player?, compound: NBTCompound) {
+    override fun drop(player: Player?, compound: ItemTag) {
         compound.remove("AttributeModifiers")
     }
 
@@ -113,19 +109,19 @@ class MetaAttribute(root: ConfigurationSection) : Meta(root) {
         return intArrayOf((m shr 32).toInt(), m.toInt(), (l shr 32).toInt(), l.toInt())
     }
 
-    fun Attribute.toBukkit(): org.bukkit.attribute.Attribute {
+    fun BukkitAttribute.toBukkit(): org.bukkit.attribute.Attribute {
         return when (this) {
-            Attribute.MAX_HEALTH -> org.bukkit.attribute.Attribute.GENERIC_MAX_HEALTH
-            Attribute.FOLLOW_RANGE -> org.bukkit.attribute.Attribute.GENERIC_FOLLOW_RANGE
-            Attribute.KNOCKBACK_RESISTANCE -> org.bukkit.attribute.Attribute.GENERIC_KNOCKBACK_RESISTANCE
-            Attribute.MOVEMENT_SPEED -> org.bukkit.attribute.Attribute.GENERIC_MOVEMENT_SPEED
-            Attribute.FLYING_SPEED -> org.bukkit.attribute.Attribute.GENERIC_FLYING_SPEED
-            Attribute.ATTACK_DAMAGE -> org.bukkit.attribute.Attribute.GENERIC_ATTACK_DAMAGE
-            Attribute.ATTACK_KNOCKBACK -> org.bukkit.attribute.Attribute.GENERIC_ATTACK_KNOCKBACK
-            Attribute.ATTACK_SPEED -> org.bukkit.attribute.Attribute.GENERIC_ATTACK_SPEED
-            Attribute.ARMOR -> org.bukkit.attribute.Attribute.GENERIC_ARMOR
-            Attribute.ARMOR_TOUGHNESS -> org.bukkit.attribute.Attribute.GENERIC_ARMOR_TOUGHNESS
-            Attribute.LUCK -> org.bukkit.attribute.Attribute.GENERIC_LUCK
+            BukkitAttribute.MAX_HEALTH -> org.bukkit.attribute.Attribute.GENERIC_MAX_HEALTH
+            BukkitAttribute.FOLLOW_RANGE -> org.bukkit.attribute.Attribute.GENERIC_FOLLOW_RANGE
+            BukkitAttribute.KNOCKBACK_RESISTANCE -> org.bukkit.attribute.Attribute.GENERIC_KNOCKBACK_RESISTANCE
+            BukkitAttribute.MOVEMENT_SPEED -> org.bukkit.attribute.Attribute.GENERIC_MOVEMENT_SPEED
+            BukkitAttribute.FLYING_SPEED -> org.bukkit.attribute.Attribute.GENERIC_FLYING_SPEED
+            BukkitAttribute.ATTACK_DAMAGE -> org.bukkit.attribute.Attribute.GENERIC_ATTACK_DAMAGE
+            BukkitAttribute.ATTACK_KNOCKBACK -> org.bukkit.attribute.Attribute.GENERIC_ATTACK_KNOCKBACK
+            BukkitAttribute.ATTACK_SPEED -> org.bukkit.attribute.Attribute.GENERIC_ATTACK_SPEED
+            BukkitAttribute.ARMOR -> org.bukkit.attribute.Attribute.GENERIC_ARMOR
+            BukkitAttribute.ARMOR_TOUGHNESS -> org.bukkit.attribute.Attribute.GENERIC_ARMOR_TOUGHNESS
+            BukkitAttribute.LUCK -> org.bukkit.attribute.Attribute.GENERIC_LUCK
         }
     }
 }

@@ -1,6 +1,6 @@
 package ink.ptms.zaphkiel.api.internal
 
-import io.izzel.taboolib.util.Variables
+import taboolib.common.util.VariableReader
 
 /**
  * @Author sky
@@ -8,7 +8,7 @@ import io.izzel.taboolib.util.Variables
  */
 class StructureList(source: List<String>) {
 
-    val cache = source.map { Variables(it).find() }.toList()
+    val cache = source.map { VariableReader(it, '<', '>') }.toList()
 
     fun buildTrim(vars: Map<String, MutableList<String>>): List<String> {
         val list = build(vars).toMutableList()
@@ -25,7 +25,7 @@ class StructureList(source: List<String>) {
             var more = false
             var pass = false
             val builder = StringBuilder()
-            cache[0].variableList.forEach { variable ->
+            cache[0].parts.forEach { variable ->
                 if (variable.isVariable) {
                     if (variable.text.endsWith("...")) {
                         val list = vars[variable.text.substring(0, variable.text.length - 3)]

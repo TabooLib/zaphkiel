@@ -1,10 +1,10 @@
 package ink.ptms.zaphkiel
 
-import io.izzel.taboolib.loader.Plugin
-import io.izzel.taboolib.module.config.TConfig
-import io.izzel.taboolib.module.inject.TInject
-import io.izzel.taboolib.module.inject.TSchedule
-import io.izzel.taboolib.module.locale.logger.TLogger
+import taboolib.common.platform.Plugin
+import taboolib.common.platform.function.releaseResourceFile
+import taboolib.common.platform.function.submit
+import taboolib.module.configuration.Config
+import taboolib.module.configuration.SecuredFile
 
 /**
  * @Author sky
@@ -12,21 +12,22 @@ import io.izzel.taboolib.module.locale.logger.TLogger
  */
 object Zaphkiel : Plugin() {
 
-    @TInject
-    lateinit var conf: TConfig
+    @Config
+    lateinit var conf: SecuredFile
         private set
 
-    @TInject
-    lateinit var logger: TLogger
-        private set
+    override fun onActive() {
+       submit(delay = 20) {
+           reload()
+       }
+    }
 
-    @TSchedule(delay = 20)
     fun reload() {
         if (!ZaphkielAPI.folderItem.exists()) {
-            plugin.saveResource("item/def.yml", true)
+            releaseResourceFile("item/def.yml")
         }
         if (!ZaphkielAPI.folderDisplay.exists()) {
-            plugin.saveResource("display/def.yml", true)
+            releaseResourceFile("display/def.yml")
         }
         ZaphkielAPI.reloadDisplay()
         ZaphkielAPI.reloadItem()

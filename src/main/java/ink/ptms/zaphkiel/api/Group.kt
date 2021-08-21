@@ -1,12 +1,13 @@
 package ink.ptms.zaphkiel.api
 
-import ink.ptms.zaphkiel.Zaphkiel
-import io.izzel.taboolib.module.db.local.SecuredFile
-import io.izzel.taboolib.util.item.ItemBuilder
-import io.izzel.taboolib.util.item.Items
 import org.bukkit.Material
-import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.inventory.ItemStack
+import taboolib.common.platform.function.getDataFolder
+import taboolib.library.configuration.ConfigurationSection
+import taboolib.library.xseries.XItemStack
+import taboolib.library.xseries.XMaterial
+import taboolib.module.configuration.SecuredFile
+import taboolib.platform.util.buildItem
 import java.io.File
 
 /**
@@ -14,15 +15,18 @@ import java.io.File
  * @Since 2020-11-13 22:50
  */
 class Group(
-        val name: String,
-        val file: File,
-        val config: ConfigurationSection,
-        val display: ItemStack = Items.loadItem(config)!!,
-        val priority: Int = 0
+    val name: String,
+    val file: File,
+    val config: ConfigurationSection,
+    val display: ItemStack = XItemStack.deserialize(config) ?: ItemStack(Material.STONE),
+    val priority: Int = 0,
 ) {
 
     companion object {
 
-        val NO_GROUP = Group("#", File(Zaphkiel.plugin.dataFolder, "config.yml"), SecuredFile(), ItemBuilder(Material.BARRIER).name("&7[NO GROUP]").colored().build(), -1)
+        val NO_GROUP = Group("#", File(getDataFolder(), "config.yml"), SecuredFile(), buildItem(XMaterial.BARRIER) {
+            name = "&7[NO GROUP]"
+            colored()
+        }, -1)
     }
 }

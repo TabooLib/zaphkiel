@@ -1,9 +1,8 @@
-package ink.ptms.zaphkiel.api.event.single
+package ink.ptms.zaphkiel.api.event
 
 import ink.ptms.zaphkiel.api.ItemStream
-import io.izzel.taboolib.module.event.EventCancellable
-import io.izzel.taboolib.module.event.EventNormal
 import org.bukkit.entity.Player
+import taboolib.platform.type.BukkitProxyEvent
 
 /**
  * @Author sky
@@ -15,7 +14,7 @@ class ItemBuildEvent {
      * 构建之前
      * 可被取消
      */
-    class Pre(val player: Player?, val itemStream: ItemStream, val name: MutableMap<String, String>, val lore: MutableMap<String, MutableList<String>>) : EventCancellable<Pre>() {
+    class Pre(val player: Player?, val itemStream: ItemStream, val name: MutableMap<String, String>, val lore: MutableMap<String, MutableList<String>>) : BukkitProxyEvent() {
 
         val item = itemStream.getZaphkielItem()
 
@@ -38,7 +37,10 @@ class ItemBuildEvent {
      * 不可取消
      * 名称、描述、数据已就绪
      */
-    class Post(val player: Player?, val itemStream: ItemStream, val name: Map<String, String>, val lore: Map<String, MutableList<String>>) : EventNormal<Post>() {
+    class Post(val player: Player?, val itemStream: ItemStream, val name: Map<String, String>, val lore: Map<String, MutableList<String>>) : BukkitProxyEvent() {
+
+        override val allowCancelled: Boolean
+            get() = false
 
         val item = itemStream.getZaphkielItem()
     }
@@ -48,7 +50,7 @@ class ItemBuildEvent {
      * 可被取消
      * 递交至构建事件之前
      */
-    class Rebuild(val player: Player?, val itemStream: ItemStream, fromRefresh: Boolean) : EventCancellable<Rebuild>() {
+    class Rebuild(val player: Player?, val itemStream: ItemStream, fromRefresh: Boolean) : BukkitProxyEvent() {
 
         val item = itemStream.getZaphkielItem()
 

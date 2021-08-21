@@ -1,39 +1,29 @@
 package ink.ptms.zaphkiel
 
-import com.google.common.collect.Maps
 import ink.ptms.zaphkiel.api.*
+import ink.ptms.zaphkiel.api.event.ItemBuildEvent
 import ink.ptms.zaphkiel.api.event.PluginReloadEvent
-import ink.ptms.zaphkiel.api.event.single.Events
-import ink.ptms.zaphkiel.api.event.single.ItemBuildEvent
 import ink.ptms.zaphkiel.module.meta.Meta
 import ink.ptms.zaphkiel.module.meta.MetaKey
-import io.izzel.taboolib.TabooLibLoader
-import io.izzel.taboolib.kotlin.Mirror
-import io.izzel.taboolib.kotlin.Reflex.Companion.static
-import io.izzel.taboolib.module.config.TConfigWatcher
-import io.izzel.taboolib.module.db.local.SecuredFile
-import io.izzel.taboolib.module.nms.nbt.NBTCompound
-import io.izzel.taboolib.util.Files
-import io.izzel.taboolib.util.Reflection
-import io.izzel.taboolib.util.item.Equipments
-import io.izzel.taboolib.util.item.Items
 import org.bukkit.Bukkit
-import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Player
 import org.bukkit.inventory.Inventory
+import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
 import org.bukkit.potion.PotionEffectType
-import org.bukkit.util.io.BukkitObjectInputStream
-import org.bukkit.util.io.BukkitObjectOutputStream
-import java.io.ByteArrayInputStream
-import java.io.ByteArrayOutputStream
+import taboolib.common.io.runningClasses
+import taboolib.common.platform.function.getDataFolder
+import taboolib.common.platform.function.info
+import taboolib.common.reflect.Reflex.Companion.getProperty
+import taboolib.common.reflect.Reflex.Companion.invokeConstructor
+import taboolib.common5.FileWatcher
+import taboolib.library.configuration.ConfigurationSection
+import taboolib.module.configuration.SecuredFile
+import taboolib.module.nms.ItemTag
+import taboolib.platform.util.isAir
+import taboolib.type.BukkitEquipment
 import java.io.File
-import java.util.*
-import java.util.zip.GZIPInputStream
-import java.util.zip.GZIPOutputStream
-import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
 
 /**
  * @Author sky
@@ -42,23 +32,16 @@ import kotlin.collections.HashMap
 @Suppress("UNCHECKED_CAST")
 object ZaphkielAPI {
 
-    val mirror = Mirror()
-    val events = Events
     val loaded = ArrayList<File>()
-    val folderItem = File(Zaphkiel.plugin.dataFolder, "item")
-    val folderDisplay = File(Zaphkiel.plugin.dataFolder, "display")
-    val registeredItem = Maps.newHashMap<String, Item>()!!
-    val registeredModel = Maps.newHashMap<String, Model>()!!
-    val registeredDisplay = Maps.newHashMap<String, Display>()!!
-    val registeredGroup = Maps.newHashMap<String, Group>()!!
-    val registeredMeta = TabooLibLoader.getPluginClassSafely(Zaphkiel.plugin)
+    val folderItem = File(getDataFolder(), "item")
+    val folderDisplay = File(getDataFolder(), "display")
+    val registeredItem = HashMap<String, Item>()
+    val registeredModel = HashMap<String, Model>()
+    val registeredDisplay = HashMap<String, Display>()
+    val registeredGroup = HashMap<String, Group>()
+    val registeredMeta = runningClasses
         .filter { it.isAnnotationPresent(MetaKey::class.java) }
-        .map { it.getAnnotation(MetaKey::class.java).value to it }
-        .toMap(HashMap())
-
-    fun mirrorFuture(id: String, func: Mirror.MirrorFuture.() -> Unit) {
-        mirror.mirrorFuture(id, func)
-    }
+        .associateBy { it.getAnnotation(MetaKey::class.java).value }
 
     fun getItem(id: String): ItemStream? {
         return registeredItem[id]?.build(null)
@@ -85,7 +68,7 @@ object ZaphkielAPI {
         }
     }
 
-    fun getData(item: ItemStack): NBTCompound? {
+    fun getData(item: ItemStack): ItemTag? {
         val read = read(item)
         return if (read.isExtension()) {
             read.getZaphkielData()
@@ -94,7 +77,7 @@ object ZaphkielAPI {
         }
     }
 
-    fun getUnique(item: ItemStack): NBTCompound? {
+    fun getUnique(item: ItemStack): ItemTag? {
         val read = read(item)
         return if (read.isExtension()) {
             read.getZaphkielUniqueData()
@@ -113,8 +96,8 @@ object ZaphkielAPI {
     }
 
     fun read(item: ItemStack): ItemStream {
-        if (Items.isNull(item)) {
-            throw RuntimeException("Could not read empty item.")
+        if (item.isAir()) {
+            error("Could not read empty item.")
         }
         return ItemStream(item)
     }
@@ -122,7 +105,7 @@ object ZaphkielAPI {
     fun rebuild(player: Player?, inventory: Inventory) {
         (0 until inventory.size).forEach { i ->
             val item = inventory.getItem(i)
-            if (Items.isNull(item)) {
+            if (item.isAir()) {
                 return@forEach
             }
             val rebuild = rebuild(player, item!!)
@@ -133,15 +116,15 @@ object ZaphkielAPI {
     }
 
     fun rebuild(player: Player?, item: ItemStack): ItemStream {
-        if (Items.isNull(item)) {
-            throw RuntimeException("Could not read empty item.")
+        if (item.isAir()) {
+            error("Could not read empty item.")
         }
         val itemStream = ItemStream(item)
         if (itemStream.isVanilla()) {
             return itemStream
         }
-        val pre = Events.call(ItemBuildEvent.Rebuild(player, itemStream, itemStream.shouldRefresh()))
-        if (pre.isCancelled) {
+        val pre = ItemBuildEvent.Rebuild(player, itemStream, itemStream.shouldRefresh())
+        if (!pre.call()) {
             return itemStream
         }
         itemStream.rebuild = true
@@ -149,13 +132,13 @@ object ZaphkielAPI {
     }
 
     fun reloadItem() {
-        loaded.forEach { TConfigWatcher.getInst().removeListener(it) }
+        loaded.forEach { FileWatcher.INSTANCE.removeListener(it) }
         registeredItem.clear()
         registeredModel.clear()
         reloadModel(folderItem)
         reloadItem(folderItem)
         PluginReloadEvent.Item().call()
-        Zaphkiel.logger.info("Loaded ${registeredItem.size} item(s) and ${registeredModel.size} model(s).")
+        info("Loaded ${registeredItem.size} item(s) and ${registeredModel.size} model(s).")
     }
 
     fun reloadItem(file: File) {
@@ -166,7 +149,7 @@ object ZaphkielAPI {
             val task = Runnable {
                 keys.forEach { registeredItem.remove(it) }
                 var group: Group? = null
-                val conf = Files.load(file)
+                val conf = SecuredFile.loadConfiguration(file)
                 if (conf.contains("__group__")) {
                     val name = file.name.substring(0, file.name.indexOf("."))
                     group = Group(name, file, conf.getConfigurationSection("__group__")!!, priority = conf.getInt("__group__.priority"))
@@ -186,7 +169,7 @@ object ZaphkielAPI {
             }
             task.run()
             loaded.add(file)
-            TConfigWatcher.getInst().addSimpleListener(file) {
+            FileWatcher.INSTANCE.addSimpleListener(file) {
                 task.run()
             }
         }
@@ -196,7 +179,7 @@ object ZaphkielAPI {
         if (file.isDirectory) {
             file.listFiles()?.forEach { reloadModel(it) }
         } else {
-            val conf = Files.load(file)
+            val conf = SecuredFile.loadConfiguration(file)
             conf.getKeys(false).filter { it.endsWith("$") }.forEach { key ->
                 registeredModel[key.substring(0, key.length - 1)] = Model(conf.getConfigurationSection(key)!!)
             }
@@ -207,23 +190,35 @@ object ZaphkielAPI {
         registeredDisplay.clear()
         reloadDisplay(folderDisplay)
         PluginReloadEvent.Display().call()
-        Zaphkiel.logger.info("Loaded ${registeredDisplay.size} display plan(s).")
+        info("Loaded ${registeredDisplay.size} display plan(s).")
     }
 
     fun reloadDisplay(file: File) {
         if (file.isDirectory) {
             file.listFiles()?.forEach { reloadDisplay(it) }
         } else {
-            val conf = Files.load(file)
+            val conf = SecuredFile.loadConfiguration(file)
             conf.getKeys(false).forEach { key ->
                 registeredDisplay[key] = Display(conf.getConfigurationSection(key)!!)
             }
         }
     }
 
+    fun asEquipmentSlot(id: String): BukkitEquipment? {
+        return BukkitEquipment.fromString(id)
+    }
+
+    fun asItemFlag(name: String): ItemFlag? {
+        try {
+            return ItemFlag.valueOf(name)
+        } catch (t: Throwable) {
+        }
+        return null
+    }
+
     fun asEnchantment(name: String): Enchantment? {
         try {
-            return Enchantment::class.java.static(name.toUpperCase())
+            return Enchantment::class.java.getProperty(name.toUpperCase(), fixed = true)
         } catch (t: Throwable) {
         }
         return null
@@ -231,80 +226,10 @@ object ZaphkielAPI {
 
     fun asPotionEffect(name: String): PotionEffectType? {
         try {
-            return PotionEffectType::class.java.static(name.toUpperCase())
+            return PotionEffectType::class.java.getProperty(name.toUpperCase(), fixed = true)
         } catch (t: Throwable) {
         }
         return null
-    }
-
-    fun asEquipmentSlot(id: String) = when (id.toLowerCase()) {
-        "0", "mainhand", "hand" -> Equipments.HAND
-        "1", "head", "helmet" -> Equipments.HEAD
-        "2", "chest", "chestplate" -> Equipments.CHEST
-        "3", "legs", "leggings" -> Equipments.LEGS
-        "4", "feet", "boots" -> Equipments.FEET
-        "-1", "offhand" -> Equipments.OFF_HAND
-        else -> null
-    }
-
-    fun toItemStack(data: ByteArray): ItemStack {
-        ByteArrayInputStream(fromZip(data)).use { byteArrayInputStream ->
-            BukkitObjectInputStream(byteArrayInputStream).use { bukkitObjectInputStream ->
-                return bukkitObjectInputStream.readObject() as ItemStack
-            }
-        }
-    }
-
-    fun fromItemStack(itemStack: ItemStack): ByteArray {
-        ByteArrayOutputStream().use { byteArrayOutputStream ->
-            BukkitObjectOutputStream(byteArrayOutputStream).use { bukkitObjectOutputStream ->
-                bukkitObjectOutputStream.writeObject(itemStack)
-                return toZip(byteArrayOutputStream.toByteArray())
-            }
-        }
-    }
-
-    fun toInventory(inventory: Inventory, data: ByteArray) {
-        ByteArrayInputStream(fromZip(data)).use { byteArrayInputStream ->
-            BukkitObjectInputStream(byteArrayInputStream).use { bukkitObjectInputStream ->
-                val index = bukkitObjectInputStream.readObject() as Array<Int>
-                index.indices.forEach {
-                    inventory.setItem(index[it], bukkitObjectInputStream.readObject() as ItemStack)
-                }
-            }
-        }
-    }
-
-    fun fromInventory(inventory: Inventory, size: Int): ByteArray {
-        ByteArrayOutputStream().use { byteArrayOutputStream ->
-            BukkitObjectOutputStream(byteArrayOutputStream).use { bukkitObjectOutputStream ->
-                (0..size).map { it to inventory.getItem(it) }.filter { Items.nonNull(it.second) }.toMap().run {
-                    bukkitObjectOutputStream.writeObject(this.keys.toTypedArray())
-                    this.forEach { (_, v) ->
-                        bukkitObjectOutputStream.writeObject(v)
-                    }
-                }
-            }
-            return toZip(byteArrayOutputStream.toByteArray())
-        }
-    }
-
-    fun toZip(byteArray: ByteArray): ByteArray {
-        ByteArrayOutputStream().use { byteArrayOutputStream ->
-            GZIPOutputStream(byteArrayOutputStream).use { gzipOutputStream ->
-                gzipOutputStream.write(byteArray)
-                gzipOutputStream.flush()
-            }
-            return byteArrayOutputStream.toByteArray()
-        }
-    }
-
-    fun fromZip(byteArray: ByteArray): ByteArray {
-        ByteArrayInputStream(byteArray).use { byteArrayOutputStream ->
-            GZIPInputStream(byteArrayOutputStream).use { gzipInputStream ->
-                return gzipInputStream.readBytes()
-            }
-        }
     }
 
     fun getMeta(root: ConfigurationSection): MutableList<Meta> {
@@ -316,15 +241,14 @@ object ZaphkielAPI {
                 copy.set("meta.$id", root.get("meta.$id"))
             }
             val locked: Boolean
-            val meta = Reflection.instantiateObject(
-                if (id.endsWith("!!")) {
-                    locked = true
-                    registeredMeta[id.substring(0, id.length - 2)]
-                } else {
-                    locked = false
-                    registeredMeta[id]
-                } ?: return@mapNotNull null, copy
-            ) as Meta
+            val metaClass = if (id.endsWith("!!")) {
+                locked = true
+                registeredMeta[id.substring(0, id.length - 2)]
+            } else {
+                locked = false
+                registeredMeta[id]
+            } ?: return@mapNotNull null
+            val meta = metaClass.invokeConstructor(null, copy) as Meta
             meta.locked = locked
             meta
         }?.toMutableList() ?: ArrayList()

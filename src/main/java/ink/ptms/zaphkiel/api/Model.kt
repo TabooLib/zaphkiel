@@ -1,9 +1,9 @@
 package ink.ptms.zaphkiel.api
 
-import org.bukkit.configuration.ConfigurationSection
+import taboolib.library.configuration.ConfigurationSection
 
 /**
  * @Author sky
  * @Since 2019-12-25 8:07
  */
-class Model(val config: ConfigurationSection) 
+class Model(val config: ConfigurationSection)

@@ -1,24 +1,24 @@
 package ink.ptms.zaphkiel.module.meta
 
-import io.izzel.taboolib.kotlin.asList
-import io.izzel.taboolib.module.nms.nbt.NBTCompound
-import io.izzel.taboolib.module.nms.nbt.NBTList
-import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.entity.Player
+import taboolib.common.util.asList
+import taboolib.library.configuration.ConfigurationSection
+import taboolib.module.nms.ItemTag
+import taboolib.module.nms.ItemTagList
 
 @MetaKey("can-destroy")
 class MetaCanDestroy(root: ConfigurationSection) : Meta(root) {
 
     val canDestroy = root.get("meta.can-destroy")?.asList()
 
-    override fun build(player: Player?, compound: NBTCompound) {
+    override fun build(player: Player?, compound: ItemTag) {
         if (canDestroy == null || compound.containsKey("CanDestroy")) {
             return
         }
-        compound.putDeep("CanDestroy", NBTList.of(*canDestroy.toTypedArray()))
+        compound.putDeep("CanDestroy", ItemTagList.of(*canDestroy.toTypedArray()))
     }
 
-    override fun drop(player: Player?, compound: NBTCompound) {
+    override fun drop(player: Player?, compound: ItemTag) {
         compound.remove("CanDestroy")
     }
 

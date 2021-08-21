@@ -25,7 +25,7 @@ class ActionCooldown {
     class Check(val byPlayer: Boolean) : QuestAction<Boolean>() {
 
         override fun process(frame: QuestContext.Frame): CompletableFuture<Boolean> {
-            val viewer = (frame.context() as ScriptContext).sender as? Player ?: throw RuntimeException("No player selected.")
+            val viewer = (frame.context() as ScriptContext).sender as? Player ?: error("No player selected.")
             return if (byPlayer) {
                 CompletableFuture.completedFuture(frame.itemAPI().isCooldown(viewer))
             } else {
@@ -37,7 +37,7 @@ class ActionCooldown {
     class Set(val gameTick: ParsedAction<*>, val byPlayer: Boolean) : QuestAction<Void>() {
 
         override fun process(frame: QuestContext.Frame): CompletableFuture<Void> {
-            val viewer = (frame.context() as ScriptContext).sender as? Player ?: throw RuntimeException("No player selected.")
+            val viewer = (frame.context() as ScriptContext).sender as? Player ?: error("No player selected.")
             frame.newFrame(gameTick).run<Any>().thenApply {
                 if (byPlayer) {
                     CompletableFuture.completedFuture(frame.itemAPI().toCooldown(viewer, Coerce.toInteger(it)))

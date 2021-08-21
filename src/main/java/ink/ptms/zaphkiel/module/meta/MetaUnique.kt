@@ -1,11 +1,11 @@
 package ink.ptms.zaphkiel.module.meta
 
 import ink.ptms.zaphkiel.api.internal.ItemKey
-import io.izzel.taboolib.internal.apache.lang3.time.DateFormatUtils
-import io.izzel.taboolib.module.nms.nbt.NBTBase
-import io.izzel.taboolib.module.nms.nbt.NBTCompound
-import org.bukkit.configuration.ConfigurationSection
+import org.bukkit.craftbukkit.libs.org.apache.commons.lang3.time.DateFormatUtils
+import taboolib.library.configuration.ConfigurationSection
 import org.bukkit.entity.Player
+import taboolib.module.nms.ItemTag
+import taboolib.module.nms.ItemTagData
 import java.util.*
 
 @MetaKey("unique")
@@ -14,17 +14,17 @@ class MetaUnique(root: ConfigurationSection) : Meta(root) {
     val unique = root.getBoolean("meta.unique")
     val format = "yyyy-MM-dd HH:mm:ss"
 
-    override fun build(player: Player?, compound: NBTCompound) {
+    override fun build(player: Player?, compound: ItemTag) {
         val base = compound["zaphkiel"]!!.asCompound()
         if (unique) {
             if (!base.containsKey(ItemKey.UNIQUE.key)) {
-                val unique = NBTCompound()
+                val unique = ItemTag()
                 if (player != null) {
-                    unique["player"] = NBTBase(player.name)
+                    unique["player"] = ItemTagData(player.name)
                 }
-                unique["date"] = NBTBase(System.currentTimeMillis())
-                unique["date-formatted"] = NBTBase(DateFormatUtils.format(System.currentTimeMillis(), format))
-                unique["uuid"] = NBTBase(UUID.randomUUID().toString())
+                unique["date"] = ItemTagData(System.currentTimeMillis())
+                unique["date-formatted"] = ItemTagData(DateFormatUtils.format(System.currentTimeMillis(), format))
+                unique["uuid"] = ItemTagData(UUID.randomUUID().toString())
                 base[ItemKey.UNIQUE.key] = unique
             }
         } else {
@@ -32,7 +32,7 @@ class MetaUnique(root: ConfigurationSection) : Meta(root) {
         }
     }
 
-    override fun drop(player: Player?, compound: NBTCompound) {
+    override fun drop(player: Player?, compound: ItemTag) {
         compound.removeDeep("zaphkiel.${ItemKey.UNIQUE}")
     }
 

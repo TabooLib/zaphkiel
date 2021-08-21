@@ -1,11 +1,11 @@
 package ink.ptms.zaphkiel.module.meta
 
-import io.izzel.taboolib.util.Coerce
 import org.bukkit.Color
-import org.bukkit.configuration.ConfigurationSection
+import taboolib.library.configuration.ConfigurationSection
 import org.bukkit.inventory.meta.ItemMeta
 import org.bukkit.inventory.meta.LeatherArmorMeta
 import org.bukkit.inventory.meta.PotionMeta
+import taboolib.common5.Coerce
 
 @MetaKey("color")
 class MetaColor(root: ConfigurationSection) : Meta(root) {

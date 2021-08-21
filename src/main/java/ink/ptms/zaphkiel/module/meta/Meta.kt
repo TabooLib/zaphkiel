@@ -1,10 +1,10 @@
 package ink.ptms.zaphkiel.module.meta
 
-import ink.ptms.zaphkiel.api.event.single.ItemReleaseEvent
-import io.izzel.taboolib.module.nms.nbt.NBTCompound
-import org.bukkit.configuration.ConfigurationSection
+import ink.ptms.zaphkiel.api.event.ItemReleaseEvent
 import org.bukkit.entity.Player
 import org.bukkit.inventory.meta.ItemMeta
+import taboolib.library.configuration.ConfigurationSection
+import taboolib.module.nms.ItemTag
 
 abstract class Meta(val root: ConfigurationSection) {
 
@@ -20,7 +20,7 @@ abstract class Meta(val root: ConfigurationSection) {
 
     }
 
-    open fun build(player: Player?, compound: NBTCompound) {
+    open fun build(player: Player?, compound: ItemTag) {
 
     }
 
@@ -32,7 +32,7 @@ abstract class Meta(val root: ConfigurationSection) {
 
     }
 
-    open fun drop(player: Player?, compound: NBTCompound) {
+    open fun drop(player: Player?, compound: ItemTag) {
 
     }
 

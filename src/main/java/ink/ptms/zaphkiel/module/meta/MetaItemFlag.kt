@@ -1,7 +1,7 @@
 package ink.ptms.zaphkiel.module.meta
 
-import io.izzel.taboolib.util.item.Items
-import org.bukkit.configuration.ConfigurationSection
+import ink.ptms.zaphkiel.ZaphkielAPI
+import taboolib.library.configuration.ConfigurationSection
 import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.meta.ItemMeta
 
@@ -9,7 +9,7 @@ import org.bukkit.inventory.meta.ItemMeta
 class MetaItemFlag(root: ConfigurationSection) : Meta(root) {
 
     val itemflag = root.getStringList("meta.itemflag")
-        .mapNotNull { Items.asItemFlag(it.toString().toUpperCase()) }
+        .mapNotNull { ZaphkielAPI.asItemFlag(it.toString().toUpperCase()) }
         .toSet()
         .toTypedArray()
 

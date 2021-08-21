@@ -1,9 +1,8 @@
 package ink.ptms.zaphkiel.api
 
-import io.izzel.taboolib.kotlin.getCompound
-import io.izzel.taboolib.module.nms.NMS
-import io.izzel.taboolib.module.nms.nbt.NBTCompound
 import org.bukkit.inventory.ItemStack
+import taboolib.module.nms.ItemTag
+import taboolib.module.nms.getItemTag
 
 /**
  * @Author sky
@@ -13,7 +12,7 @@ class ItemStreamGenerated(
     itemStack: ItemStack,
     val name: MutableMap<String, String>,
     val lore: MutableMap<String, MutableList<String>>,
-    compound: NBTCompound = itemStack.getCompound()) : ItemStream(itemStack, compound) {
+    compound: ItemTag = itemStack.getItemTag()) : ItemStream(itemStack, compound) {
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

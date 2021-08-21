@@ -1,7 +1,7 @@
 package ink.ptms.zaphkiel.module.meta
 
 import ink.ptms.zaphkiel.ZaphkielAPI
-import org.bukkit.configuration.ConfigurationSection
+import taboolib.library.configuration.ConfigurationSection
 import org.bukkit.inventory.meta.EnchantmentStorageMeta
 import org.bukkit.inventory.meta.ItemMeta
 import org.bukkit.util.NumberConversions

@@ -17,7 +17,7 @@
 | ItemEvents.AsyncTick | 每 100 游戏刻触发 |
 
 ```kotlin
-@EventHandler
+@SubscribeEvent
 fun e(e: PluginReloadEvent.Item) {
     // ...
 }

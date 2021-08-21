@@ -1,14 +1,14 @@
 package ink.ptms.zaphkiel.module.meta
 
 import ink.ptms.zaphkiel.ZaphkielAPI
-import io.izzel.taboolib.kotlin.warning
-import io.izzel.taboolib.util.Coerce
-import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.inventory.meta.ItemMeta
 import org.bukkit.inventory.meta.PotionMeta
 import org.bukkit.potion.PotionData
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionType
+import taboolib.common.platform.function.warning
+import taboolib.common5.Coerce
+import taboolib.library.configuration.ConfigurationSection
 
 @MetaKey("potion")
 class MetaPotion(root: ConfigurationSection) : Meta(root) {

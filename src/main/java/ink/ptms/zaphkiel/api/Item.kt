@@ -1,45 +1,42 @@
 package ink.ptms.zaphkiel.api
 
-import ink.ptms.zaphkiel.Zaphkiel
 import ink.ptms.zaphkiel.ZaphkielAPI
-import ink.ptms.zaphkiel.api.event.single.Events
-import ink.ptms.zaphkiel.api.event.single.ItemBuildEvent
+import ink.ptms.zaphkiel.api.event.ItemBuildEvent
 import ink.ptms.zaphkiel.api.internal.ItemKey
 import ink.ptms.zaphkiel.api.internal.Translator
-import io.izzel.taboolib.kotlin.asList
-import io.izzel.taboolib.module.nms.nbt.NBTBase
-import io.izzel.taboolib.module.nms.nbt.NBTCompound
-import io.izzel.taboolib.util.Strings
-import io.izzel.taboolib.util.item.Items
-import org.bukkit.Material
-import org.bukkit.configuration.ConfigurationSection
-import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
 import org.bukkit.event.Cancellable
 import org.bukkit.event.Event
 import org.bukkit.event.player.PlayerEvent
 import org.bukkit.inventory.ItemStack
 import org.bukkit.util.NumberConversions
-import java.util.*
-import kotlin.collections.HashMap
+import taboolib.common.io.digest
+import taboolib.common.platform.function.severe
+import taboolib.common.util.asList
+import taboolib.library.configuration.ConfigurationSection
+import taboolib.library.xseries.parseToMaterial
+import taboolib.module.configuration.SecuredFile
+import taboolib.module.nms.ItemTag
+import taboolib.module.nms.ItemTagData
 
 /**
  * @Author sky
  * @Since 2019-12-15 16:09
  */
 class Item(
-        val config: ConfigurationSection,
-        val id: String = config.name,
-        val display: String = config.getString("display") ?: "null",
-        val icon: ItemStack = parseIcon(config),
-        val iconLocked: Boolean = config.contains("icon!!"),
-        val name: MutableMap<String, String> = parseName(config),
-        val nameLocked: Boolean = config.contains("name!!"),
-        val lore: MutableMap<String, MutableList<String>> = parseLore(config),
-        val loreLocked: Boolean = config.contains("lore!!"),
-        val data: ConfigurationSection = config.getConfigurationSection("data") ?: config.createSection("data"),
-        val model: MutableList<String> = config.getString("event.from")?.split(",")?.map { it.trim() }?.toMutableList() ?: ArrayList(),
-        val group: Group? = null) {
+    val config: ConfigurationSection,
+    val id: String = config.name,
+    val display: String = config.getString("display") ?: "null",
+    val icon: ItemStack = parseIcon(config),
+    val iconLocked: Boolean = config.contains("icon!!"),
+    val name: MutableMap<String, String> = parseName(config),
+    val nameLocked: Boolean = config.contains("name!!"),
+    val lore: MutableMap<String, MutableList<String>> = parseLore(config),
+    val loreLocked: Boolean = config.contains("lore!!"),
+    val data: ConfigurationSection = config.getConfigurationSection("data") ?: config.createSection("data"),
+    val model: MutableList<String> = config.getString("event.from")?.split(",")?.map { it.trim() }?.toMutableList() ?: ArrayList(),
+    val group: Group? = null,
+) {
 
     val displayInstance = ZaphkielAPI.registeredDisplay[display]
     val updateData = getUpdateData(HashMap(), data)
@@ -52,7 +49,7 @@ class Item(
                 if (model != null) {
                     map.putAll(parseEvent(this, model.config))
                 } else {
-                    Zaphkiel.logger.error("Model ${this.model} not found.")
+                    severe("Model ${this.model} not found.")
                 }
             }
         } else {
@@ -65,15 +62,15 @@ class Item(
         it.addAll(displayInstance?.meta ?: emptyList())
     }
 
-    val hash = YamlConfiguration().run {
+    val hash = SecuredFile().run {
         set("value", config)
         val display = ZaphkielAPI.registeredDisplay[display]
         if (display != null) {
             set("display.name", display.name)
             set("display.lore", display.lore)
         }
-        Strings.hashKeyForDisk(saveToString())
-    }!!
+        saveToString().digest("sha-1")
+    }
 
     fun eval(key: String, player: Player, event: Event, itemStack: ItemStack) {
         eventMap[key]?.run {
@@ -99,27 +96,29 @@ class Item(
 
     fun build(player: Player?): ItemStream {
         val itemStream = ItemStreamGenerated(icon.clone(), name.toMutableMap(), lore.toMutableMap())
-        val compound = itemStream.compound.computeIfAbsent("zaphkiel") { NBTCompound() }.asCompound()
-        compound[ItemKey.ID.key] = NBTBase(id)
-        compound[ItemKey.DATA.key] = Translator.toNBTCompound(NBTCompound(), data)
+        val compound = itemStream.compound.computeIfAbsent("zaphkiel") { ItemTag() }.asCompound()
+        compound[ItemKey.ID.key] = ItemTagData(id)
+        compound[ItemKey.DATA.key] = Translator.toNBTCompound(ItemTag(), data)
         return build(player, itemStream)
     }
 
     fun build(player: Player?, itemStream: ItemStream): ItemStream {
         val pre = if (itemStream is ItemStreamGenerated) {
-            Events.call(ItemBuildEvent.Pre(player, itemStream, itemStream.name, itemStream.lore))
+            ItemBuildEvent.Pre(player, itemStream, itemStream.name, itemStream.lore)
         } else {
-            Events.call(ItemBuildEvent.Pre(player, itemStream, name.toMutableMap(), lore.toMutableMap()))
+            ItemBuildEvent.Pre(player, itemStream, name.toMutableMap(), lore.toMutableMap())
         }
-        if (pre.isCancelled) {
+        if (!pre.call()) {
             return itemStream
         }
         updateData.forEach { (k, v) -> itemStream.getZaphkielData().putDeep(k, v) }
-        pre.itemStream.compound["zaphkiel"]!!.asCompound()[ItemKey.HASH.key] = NBTBase(hash)
-        return Events.call(ItemBuildEvent.Post(player, pre.itemStream, pre.name, pre.lore)).itemStream
+        pre.itemStream.compound["zaphkiel"]!!.asCompound()[ItemKey.HASH.key] = ItemTagData(hash)
+        val post = ItemBuildEvent.Post(player, pre.itemStream, pre.name, pre.lore)
+        post.call()
+        return post.itemStream
     }
 
-    private fun getUpdateData(map: MutableMap<String, NBTBase?>, section: ConfigurationSection, path: String = ""): MutableMap<String, NBTBase?> {
+    private fun getUpdateData(map: MutableMap<String, ItemTagData?>, section: ConfigurationSection, path: String = ""): MutableMap<String, ItemTagData?> {
         section.getKeys(false).forEach { key ->
             if (key.endsWith("!!")) {
                 map[path + key.substring(0, key.length - 2)] = Translator.toNBTBase(config.get("data.$path$key"))
@@ -173,7 +172,7 @@ class Item(
         fun parseIcon(config: ConfigurationSection): ItemStack {
             val node = if (config.contains("icon!!")) "icon!!" else "icon"
             val args = config.getString(node, "STONE")!!.split("~")
-            return ItemStack(Items.asMaterial(args[0]) ?: Material.STONE, 1, NumberConversions.toShort(args.getOrElse(1) { "0" }))
+            return ItemStack(args[0].parseToMaterial(), 1, NumberConversions.toShort(args.getOrElse(1) { "0" }))
         }
 
         fun parseName(config: ConfigurationSection): MutableMap<String, String> {

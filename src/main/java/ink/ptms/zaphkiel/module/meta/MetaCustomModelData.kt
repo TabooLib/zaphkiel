@@ -1,6 +1,6 @@
 package ink.ptms.zaphkiel.module.meta
 
-import org.bukkit.configuration.ConfigurationSection
+import taboolib.library.configuration.ConfigurationSection
 import org.bukkit.inventory.meta.ItemMeta
 
 @MetaKey("custom-model-data")

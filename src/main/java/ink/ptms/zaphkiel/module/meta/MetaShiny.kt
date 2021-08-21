@@ -1,6 +1,6 @@
 package ink.ptms.zaphkiel.module.meta
 
-import org.bukkit.configuration.ConfigurationSection
+import taboolib.library.configuration.ConfigurationSection
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.meta.ItemMeta

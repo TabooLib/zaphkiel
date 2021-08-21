@@ -1,6 +1,6 @@
 package ink.ptms.zaphkiel.api.internal
 
-import io.izzel.taboolib.util.Variables
+import taboolib.common.util.VariableReader
 
 /**
  * @Author sky
@@ -8,14 +8,14 @@ import io.izzel.taboolib.util.Variables
  */
 class StructureSingle(source: String) {
 
-    val cache = Variables(source).find()!!
+    val cache = VariableReader(source, '<', '>')
 
     fun buildTrim(vars: Map<String, String>): String {
         return build(vars).trim()
     }
 
     fun build(vars: Map<String, String>): String {
-        return cache.variableList.joinToString("") {
+        return cache.parts.joinToString("") {
             if (it.isVariable) {
                 vars[it.text] ?: ""
             } else {

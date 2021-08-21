@@ -1,38 +1,43 @@
 package ink.ptms.zaphkiel.module
 
-import ink.ptms.zaphkiel.Zaphkiel
 import ink.ptms.zaphkiel.ZaphkielAPI
-import io.izzel.taboolib.module.inject.TListener
-import io.izzel.taboolib.module.inject.TSchedule
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
-import org.bukkit.event.EventHandler
-import org.bukkit.event.EventPriority
-import org.bukkit.event.Listener
 import org.bukkit.event.inventory.InventoryOpenEvent
 import org.bukkit.event.player.PlayerDropItemEvent
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerPickupItemEvent
 import org.bukkit.event.player.PlayerRespawnEvent
+import taboolib.common.LifeCycle
+import taboolib.common.platform.Awake
+import taboolib.common.platform.event.EventPriority
+import taboolib.common.platform.event.SubscribeEvent
+import taboolib.common.platform.function.submit
 
 /**
  * @Author sky
  * @Since 2019-12-16 10:40
  */
-@TListener
-private class ItemRefresher : Listener {
+internal class ItemRefresher {
 
-    @EventHandler
+    @Awake(LifeCycle.ACTIVE)
+    fun tick() {
+        submit(period = 100, async = true) {
+            Bukkit.getOnlinePlayers().forEach { player -> ZaphkielAPI.rebuild(player, player.inventory) }
+        }
+    }
+
+    @SubscribeEvent
     fun e(e: PlayerJoinEvent) {
         ZaphkielAPI.rebuild(e.player, e.player.inventory)
     }
 
-    @EventHandler
+    @SubscribeEvent
     fun e(e: PlayerRespawnEvent) {
         ZaphkielAPI.rebuild(e.player, e.player.inventory)
     }
 
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    @SubscribeEvent(priority = EventPriority.MONITOR, ignoreCancelled = true)
     fun e(e: PlayerDropItemEvent) {
         ZaphkielAPI.rebuild(e.player, e.itemDrop.itemStack).run {
             if (this.rebuild) {
@@ -41,7 +46,7 @@ private class ItemRefresher : Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    @SubscribeEvent(priority = EventPriority.MONITOR, ignoreCancelled = true)
     fun e(e: PlayerPickupItemEvent) {
         ZaphkielAPI.rebuild(e.player, e.item.itemStack).run {
             if (this.rebuild) {
@@ -50,20 +55,12 @@ private class ItemRefresher : Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    @SubscribeEvent(priority = EventPriority.MONITOR, ignoreCancelled = true)
     fun e(e: InventoryOpenEvent) {
         if (e.inventory.location != null) {
-            Bukkit.getScheduler().runTaskAsynchronously(Zaphkiel.plugin, Runnable {
+            submit(async = true) {
                 ZaphkielAPI.rebuild(e.player as Player, e.inventory)
-            })
-        }
-    }
-
-    companion object {
-
-        @TSchedule(period = 100, async = true)
-        fun tick() {
-            Bukkit.getOnlinePlayers().forEach { player -> ZaphkielAPI.rebuild(player, player.inventory) }
+            }
         }
     }
 }
