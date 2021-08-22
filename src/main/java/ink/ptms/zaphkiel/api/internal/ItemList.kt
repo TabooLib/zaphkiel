@@ -3,124 +3,79 @@ package ink.ptms.zaphkiel.api.internal
 import ink.ptms.zaphkiel.ZaphkielAPI
 import ink.ptms.zaphkiel.api.Group
 import ink.ptms.zaphkiel.api.Item
-import io.izzel.taboolib.cronus.CronusUtils
-import io.izzel.taboolib.internal.xseries.XMaterial
-import io.izzel.taboolib.util.item.ItemBuilder
-import io.izzel.taboolib.util.item.Items
-import io.izzel.taboolib.util.item.inventory.ClickEvent
-import io.izzel.taboolib.util.item.inventory.linked.MenuLinked
 import org.bukkit.Sound
 import org.bukkit.entity.Player
-import org.bukkit.inventory.Inventory
-import org.bukkit.inventory.ItemFlag
-import org.bukkit.inventory.ItemStack
+import taboolib.library.xseries.XMaterial
+import taboolib.module.ui.openMenu
+import taboolib.module.ui.type.Linked
+import taboolib.platform.util.buildItem
+import taboolib.platform.util.giveItem
+import taboolib.platform.util.inventoryCenterSlots
+import taboolib.platform.util.modifyLore
 
 fun Player.openGroupMenu() {
-    MenuGroup(this).open()
+    playSound(location, Sound.UI_BUTTON_CLICK, 1f, 2f)
+    openMenu<Linked<Group>>("Zaphkiel [Pg.%p]") {
+        rows(6)
+        slots(inventoryCenterSlots)
+        elements {
+            ZaphkielAPI.registeredItem.values.groupBy { it.group ?: Group.NO_GROUP }.map { it.key }.sortedByDescending { it.priority }
+        }
+        onGenerate { _, element, _, _ ->
+            buildItem(element.display) { hideAll() }
+        }
+        onClick { _, element ->
+            openItemMenu(element)
+        }
+        setNextPage(51) { _, hasNextPage ->
+            if (hasNextPage) {
+                buildItem(XMaterial.SPECTRAL_ARROW) { name = "§7下一页" }
+            } else {
+                buildItem(XMaterial.ARROW) { name = "§8下一页" }
+            }
+        }
+        setPreviousPage(47) { _, hasPreviousPage ->
+            if (hasPreviousPage) {
+                buildItem(XMaterial.SPECTRAL_ARROW) { name = "§7上一页" }
+            } else {
+                buildItem(XMaterial.ARROW) { name = "§8上一页" }
+            }
+        }
+    }
 }
 
 fun Player.openItemMenu(group: Group) {
-    MenuItem(this, group).open()
-}
-
-class MenuGroup(player: Player) : MenuLinked<Group>(player) {
-
-    init {
-        addButtonPreviousPage(47)
-        addButtonNextPage(51)
-    }
-
-    override fun getTitle(): String {
-        return "Zaphkiel [Pg.${page + 1}]"
-    }
-
-    override fun getRows(): Int {
-        return 6
-    }
-
-    override fun getElements(): List<Group> {
-        return ZaphkielAPI.registeredItem.values.groupBy { it.group ?: Group.NO_GROUP }.map { it.key }.sortedByDescending { it.priority }
-    }
-
-    override fun getSlots(): List<Int> {
-        return Items.INVENTORY_CENTER.toList()
-    }
-
-    override fun onBuild(inv: Inventory) {
-        if (hasPreviousPage()) {
-            inv.setItem(47, ItemBuilder(XMaterial.SPECTRAL_ARROW).name("&f上一页").colored().build())
-        } else {
-            inv.setItem(47, ItemBuilder(XMaterial.ARROW).name("&8上一页").colored().build())
+    playSound(location, Sound.UI_BUTTON_CLICK, 1f, 2f)
+    openMenu<Linked<Item>>("Zaphkiel - ${group.name} [Pg.%p]") {
+        rows(6)
+        slots(inventoryCenterSlots)
+        elements {
+            ZaphkielAPI.registeredItem.values.filter { (it.group ?: Group.NO_GROUP) == group }
         }
-        if (hasNextPage()) {
-            inv.setItem(51, ItemBuilder(XMaterial.SPECTRAL_ARROW).name("&f下一页").colored().build())
-        } else {
-            inv.setItem(51, ItemBuilder(XMaterial.ARROW).name("&8下一页").colored().build())
+        onGenerate { _, element, _, _ ->
+            element.buildItemStack(this@openItemMenu).modifyLore {
+                add("")
+                add("§7序号: ${element.id}")
+            }
         }
-        player.playSound(player.location, Sound.UI_BUTTON_CLICK, 1f, 2f)
-    }
-
-    override fun onClick(event: ClickEvent, group: Group) {
-        player.openItemMenu(group)
-    }
-
-    override fun generateItem(player: Player, group: Group, index: Int, slot: Int): ItemStack {
-        return ItemBuilder(group.display).flags(ItemFlag.HIDE_ATTRIBUTES).build()
-    }
-}
-
-class MenuItem(player: Player, val group: Group) : MenuLinked<Item>(player) {
-
-    init {
-        addButtonPreviousPage(47)
-        addButtonNextPage(51)
-        addButton(49) {
-            player.openGroupMenu()
+        onClick { _, element ->
+            giveItem(element.buildItemStack(this@openItemMenu))
         }
-    }
-
-    override fun getTitle(): String {
-        return "Zaphkiel - ${group.name} [Pg.${page + 1}]"
-    }
-
-    override fun getRows(): Int {
-        return 6
-    }
-
-    override fun getElements(): List<Item> {
-        return ZaphkielAPI.registeredItem.values.filter { (it.group ?: Group.NO_GROUP) == group }
-    }
-
-    override fun getSlots(): List<Int> {
-        return Items.INVENTORY_CENTER.toList()
-    }
-
-    override fun onBuild(inv: Inventory) {
-        if (hasPreviousPage()) {
-            inv.setItem(47, ItemBuilder(XMaterial.SPECTRAL_ARROW).name("&f上一页").colored().build())
-        } else {
-            inv.setItem(47, ItemBuilder(XMaterial.ARROW).name("&8上一页").colored().build())
+        set(49, buildItem(XMaterial.BOOK) { name = "§7返回" }) {
+            openGroupMenu()
         }
-        if (hasNextPage()) {
-            inv.setItem(51, ItemBuilder(XMaterial.SPECTRAL_ARROW).name("&f下一页").colored().build())
-        } else {
-            inv.setItem(51, ItemBuilder(XMaterial.ARROW).name("&8下一页").colored().build())
+        setNextPage(51) { _, hasNextPage ->
+            if (hasNextPage) {
+                buildItem(XMaterial.SPECTRAL_ARROW) { name = "§7下一页" }
+            } else {
+                buildItem(XMaterial.ARROW) { name = "§8下一页" }
+            }
         }
-        inv.setItem(49, ItemBuilder(XMaterial.BOOK).name("&8组").colored().build())
-        player.playSound(player.location, Sound.UI_BUTTON_CLICK, 1f, 2f)
-    }
-
-    override fun onClick(event: ClickEvent, item: Item) {
-        CronusUtils.addItem(player, item.build(player).save())
-    }
-
-    override fun generateItem(player: Player, item: Item, index: Int, slot: Int): ItemStack {
-        return item.build(player).save().also { itemStack ->
-            itemStack.itemMeta = itemStack.itemMeta!!.also { itemMeta ->
-                itemMeta.lore = (itemMeta.lore ?: ArrayList<String>()).also {
-                    it.add("")
-                    it.add("§7序号: ${item.id}")
-                }
+        setPreviousPage(47) { _, hasPreviousPage ->
+            if (hasPreviousPage) {
+                buildItem(XMaterial.SPECTRAL_ARROW) { name = "§7上一页" }
+            } else {
+                buildItem(XMaterial.ARROW) { name = "§8上一页" }
             }
         }
     }

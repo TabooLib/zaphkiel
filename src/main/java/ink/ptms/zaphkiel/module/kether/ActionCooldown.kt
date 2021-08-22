@@ -1,16 +1,10 @@
 package ink.ptms.zaphkiel.module.kether
 
-import io.izzel.taboolib.kotlin.kether.Kether.expects
-import io.izzel.taboolib.kotlin.kether.KetherParser
-import io.izzel.taboolib.kotlin.kether.ScriptContext
-import io.izzel.taboolib.kotlin.kether.ScriptParser
-import io.izzel.taboolib.kotlin.kether.action.supplier.ActionPass
-import io.izzel.taboolib.kotlin.kether.common.api.ParsedAction
-import io.izzel.taboolib.kotlin.kether.common.api.QuestAction
-import io.izzel.taboolib.kotlin.kether.common.api.QuestContext
-import io.izzel.taboolib.kotlin.kether.common.loader.types.ArgTypes
-import io.izzel.taboolib.util.Coerce
 import org.bukkit.entity.Player
+import taboolib.common5.Coerce
+import taboolib.library.kether.ArgTypes
+import taboolib.library.kether.ParsedAction
+import taboolib.module.kether.*
 import java.util.concurrent.CompletableFuture
 
 /**
@@ -22,10 +16,10 @@ import java.util.concurrent.CompletableFuture
  */
 class ActionCooldown {
 
-    class Check(val byPlayer: Boolean) : QuestAction<Boolean>() {
+    class Check(val byPlayer: Boolean) : ScriptAction<Boolean>() {
 
-        override fun process(frame: QuestContext.Frame): CompletableFuture<Boolean> {
-            val viewer = (frame.context() as ScriptContext).sender as? Player ?: error("No player selected.")
+        override fun run(frame: ScriptFrame): CompletableFuture<Boolean> {
+            val viewer = frame.script().sender?.castSafely<Player>() ?: error("No player selected.")
             return if (byPlayer) {
                 CompletableFuture.completedFuture(frame.itemAPI().isCooldown(viewer))
             } else {
@@ -34,10 +28,10 @@ class ActionCooldown {
         }
     }
 
-    class Set(val gameTick: ParsedAction<*>, val byPlayer: Boolean) : QuestAction<Void>() {
+    class Set(val gameTick: ParsedAction<*>, val byPlayer: Boolean) : ScriptAction<Void>() {
 
-        override fun process(frame: QuestContext.Frame): CompletableFuture<Void> {
-            val viewer = (frame.context() as ScriptContext).sender as? Player ?: error("No player selected.")
+        override fun run(frame: ScriptFrame): CompletableFuture<Void> {
+            val viewer = frame.script().sender?.castSafely<Player>() ?: error("No player selected.")
             frame.newFrame(gameTick).run<Any>().thenApply {
                 if (byPlayer) {
                     CompletableFuture.completedFuture(frame.itemAPI().toCooldown(viewer, Coerce.toInteger(it)))
@@ -57,8 +51,8 @@ class ActionCooldown {
          * cooldown set 100
          * cooldown set 100 for player
          */
-        @KetherParser(["cooldown"], namespace = "zaphkiel")
-        fun parser() = ScriptParser.parser {
+        @KetherParser(["cooldown"], namespace = "zaphkiel", shared = true)
+        fun parser() = scriptParser {
             when (it.expects("check", "set")) {
                 "check" -> {
                     try {
@@ -81,9 +75,7 @@ class ActionCooldown {
                         Set(gameTick, false)
                     }
                 }
-                else -> {
-                    ActionPass()
-                }
+                else -> error("out of case")
             }
         }
     }

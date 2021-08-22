@@ -1,19 +1,13 @@
 package ink.ptms.zaphkiel.module.kether
 
-import io.izzel.taboolib.kotlin.Tasks
-import io.izzel.taboolib.kotlin.kether.Kether.expects
-import io.izzel.taboolib.kotlin.kether.KetherParser
-import io.izzel.taboolib.kotlin.kether.ScriptContext
-import io.izzel.taboolib.kotlin.kether.ScriptParser
-import io.izzel.taboolib.kotlin.kether.action.supplier.ActionPass
-import io.izzel.taboolib.kotlin.kether.common.api.ParsedAction
-import io.izzel.taboolib.kotlin.kether.common.api.QuestAction
-import io.izzel.taboolib.kotlin.kether.common.api.QuestContext
-import io.izzel.taboolib.kotlin.kether.common.loader.types.ArgTypes
-import io.izzel.taboolib.util.Coerce
 import org.bukkit.entity.Player
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
+import taboolib.common.platform.function.submit
+import taboolib.common5.Coerce
+import taboolib.library.kether.ArgTypes
+import taboolib.library.kether.ParsedAction
+import taboolib.module.kether.*
 import java.util.concurrent.CompletableFuture
 
 /**
@@ -25,10 +19,10 @@ import java.util.concurrent.CompletableFuture
  */
 class ActionEffect {
 
-    class Give(val name: ParsedAction<*>, val duration: ParsedAction<*>, val amplifier: ParsedAction<*>) : QuestAction<Void>() {
+    class Give(val name: ParsedAction<*>, val duration: ParsedAction<*>, val amplifier: ParsedAction<*>) : ScriptAction<Void>() {
 
-        override fun process(frame: QuestContext.Frame): CompletableFuture<Void> {
-            val viewer = (frame.context() as ScriptContext).sender as? Player ?: error("No player selected.")
+        override fun run(frame: ScriptFrame): CompletableFuture<Void> {
+            val viewer = frame.script().sender?.castSafely<Player>() ?: error("No player selected.")
             frame.newFrame(name).run<Any>().thenApply { name ->
                 frame.newFrame(duration).run<Any>().thenApply { duration ->
                     frame.newFrame(amplifier).run<Any>().thenApplyAsync({ amplifier ->
@@ -43,10 +37,10 @@ class ActionEffect {
         }
     }
 
-    class Remove(val name: ParsedAction<*>) : QuestAction<Void>() {
+    class Remove(val name: ParsedAction<*>) : ScriptAction<Void>() {
 
-        override fun process(frame: QuestContext.Frame): CompletableFuture<Void> {
-            val viewer = (frame.context() as ScriptContext).sender as? Player ?: error("No player selected.")
+        override fun run(frame: ScriptFrame): CompletableFuture<Void> {
+            val viewer = frame.script().sender?.castSafely<Player>() ?: error("No player selected.")
             frame.newFrame(name).run<Any>().thenApplyAsync({ name ->
                 val effectType = PotionEffectType.getByName(name.toString().toUpperCase())
                 if (effectType != null) {
@@ -57,11 +51,11 @@ class ActionEffect {
         }
     }
 
-    class Clear : QuestAction<Void>() {
+    class Clear : ScriptAction<Void>() {
 
-        override fun process(frame: QuestContext.Frame): CompletableFuture<Void> {
-            val viewer = (frame.context() as ScriptContext).sender as? Player ?: error("No player selected.")
-            Tasks.task {
+        override fun run(frame: ScriptFrame): CompletableFuture<Void> {
+            val viewer = frame.script().sender?.castSafely<Player>() ?: error("No player selected.")
+            submit {
                 viewer.activePotionEffects.toList().forEach { viewer.removePotionEffect(it.type) }
             }
             return CompletableFuture.completedFuture(null)
@@ -73,21 +67,13 @@ class ActionEffect {
         /**
          * effect give *SPEED *10 *10
          */
-        @KetherParser(["effect"], namespace = "zaphkiel")
-        fun parser() = ScriptParser.parser {
+        @KetherParser(["effect"], namespace = "zaphkiel", shared = true)
+        fun parser() = scriptParser {
             when (it.expects("give", "remove", "clear")) {
-                "give" -> {
-                    Give(it.next(ArgTypes.ACTION), it.next(ArgTypes.ACTION), it.next(ArgTypes.ACTION))
-                }
-                "remove" -> {
-                    Remove(it.next(ArgTypes.ACTION))
-                }
-                "clear" -> {
-                    Clear()
-                }
-                else -> {
-                    ActionPass()
-                }
+                "give" -> Give(it.next(ArgTypes.ACTION), it.next(ArgTypes.ACTION), it.next(ArgTypes.ACTION))
+                "remove" -> Remove(it.next(ArgTypes.ACTION))
+                "clear" -> Clear()
+                else -> error("out of case")
             }
         }
     }

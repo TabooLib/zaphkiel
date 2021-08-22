@@ -14,6 +14,7 @@ taboolib {
     install("common")
     install("common-5")
     install("module-configuration")
+    install("module-database")
     install("module-kether")
     install("module-chat")
     install("module-lang")

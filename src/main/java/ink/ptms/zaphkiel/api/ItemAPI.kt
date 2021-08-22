@@ -1,7 +1,7 @@
 package ink.ptms.zaphkiel.api
 
+import ink.ptms.zaphkiel.Zaphkiel
 import ink.ptms.zaphkiel.ZaphkielAPI
-import io.izzel.taboolib.module.db.local.LocalPlayer
 import org.bukkit.Bukkit
 import org.bukkit.Particle
 import org.bukkit.Sound
@@ -14,6 +14,7 @@ import org.bukkit.potion.PotionEffectType
 import taboolib.common.platform.function.adaptPlayer
 import taboolib.common.platform.function.console
 import taboolib.common.util.random
+import taboolib.common5.Coerce
 import taboolib.library.xseries.parseToMaterial
 import taboolib.module.nms.ItemTagData
 import taboolib.platform.BukkitPlugin
@@ -30,9 +31,6 @@ open class ItemAPI(val item: Item, val itemStack: ItemStack, val player: Player)
     val itemStream = ItemStream(itemStack)
     var isChanged = false
     var isReplaced = false
-    val data = HashMap<String, Any>()
-
-    fun data(data: String) = this.data[data]
 
     fun command(sender: CommandSender, command: String) {
         adaptPlayer(sender).performCommand(command)
@@ -58,19 +56,23 @@ open class ItemAPI(val item: Item, val itemStack: ItemStack, val player: Player)
     }
 
     fun toCooldown(player: Player, gameTick: Int) {
-        LocalPlayer.get(player).set("Zaphkiel.cooldown.${item.id}", System.currentTimeMillis() + (gameTick * 50L))
+        val vars = Zaphkiel.playerVars[player.name] ?: return
+        vars["cooldown.${item.id}"] = System.currentTimeMillis() + (gameTick * 50L)
     }
 
     fun toCooldown(player: Player, index: String, gameTick: Int) {
-        LocalPlayer.get(player).set("Zaphkiel.cooldown.$index", System.currentTimeMillis() + (gameTick * 50L))
+        val vars = Zaphkiel.playerVars[player.name] ?: return
+        vars["cooldown.$index"] = System.currentTimeMillis() + (gameTick * 50L)
     }
 
     fun isCooldown(player: Player): Boolean {
-        return LocalPlayer.get(player).getLong("Zaphkiel.cooldown.${item.id}") > System.currentTimeMillis()
+        val vars = Zaphkiel.playerVars[player.name] ?: return true
+        return Coerce.toLong(vars["cooldown.${item.id}"]) > System.currentTimeMillis()
     }
 
     fun isCooldown(player: Player, index: String): Boolean {
-        return LocalPlayer.get(player).getLong("Zaphkiel.cooldown.$index") > System.currentTimeMillis()
+        val vars = Zaphkiel.playerVars[player.name] ?: return true
+        return Coerce.toLong(vars["cooldown.$index"]) > System.currentTimeMillis()
     }
 
     fun toCooldown(gameTick: Int) {

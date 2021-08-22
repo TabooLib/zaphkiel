@@ -1,14 +1,9 @@
 package ink.ptms.zaphkiel.module.kether
 
-import io.izzel.taboolib.kotlin.kether.Kether.expects
-import io.izzel.taboolib.kotlin.kether.KetherParser
-import io.izzel.taboolib.kotlin.kether.ScriptParser
-import io.izzel.taboolib.kotlin.kether.action.supplier.ActionPass
-import io.izzel.taboolib.kotlin.kether.common.api.ParsedAction
-import io.izzel.taboolib.kotlin.kether.common.api.QuestAction
-import io.izzel.taboolib.kotlin.kether.common.api.QuestContext
-import io.izzel.taboolib.kotlin.kether.common.loader.types.ArgTypes
-import io.izzel.taboolib.util.Coerce
+import taboolib.common5.Coerce
+import taboolib.library.kether.ArgTypes
+import taboolib.library.kether.ParsedAction
+import taboolib.module.kether.*
 import java.util.concurrent.CompletableFuture
 
 /**
@@ -20,18 +15,18 @@ import java.util.concurrent.CompletableFuture
  */
 class ActionItem {
 
-    class Damage(val amount: ParsedAction<*>) : QuestAction<Void>() {
+    class Damage(val amount: ParsedAction<*>) : ScriptAction<Void>() {
 
-        override fun process(frame: QuestContext.Frame): CompletableFuture<Void> {
+        override fun run(frame: ScriptFrame): CompletableFuture<Void> {
             return frame.newFrame(amount).run<Any>().thenAcceptAsync({
                 frame.itemAPI().toRepair(-Coerce.toInteger(it))
             }, frame.context().executor)
         }
     }
 
-    class Repair(val amount: ParsedAction<*>) : QuestAction<Void>() {
+    class Repair(val amount: ParsedAction<*>) : ScriptAction<Void>() {
 
-        override fun process(frame: QuestContext.Frame): CompletableFuture<Void> {
+        override fun run(frame: ScriptFrame): CompletableFuture<Void> {
             return frame.newFrame(amount).run<Any>().thenAcceptAsync({
                 frame.itemAPI().toRepair(Coerce.toInteger(it))
             }, frame.context().executor)
@@ -40,8 +35,8 @@ class ActionItem {
 
     companion object {
 
-        @KetherParser(["item"], namespace = "zaphkiel")
-        fun parser() = ScriptParser.parser {
+        @KetherParser(["item"], namespace = "zaphkiel", shared = true)
+        fun parser() = scriptParser {
             when (it.expects("repair", "damage")) {
                 "repair" -> {
                     Repair(it.next(ArgTypes.ACTION))
@@ -49,9 +44,7 @@ class ActionItem {
                 "damage" -> {
                     Damage(it.next(ArgTypes.ACTION))
                 }
-                else -> {
-                    ActionPass()
-                }
+                else -> error("out of case")
             }
         }
     }

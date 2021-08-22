@@ -1,9 +1,9 @@
 package ink.ptms.zaphkiel.module.kether
 
-import io.izzel.taboolib.kotlin.kether.KetherParser
-import io.izzel.taboolib.kotlin.kether.ScriptParser
-import io.izzel.taboolib.kotlin.kether.common.api.QuestAction
-import io.izzel.taboolib.kotlin.kether.common.api.QuestContext
+import taboolib.module.kether.KetherParser
+import taboolib.module.kether.ScriptAction
+import taboolib.module.kether.ScriptFrame
+import taboolib.module.kether.scriptParser
 import java.util.concurrent.CompletableFuture
 
 /**
@@ -13,9 +13,9 @@ import java.util.concurrent.CompletableFuture
  * @author sky
  * @since 2021/3/16 2:56 下午
  */
-class ActionSave : QuestAction<Void>() {
+class ActionSave : ScriptAction<Void>() {
 
-    override fun process(frame: QuestContext.Frame): CompletableFuture<Void> {
+    override fun run(frame: ScriptFrame): CompletableFuture<Void> {
         val itemAPI = frame.itemAPI()
         itemAPI.isChanged = false
         itemAPI.save()
@@ -24,8 +24,8 @@ class ActionSave : QuestAction<Void>() {
 
     companion object {
 
-        @KetherParser(["save"], namespace = "zaphkiel")
-        fun parser() = ScriptParser.parser {
+        @KetherParser(["save"], namespace = "zaphkiel", shared = true)
+        fun parser() = scriptParser {
             ActionSave()
         }
     }

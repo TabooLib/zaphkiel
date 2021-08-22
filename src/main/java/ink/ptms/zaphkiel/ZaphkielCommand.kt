@@ -1,69 +1,68 @@
 package ink.ptms.zaphkiel
 
 import ink.ptms.zaphkiel.api.internal.openGroupMenu
-import io.izzel.taboolib.cronus.CronusUtils
-import io.izzel.taboolib.kotlin.Serializer
-import io.izzel.taboolib.module.command.base.BaseCommand
-import io.izzel.taboolib.module.command.base.BaseMainCommand
-import io.izzel.taboolib.module.command.base.SubCommand
-import io.izzel.taboolib.module.locale.TLocale
 import org.bukkit.Bukkit
 import org.bukkit.Sound
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
-import org.bukkit.util.NumberConversions
+import taboolib.common.platform.command.CommandBody
+import taboolib.common.platform.command.CommandHeader
+import taboolib.common.platform.command.subCommand
+import taboolib.common5.Coerce
+import taboolib.module.chat.colored
+import taboolib.platform.util.giveItem
 
 /**
  * @Author sky
  * @Since 2019-12-15 22:39
  */
-@BaseCommand(name = "Zaphkiel", aliases = ["zl", "item"], permission = "*")
-class ZaphkielCommand : BaseMainCommand() {
+@CommandHeader(name = "Zaphkiel", aliases = ["zl", "item"], permission = "*")
+object ZaphkielCommand {
 
-    override fun onTabComplete(sender: CommandSender, command: String, argument: String): List<String>? {
-        return when (argument) {
-            "节点" -> ZaphkielAPI.registeredItem.keys.toList()
-            else -> null
+    @CommandBody
+    val give = subCommand {
+        dynamic {
+            suggestion<CommandSender> { _, _ ->
+                ZaphkielAPI.registeredItem.keys.toList()
+            }
+            execute<Player> { sender, _, argument ->
+                sender.giveItem(ZaphkielAPI.getItemStack(argument)!!)
+            }
+            dynamic(optional = true) {
+                suggestion<CommandSender> { _, _ ->
+                    Bukkit.getOnlinePlayers().map { it.name }
+                }
+                execute<Player> { _, context, argument ->
+                    Bukkit.getPlayerExact(argument)!!.giveItem(ZaphkielAPI.getItemStack(context.argument(-1)!!)!!)
+                }
+                dynamic(optional = true) {
+                    execute<Player> { _, context, argument ->
+                        val amount = Coerce.toInteger(argument)
+                        Bukkit.getPlayerExact(context.argument(-1)!!)!!.giveItem(ZaphkielAPI.getItemStack(context.argument(-2)!!)!!, amount)
+                    }
+                }
+            }
         }
     }
 
-    @SubCommand(priority = 0.0, description = "赋予物品", arguments = ["节点", "玩家?", "数量?"])
-    fun give(sender: CommandSender, args: Array<String>) {
-        val item = ZaphkielAPI.registeredItem[args[0]]
-        if (item == null) {
-            notify(sender, "物品 \"&f${args[0]}&7\" 不存在.")
-            return
+    @CommandBody
+    val list = subCommand {
+        execute<Player> { sender, _, _ ->
+            sender.openGroupMenu()
         }
-        val target: Player? = when {
-            args.size > 1 -> Bukkit.getPlayerExact(args[1])
-            sender is Player -> sender
-            else -> null
-        }
-        if (target == null) {
-            notify(sender, "缺少玩家.")
-            return
-        }
-        val itemStack = item.build(target).save()
-        if (args.size > 2) {
-            itemStack.amount = NumberConversions.toInt(args[2])
-        }
-        CronusUtils.addItem(target, itemStack)
     }
 
-    @SubCommand(priority = 0.1, description = "列出物品")
-    fun list(player: Player, args: Array<String>) {
-        player.openGroupMenu()
-    }
-
-    @SubCommand(priority = 0.2, description = "重载插件")
-    fun reload(sender: CommandSender, args: Array<String>) {
-        Zaphkiel.conf.reload()
-        Zaphkiel.reload()
-        notify(sender, "插件已重载.")
+    @CommandBody
+    val reload = subCommand {
+        execute<CommandSender> { sender, _, _ ->
+            Zaphkiel.conf.reload()
+            Zaphkiel.reload()
+            notify(sender, "插件已重载.")
+        }
     }
 
     fun notify(sender: CommandSender, value: String) {
-        sender.sendMessage("§c[Zaphkiel] §7${TLocale.Translate.setColored(value)}")
+        sender.sendMessage("§c[Zaphkiel] §7${value.colored()}")
         if (sender is Player) {
             sender.playSound(sender.location, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 2f)
         }
