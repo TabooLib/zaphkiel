@@ -1,7 +1,7 @@
 package ink.ptms.zaphkiel.module.meta
 
 import ink.ptms.zaphkiel.api.internal.ItemKey
-import org.bukkit.craftbukkit.libs.org.apache.commons.lang3.time.DateFormatUtils
+import org.apache.commons.lang.time.DateFormatUtils
 import taboolib.library.configuration.ConfigurationSection
 import org.bukkit.entity.Player
 import taboolib.module.nms.ItemTag

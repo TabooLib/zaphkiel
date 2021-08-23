@@ -14,9 +14,9 @@ import taboolib.module.configuration.SecuredFile
  * @Author sky
  * @Since 2019-12-26 9:53
  */
-internal class ItemBuilder {
+internal object ItemBuilder {
 
-    val dropMeta = ZaphkielAPI.registeredMeta.map { it.value.invokeConstructor(SecuredFile()) as Meta }.associateBy { it.id }
+    val dropMeta by lazy { ZaphkielAPI.registeredMeta.map { it.value.invokeConstructor(SecuredFile()) as Meta }.associateBy { it.id } }
 
     @SubscribeEvent
     fun e(e: ItemBuildEvent.Post) {
