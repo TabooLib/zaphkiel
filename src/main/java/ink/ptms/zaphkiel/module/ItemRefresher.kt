@@ -18,7 +18,7 @@ import taboolib.common.platform.function.submit
  * @Author sky
  * @Since 2019-12-16 10:40
  */
-internal class ItemRefresher {
+internal object ItemRefresher {
 
     @Awake(LifeCycle.ACTIVE)
     fun tick() {
