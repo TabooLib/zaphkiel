@@ -16,7 +16,7 @@ import taboolib.platform.util.isNotAir
  * @Author sky
  * @Since 2019-12-15 22:22
  */
-internal class ItemEvents {
+internal object ItemEvents {
 
 //    @SubscribeEvent(priority = EventPriority.MONITOR, ignoreCancelled = true, bind = "ink.ptms.sandalphon.module.impl.blockmine.event.BlockBreakEvent")
 //    fun e(oe: OptionalEvent) {

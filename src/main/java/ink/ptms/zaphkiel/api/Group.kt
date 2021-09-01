@@ -24,9 +24,12 @@ class Group(
 
     companion object {
 
-        val NO_GROUP = Group("#", File(getDataFolder(), "config.yml"), SecuredFile(), buildItem(XMaterial.BARRIER) {
-            name = "&7[NO GROUP]"
-            colored()
-        }, -1)
+        val NO_GROUP by lazy {
+            Group("#", File(getDataFolder(), "config.yml"), SecuredFile(), buildItem(XMaterial.BARRIER) {
+                name = "&7[NO GROUP]"
+                colored()
+            }, -1)
+        }
+
     }
 }

@@ -248,7 +248,7 @@ object ZaphkielAPI {
                 locked = false
                 registeredMeta[id]
             } ?: return@mapNotNull null
-            val meta = metaClass.invokeConstructor(null, copy) as Meta
+            val meta = metaClass.invokeConstructor(copy) as Meta
             meta.locked = locked
             meta
         }?.toMutableList() ?: ArrayList()

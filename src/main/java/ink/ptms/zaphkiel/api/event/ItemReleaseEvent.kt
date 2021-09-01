@@ -27,7 +27,10 @@ class ItemReleaseEvent(var icon: Material, var data: Int, var itemMeta: ItemMeta
 
         fun addLore(key: String, value: Any) {
             val list = lore.computeIfAbsent(key) { ArrayList() } as ArrayList
-            list.add(value.toString())
+            when (value) {
+                is List<*> -> list.addAll(value.map { it.toString() })
+                else -> list.add(value.toString())
+            }
         }
 
         fun addLore(key: String, value: List<Any>) {
