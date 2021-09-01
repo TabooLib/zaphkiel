@@ -1,6 +1,7 @@
 package ink.ptms.zaphkiel.module.compat
 
 import ink.ptms.zaphkiel.ZaphkielAPI
+import io.lumine.xikage.mythicmobs.api.bukkit.events.MythicMobDeathEvent
 import io.lumine.xikage.mythicmobs.utils.config.ConfigurationSection
 import org.bukkit.Material
 import org.bukkit.entity.LivingEntity
@@ -23,7 +24,7 @@ internal class MythicHook {
 
     @SubscribeEvent(bind = "io.lumine.xikage.mythicmobs.api.bukkit.events.MythicMobDeathEvent")
     fun e1(oe: OptionalEvent) {
-        val e = oe.cast(io.lumine.xikage.mythicmobs.api.bukkit.events.MythicMobDeathEvent::class.java)
+        val e = oe.get<MythicMobDeathEvent>()
         val section = e.mob.type.config.fileConfiguration.getConfigurationSection(e.mob.type.internalName + ".Zaphkiel.equipments") ?: return
         submit(delay = 5) {
             MythicUtil.equipment(section, e.entity as? LivingEntity ?: return@submit)
@@ -32,7 +33,7 @@ internal class MythicHook {
 
     @SubscribeEvent(bind = "io.lumine.xikage.mythicmobs.api.bukkit.events.MythicMobDeathEvent")
     fun e2(oe: OptionalEvent) {
-        val e = oe.cast(io.lumine.xikage.mythicmobs.api.bukkit.events.MythicMobDeathEvent::class.java)
+        val e = oe.get<MythicMobDeathEvent>()
         e.mob.type.config.getStringList("Zaphkiel.drops").forEach {
             val args = it.split(" ")
             if (args.size == 3 && !random(Coerce.toDouble(args[2]))) {
