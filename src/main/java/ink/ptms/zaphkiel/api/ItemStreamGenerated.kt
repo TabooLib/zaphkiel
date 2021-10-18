@@ -5,8 +5,8 @@ import taboolib.module.nms.ItemTag
 import taboolib.module.nms.getItemTag
 
 /**
- * @Author sky
- * @Since 2019-12-26 10:59
+ * @author sky
+ * @since 2019-12-26 10:59
  */
 class ItemStreamGenerated(
     itemStack: ItemStack,

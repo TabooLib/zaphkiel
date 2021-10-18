@@ -3,8 +3,8 @@ package ink.ptms.zaphkiel.api.internal
 import taboolib.common.util.VariableReader
 
 /**
- * @Author sky
- * @Since 2019-12-15 14:55
+ * @author sky
+ * @since 2019-12-15 14:55
  */
 class StructureList(source: List<String>) {
 

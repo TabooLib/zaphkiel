@@ -19,12 +19,13 @@ import taboolib.library.xseries.parseToMaterial
 import taboolib.module.nms.ItemTagData
 import taboolib.platform.BukkitPlugin
 import taboolib.platform.compat.replacePlaceholder
+import java.util.*
 import kotlin.math.max
 import kotlin.math.min
 
 /**
- * @Author sky
- * @Since 2019-12-15 22:30
+ * @author sky
+ * @since 2019-12-15 22:30
  */
 open class ItemAPI(val item: Item, val itemStack: ItemStack, val player: Player) {
 
@@ -102,11 +103,11 @@ open class ItemAPI(val item: Item, val itemStack: ItemStack, val player: Player)
     }
 
     fun giveEffect(name: String, duration: Int, amplifier: Int) {
-        player.addPotionEffect(PotionEffect(PotionEffectType.getByName(name.toUpperCase())!!, duration, amplifier))
+        player.addPotionEffect(PotionEffect(PotionEffectType.getByName(name.uppercase(Locale.getDefault()))!!, duration, amplifier))
     }
 
     fun removeEffect(name: String) {
-        player.removePotionEffect(PotionEffectType.getByName(name.toUpperCase())!!)
+        player.removePotionEffect(PotionEffectType.getByName(name.uppercase(Locale.getDefault()))!!)
     }
 
     fun replace() {

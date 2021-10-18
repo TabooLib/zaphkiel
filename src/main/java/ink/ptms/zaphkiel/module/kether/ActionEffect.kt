@@ -8,6 +8,7 @@ import taboolib.common5.Coerce
 import taboolib.library.kether.ArgTypes
 import taboolib.library.kether.ParsedAction
 import taboolib.module.kether.*
+import java.util.*
 import java.util.concurrent.CompletableFuture
 
 /**
@@ -26,7 +27,7 @@ class ActionEffect {
             frame.newFrame(name).run<Any>().thenApply { name ->
                 frame.newFrame(duration).run<Any>().thenApply { duration ->
                     frame.newFrame(amplifier).run<Any>().thenApplyAsync({ amplifier ->
-                        val effectType = PotionEffectType.getByName(name.toString().toUpperCase())
+                        val effectType = PotionEffectType.getByName(name.toString().uppercase(Locale.getDefault()))
                         if (effectType != null) {
                             viewer.addPotionEffect(PotionEffect(effectType, Coerce.toInteger(duration), Coerce.toInteger(amplifier)))
                         }
@@ -42,7 +43,7 @@ class ActionEffect {
         override fun run(frame: ScriptFrame): CompletableFuture<Void> {
             val viewer = frame.script().sender?.castSafely<Player>() ?: error("No player selected.")
             frame.newFrame(name).run<Any>().thenApplyAsync({ name ->
-                val effectType = PotionEffectType.getByName(name.toString().toUpperCase())
+                val effectType = PotionEffectType.getByName(name.toString().uppercase(Locale.getDefault()))
                 if (effectType != null) {
                     viewer.removePotionEffect(effectType)
                 }

@@ -9,8 +9,8 @@ import taboolib.library.configuration.ConfigurationSection
 import java.util.*
 
 /**
- * @Author Administrator
- * @Since 2019-12-26 17:12
+ * @author Administrator
+ * @since 2019-12-26 17:12
  */
 @MetaKey("skull")
 class MetaSkull(root: ConfigurationSection) : Meta(root) {

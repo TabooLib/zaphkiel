@@ -14,8 +14,8 @@ import java.io.File
 import java.net.URL
 
 /**
- * @Author Administrator
- * @Since 2019-12-27 16:01
+ * @author Administrator
+ * @since 2019-12-27 16:01
  */
 internal object ItemInternet {
 

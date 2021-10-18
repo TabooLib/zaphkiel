@@ -13,8 +13,8 @@ import taboolib.platform.util.isAir
 import taboolib.platform.util.isNotAir
 
 /**
- * @Author sky
- * @Since 2019-12-15 22:22
+ * @author sky
+ * @since 2019-12-15 22:22
  */
 internal object ItemEvents {
 

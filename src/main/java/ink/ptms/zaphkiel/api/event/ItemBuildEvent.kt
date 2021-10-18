@@ -5,8 +5,8 @@ import org.bukkit.entity.Player
 import taboolib.platform.type.BukkitProxyEvent
 
 /**
- * @Author sky
- * @Since 2019-12-15 16:44
+ * @author sky
+ * @since 2019-12-15 16:44
  */
 class ItemBuildEvent {
 

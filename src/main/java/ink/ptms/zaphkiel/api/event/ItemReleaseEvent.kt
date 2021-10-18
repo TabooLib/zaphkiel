@@ -6,8 +6,8 @@ import org.bukkit.inventory.meta.ItemMeta
 import taboolib.platform.type.BukkitProxyEvent
 
 /**
- * @Author sky
- * @Since 2019-12-25 11:38
+ * @author sky
+ * @since 2019-12-25 11:38
  */
 class ItemReleaseEvent(var icon: Material, var data: Int, var itemMeta: ItemMeta, val itemStream: ItemStream) : BukkitProxyEvent() {
 

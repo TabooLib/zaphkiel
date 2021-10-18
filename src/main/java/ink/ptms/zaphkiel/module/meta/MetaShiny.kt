@@ -6,8 +6,8 @@ import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.meta.ItemMeta
 
 /**
- * @Author Administrator
- * @Since 2019-12-26 17:12
+ * @author Administrator
+ * @since 2019-12-26 17:12
  */
 @MetaKey("shiny")
 class MetaShiny(root: ConfigurationSection) : Meta(root) {

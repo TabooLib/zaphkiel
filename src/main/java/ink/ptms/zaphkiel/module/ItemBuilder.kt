@@ -11,8 +11,8 @@ import taboolib.module.chat.colored
 import taboolib.module.configuration.SecuredFile
 
 /**
- * @Author sky
- * @Since 2019-12-26 9:53
+ * @author sky
+ * @since 2019-12-26 9:53
  */
 internal object ItemBuilder {
 

@@ -15,18 +15,6 @@
 | ItemEvents.Drop | 当玩家丢弃 Zaphkiel 物品时 |
 | ItemEvents.Select | 当玩家加入服务器或切换世界 |
 | ItemEvents.AsyncTick | 每 100 游戏刻触发 |
-
-```kotlin
-@SubscribeEvent
-fun e(e: PluginReloadEvent.Item) {
-    // ...
-}
-```
-
-## Internal Event
-
-| 事件 | 作用 |
-| --- | --- |
 | ItemBuildEvent.Pre | 物品构建之前 |
 | ItemBuildEvent.Post | 物品构建之后 |
 | ItemBuildEvent.Rebuild | 物品重构时 |
@@ -34,7 +22,8 @@ fun e(e: PluginReloadEvent.Item) {
 | ItemReleaseEvent.Display | 当物品释放（写入展示方案之前） |
 
 ```kotlin
-Events.listen(plugin, ItemBuildEvent.Pre::class.java) {
+@SubscribeEvent
+fun e(e: PluginReloadEvent.Item) {
     // ...
 }
 ```

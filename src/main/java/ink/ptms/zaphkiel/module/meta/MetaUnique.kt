@@ -12,7 +12,6 @@ import java.util.*
 class MetaUnique(root: ConfigurationSection) : Meta(root) {
 
     val unique = root.getBoolean("meta.unique")
-    val format = "yyyy-MM-dd HH:mm:ss"
 
     override fun build(player: Player?, compound: ItemTag) {
         val base = compound["zaphkiel"]!!.asCompound()
@@ -38,5 +37,10 @@ class MetaUnique(root: ConfigurationSection) : Meta(root) {
 
     override fun toString(): String {
         return "MetaUnique(unique=$unique)"
+    }
+
+    companion object {
+
+        const val format = "yyyy-MM-dd HH:mm:ss"
     }
 }

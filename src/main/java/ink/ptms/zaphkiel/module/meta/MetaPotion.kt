@@ -9,6 +9,7 @@ import org.bukkit.potion.PotionType
 import taboolib.common.platform.function.warning
 import taboolib.common5.Coerce
 import taboolib.library.configuration.ConfigurationSection
+import java.util.*
 
 @MetaKey("potion")
 class MetaPotion(root: ConfigurationSection) : Meta(root) {
@@ -28,7 +29,7 @@ class MetaPotion(root: ConfigurationSection) : Meta(root) {
         if (itemMeta is PotionMeta) {
             if (base != null) {
                 try {
-                    itemMeta.basePotionData = PotionData(PotionType.valueOf(base.toUpperCase()))
+                    itemMeta.basePotionData = PotionData(PotionType.valueOf(base.uppercase(Locale.getDefault())))
                 } catch (ignored: Throwable) {
                     warning("Unknown base potion: $base")
                 }

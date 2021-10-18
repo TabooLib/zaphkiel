@@ -9,29 +9,25 @@ import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.player.*
 import org.bukkit.inventory.EquipmentSlot
-import taboolib.common.LifeCycle
-import taboolib.common.platform.Awake
+import taboolib.common.platform.Schedule
 import taboolib.common.platform.event.EventPriority
 import taboolib.common.platform.event.SubscribeEvent
-import taboolib.common.platform.function.submit
 import taboolib.platform.util.isNotAir
 
 /**
- * @Author sky
- * @Since 2020-04-20 12:37
+ * @author sky
+ * @since 2020-04-20 12:37
  */
 internal object ItemListener {
 
-    @Awake(LifeCycle.ACTIVE)
+    @Schedule(period = 100, async = true)
     fun e() {
-        submit(period = 100, async = true) {
-            Bukkit.getOnlinePlayers().forEach {
-                it.inventory.filter { item -> item.isNotAir() }.forEach { item ->
-                    val event = ItemEvent.AsyncTick(ZaphkielAPI.read(item), it)
-                    event.call()
-                    if (event.save) {
-                        event.itemStream.rebuild(it)
-                    }
+        Bukkit.getOnlinePlayers().forEach {
+            it.inventory.filter { item -> item.isNotAir() }.forEach { item ->
+                val event = ItemEvent.AsyncTick(ZaphkielAPI.read(item), it)
+                event.call()
+                if (event.save) {
+                    event.itemStream.rebuild(it)
                 }
             }
         }
@@ -96,7 +92,7 @@ internal object ItemListener {
             val event = ItemEvent.Drop(ZaphkielAPI.read(e.itemDrop.itemStack), e)
             event.call()
             if (event.save) {
-                e.itemDrop.setItemStack(event.itemStream.rebuild(e.player))
+                e.itemDrop.itemStack = event.itemStream.rebuild(e.player)
             }
         }
     }
@@ -107,7 +103,7 @@ internal object ItemListener {
             val event = ItemEvent.Pick(ZaphkielAPI.read(e.item.itemStack), e)
             event.call()
             if (event.save) {
-                e.item.setItemStack(event.itemStream.rebuild(e.entity as Player))
+                e.item.itemStack = event.itemStream.rebuild(e.entity as Player)
             }
         }
     }

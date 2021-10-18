@@ -11,8 +11,8 @@ import org.bukkit.event.player.PlayerItemConsumeEvent
 import taboolib.platform.type.BukkitProxyEvent
 
 /**
- * @Author sky
- * @Since 2020-04-20 12:37
+ * @author sky
+ * @since 2020-04-20 12:37
  */
 class ItemEvent {
 

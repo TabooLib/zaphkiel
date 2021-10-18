@@ -11,8 +11,8 @@ import taboolib.platform.util.buildItem
 import java.io.File
 
 /**
- * @Author sky
- * @Since 2020-11-13 22:50
+ * @author sky
+ * @since 2020-11-13 22:50
  */
 class Group(
     val name: String,

@@ -6,8 +6,8 @@ import ink.ptms.zaphkiel.api.internal.StructureSingle
 import taboolib.library.configuration.ConfigurationSection
 
 /**
- * @Author sky
- * @Since 2019-12-15 14:49
+ * @author sky
+ * @since 2019-12-15 14:49
  */
 class Display(
     val config: ConfigurationSection,

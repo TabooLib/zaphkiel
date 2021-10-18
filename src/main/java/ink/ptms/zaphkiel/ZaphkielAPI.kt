@@ -1,6 +1,5 @@
 package ink.ptms.zaphkiel
 
-import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import ink.ptms.zaphkiel.api.*
@@ -9,6 +8,8 @@ import ink.ptms.zaphkiel.api.event.PluginReloadEvent
 import ink.ptms.zaphkiel.api.internal.ItemKey
 import ink.ptms.zaphkiel.module.meta.Meta
 import ink.ptms.zaphkiel.module.meta.MetaKey
+import ink.ptms.zaphkiel.module.meta.MetaUnique
+import org.apache.commons.lang.time.DateFormatUtils
 import org.bukkit.Bukkit
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Player
@@ -25,14 +26,16 @@ import taboolib.common5.FileWatcher
 import taboolib.library.configuration.ConfigurationSection
 import taboolib.module.configuration.SecuredFile
 import taboolib.module.nms.ItemTag
+import taboolib.module.nms.ItemTagData
 import taboolib.module.nms.ItemTagSerializer
 import taboolib.platform.util.isAir
 import taboolib.type.BukkitEquipment
 import java.io.File
+import java.util.*
 
 /**
- * @Author sky
- * @Since 2019-12-15 20:14
+ * @author sky
+ * @since 2019-12-15 20:14
  */
 @Suppress("UNCHECKED_CAST")
 object ZaphkielAPI {
@@ -239,10 +242,16 @@ object ZaphkielAPI {
         }
         val json = JsonObject()
         json.addProperty("id", itemStream.getZaphkielName())
-        json.add("data", ItemTagSerializer.serializeData(itemStream.getZaphkielData()))
+        val data = itemStream.getZaphkielData()
+        if (data.isNotEmpty()) {
+            json.add("data", ItemTagSerializer.serializeData(data))
+        }
         val unique = itemStream.getZaphkielUniqueData()
         if (unique != null) {
-            json.add("unique", ItemTagSerializer.serializeData(unique))
+            json.add("unique", ItemTagSerializer.serializeData(unique).also {
+                // 移除明文日期字段
+                it.asJsonObject.remove("date-formatted")
+            })
         }
         return json
     }
@@ -254,9 +263,14 @@ object ZaphkielAPI {
     fun deserialize(json: JsonObject): ItemStream {
         val itemStream = getItem(json["id"]!!.asString) ?: error("This item is not extension item.")
         val zap = itemStream.getZaphkielCompound()!!
-        zap[ItemKey.DATA.key] = ItemTagSerializer.deserializeData(json["data"])
+        if (json.has("data")) {
+            zap[ItemKey.DATA.key] = ItemTagSerializer.deserializeData(json["data"])
+        }
         if (json.has("unique")) {
-            zap[ItemKey.UNIQUE.key] = ItemTagSerializer.deserializeData(json["unique"])
+            zap[ItemKey.UNIQUE.key] = ItemTagSerializer.deserializeData(json["unique"]).also {
+                // 复原明文日期字段
+                it.asCompound()["date-formatted"] = ItemTagData(DateFormatUtils.format(it.asCompound()["date"]!!.asLong(), MetaUnique.format))
+            }
         }
         return itemStream
     }
@@ -269,7 +283,7 @@ object ZaphkielAPI {
     }
 
     fun asEnchantment(name: String): Enchantment? {
-        return kotlin.runCatching { Enchantment::class.java.getProperty<Enchantment>(name.toUpperCase(), fixed = true) }.getOrNull()
+        return kotlin.runCatching { Enchantment::class.java.getProperty<Enchantment>(name.uppercase(Locale.getDefault()), fixed = true) }.getOrNull()
     }
 
     fun asEquipmentSlot(id: String): BukkitEquipment? {
@@ -277,6 +291,6 @@ object ZaphkielAPI {
     }
 
     fun asPotionEffect(name: String): PotionEffectType? {
-        return kotlin.runCatching { PotionEffectType::class.java.getProperty<PotionEffectType>(name.toUpperCase(), fixed = true) }.getOrNull()
+        return kotlin.runCatching { PotionEffectType::class.java.getProperty<PotionEffectType>(name.uppercase(Locale.getDefault()), fixed = true) }.getOrNull()
     }
 }

@@ -20,8 +20,8 @@ import taboolib.module.nms.ItemTag
 import taboolib.module.nms.ItemTagData
 
 /**
- * @Author sky
- * @Since 2019-12-15 16:09
+ * @author sky
+ * @since 2019-12-15 16:09
  */
 class Item(
     val config: ConfigurationSection,

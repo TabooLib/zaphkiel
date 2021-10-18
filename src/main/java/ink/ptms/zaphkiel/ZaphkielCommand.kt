@@ -17,10 +17,11 @@ import taboolib.module.chat.colored
 import taboolib.module.nms.getName
 import taboolib.platform.util.giveItem
 import taboolib.platform.util.hoverItem
+import taboolib.platform.util.serializeToByteArray
 
 /**
- * @Author sky
- * @Since 2019-12-15 22:39
+ * @author sky
+ * @since 2019-12-15 22:39
  */
 @CommandHeader(name = "Zaphkiel", aliases = ["zl", "item"], permission = "*")
 object ZaphkielCommand {
@@ -47,6 +48,7 @@ object ZaphkielCommand {
                 TellrawJson().sendTo(adaptPlayer(sender)) {
                     append("§c[Zaphkiel] §7反序列化: ").append(item.getName()).hoverItem(item)
                 }
+                sender.giveItem(item)
             } catch (ex: Throwable) {
                 notify(sender, "无效的物品: $ex")
             }
@@ -67,12 +69,12 @@ object ZaphkielCommand {
                     Bukkit.getOnlinePlayers().map { it.name }
                 }
                 execute<Player> { _, context, argument ->
-                    Bukkit.getPlayerExact(argument)!!.giveItem(ZaphkielAPI.getItemStack(context.argument(-1)!!)!!)
+                    Bukkit.getPlayerExact(argument)!!.giveItem(ZaphkielAPI.getItemStack(context.argument(-1))!!)
                 }
                 dynamic(optional = true, commit = "amount") {
                     execute<Player> { _, context, argument ->
                         val amount = Coerce.toInteger(argument)
-                        Bukkit.getPlayerExact(context.argument(-1)!!)!!.giveItem(ZaphkielAPI.getItemStack(context.argument(-2)!!)!!, amount)
+                        Bukkit.getPlayerExact(context.argument(-1))!!.giveItem(ZaphkielAPI.getItemStack(context.argument(-2))!!, amount)
                     }
                 }
             }

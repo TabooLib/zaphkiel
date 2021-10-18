@@ -15,8 +15,8 @@ import taboolib.module.configuration.Config
 import taboolib.module.configuration.SecuredFile
 
 /**
- * @Author sky
- * @Since 2019-12-15 20:09
+ * @author sky
+ * @since 2019-12-15 20:09
  */
 object Zaphkiel : Plugin() {
 

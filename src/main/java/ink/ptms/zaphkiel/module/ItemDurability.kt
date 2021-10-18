@@ -10,8 +10,8 @@ import taboolib.common.platform.event.SubscribeEvent
 import taboolib.module.nms.ItemTagData
 
 /**
- * @Author sky
- * @Since 2019-12-16 21:46
+ * @author sky
+ * @since 2019-12-16 21:46
  */
 internal object ItemDurability {
 

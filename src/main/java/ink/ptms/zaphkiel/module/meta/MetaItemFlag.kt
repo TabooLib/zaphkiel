@@ -4,12 +4,13 @@ import ink.ptms.zaphkiel.ZaphkielAPI
 import taboolib.library.configuration.ConfigurationSection
 import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.meta.ItemMeta
+import java.util.*
 
 @MetaKey("itemflag")
 class MetaItemFlag(root: ConfigurationSection) : Meta(root) {
 
     val itemflag = root.getStringList("meta.itemflag")
-        .mapNotNull { ZaphkielAPI.asItemFlag(it.toString().toUpperCase()) }
+        .mapNotNull { ZaphkielAPI.asItemFlag(it.toString().uppercase(Locale.getDefault())) }
         .toSet()
         .toTypedArray()
 

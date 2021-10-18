@@ -14,8 +14,8 @@ import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common.platform.function.submit
 
 /**
- * @Author sky
- * @Since 2019-12-16 10:40
+ * @author sky
+ * @since 2019-12-16 10:40
  */
 internal object ItemRefresher {
 

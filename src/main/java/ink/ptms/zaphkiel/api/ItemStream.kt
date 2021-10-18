@@ -8,8 +8,8 @@ import org.bukkit.inventory.ItemStack
 import taboolib.module.nms.*
 
 /**
- * @Author sky
- * @Since 2019-12-15 16:58
+ * @author sky
+ * @since 2019-12-15 16:58
  */
 open class ItemStream(val itemStack: ItemStack, val compound: ItemTag = itemStack.getItemTag()) {
 
