@@ -55,21 +55,21 @@ object ZaphkielCommand {
 
     @CommandBody
     val give = subCommand {
-        dynamic {
+        dynamic(commit = "item") {
             suggestion<CommandSender> { _, _ ->
                 ZaphkielAPI.registeredItem.keys.toList()
             }
             execute<Player> { sender, _, argument ->
                 sender.giveItem(ZaphkielAPI.getItemStack(argument)!!)
             }
-            dynamic(optional = true) {
+            dynamic(optional = true, commit = "player") {
                 suggestion<CommandSender> { _, _ ->
                     Bukkit.getOnlinePlayers().map { it.name }
                 }
                 execute<Player> { _, context, argument ->
                     Bukkit.getPlayerExact(argument)!!.giveItem(ZaphkielAPI.getItemStack(context.argument(-1)!!)!!)
                 }
-                dynamic(optional = true) {
+                dynamic(optional = true, commit = "amount") {
                     execute<Player> { _, context, argument ->
                         val amount = Coerce.toInteger(argument)
                         Bukkit.getPlayerExact(context.argument(-1)!!)!!.giveItem(ZaphkielAPI.getItemStack(context.argument(-2)!!)!!, amount)

@@ -25,6 +25,7 @@ import taboolib.common5.FileWatcher
 import taboolib.library.configuration.ConfigurationSection
 import taboolib.module.configuration.SecuredFile
 import taboolib.module.nms.ItemTag
+import taboolib.module.nms.ItemTagSerializer
 import taboolib.platform.util.isAir
 import taboolib.type.BukkitEquipment
 import java.io.File
@@ -238,10 +239,10 @@ object ZaphkielAPI {
         }
         val json = JsonObject()
         json.addProperty("id", itemStream.getZaphkielName())
-        json.add("data", itemStream.getZaphkielData().serializeData())
+        json.add("data", ItemTagSerializer.serializeData(itemStream.getZaphkielData()))
         val unique = itemStream.getZaphkielUniqueData()
         if (unique != null) {
-            json.add("unique", unique.serializeData())
+            json.add("unique", ItemTagSerializer.serializeData(unique))
         }
         return json
     }
@@ -253,8 +254,10 @@ object ZaphkielAPI {
     fun deserialize(json: JsonObject): ItemStream {
         val itemStream = getItem(json["id"]!!.asString) ?: error("This item is not extension item.")
         val zap = itemStream.getZaphkielCompound()!!
-        zap[ItemKey.DATA.key] = json["data"].deserializeData()
-        zap[ItemKey.UNIQUE.key] = json["unique"].deserializeData()
+        zap[ItemKey.DATA.key] = ItemTagSerializer.deserializeData(json["data"])
+        if (json.has("unique")) {
+            zap[ItemKey.UNIQUE.key] = ItemTagSerializer.deserializeData(json["unique"])
+        }
         return itemStream
     }
 
