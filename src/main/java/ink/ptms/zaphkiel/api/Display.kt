@@ -17,7 +17,7 @@ class Display(
     val structureName: StructureSingle? = if (name != null) StructureSingle(name) else null,
     val structureLore: StructureList = StructureList(lore)) {
 
-    val meta = ZaphkielAPI.getMeta(config)
+    val meta = ZaphkielAPI.readMeta(config)
 
     fun toProduct(name: Map<String, String>, lore: Map<String, List<String>>): DisplayProduct {
         return DisplayProduct(structureName?.build(name), structureLore.build(lore.mapValues { it.value.toMutableList() }))

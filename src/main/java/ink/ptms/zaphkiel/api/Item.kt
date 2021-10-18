@@ -58,7 +58,7 @@ class Item(
         map
     }
 
-    val meta = ZaphkielAPI.getMeta(config).also {
+    val meta = ZaphkielAPI.readMeta(config).also {
         it.addAll(displayInstance?.meta ?: emptyList())
     }
 
@@ -91,7 +91,7 @@ class Item(
     }
 
     fun buildItemStack(player: Player?): ItemStack {
-        return build(player).save()
+        return build(player).saveNow()
     }
 
     fun build(player: Player?): ItemStream {

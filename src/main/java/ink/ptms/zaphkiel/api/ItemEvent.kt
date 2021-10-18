@@ -20,7 +20,7 @@ data class ItemEvent(
             val itemStream = ZaphkielAPI.read(itemStack)
             val itemAPI = itemStream.getItemAPI(player)
             KetherShell.eval(script, namespace = listOf("zaphkiel"), sender = adaptPlayer(player)) {
-                this.rootFrame().variables().also { vars ->
+                rootFrame().variables().also { vars ->
                     data.forEach { (k, v) ->
                         vars.set(k, v)
                     }

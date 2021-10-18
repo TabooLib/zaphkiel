@@ -8,8 +8,7 @@ import org.bukkit.event.player.PlayerDropItemEvent
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerPickupItemEvent
 import org.bukkit.event.player.PlayerRespawnEvent
-import taboolib.common.LifeCycle
-import taboolib.common.platform.Awake
+import taboolib.common.platform.Schedule
 import taboolib.common.platform.event.EventPriority
 import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common.platform.function.submit
@@ -20,11 +19,9 @@ import taboolib.common.platform.function.submit
  */
 internal object ItemRefresher {
 
-    @Awake(LifeCycle.ACTIVE)
+    @Schedule(period = 100, async = true)
     fun tick() {
-        submit(period = 100, async = true) {
-            Bukkit.getOnlinePlayers().forEach { player -> ZaphkielAPI.rebuild(player, player.inventory) }
-        }
+        Bukkit.getOnlinePlayers().forEach { player -> ZaphkielAPI.rebuild(player, player.inventory) }
     }
 
     @SubscribeEvent
@@ -41,7 +38,7 @@ internal object ItemRefresher {
     fun e(e: PlayerDropItemEvent) {
         ZaphkielAPI.rebuild(e.player, e.itemDrop.itemStack).run {
             if (this.rebuild) {
-                e.itemDrop.itemStack = this.save()
+                e.itemDrop.itemStack = this.saveNow()
             }
         }
     }
@@ -50,7 +47,7 @@ internal object ItemRefresher {
     fun e(e: PlayerPickupItemEvent) {
         ZaphkielAPI.rebuild(e.player, e.item.itemStack).run {
             if (this.rebuild) {
-                e.item.itemStack = this.save()
+                e.item.itemStack = this.saveNow()
             }
         }
     }

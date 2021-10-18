@@ -1,13 +1,16 @@
 package ink.ptms.zaphkiel
 
-import ink.ptms.zaphkiel.module.Database
-import ink.ptms.zaphkiel.module.Vars
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
+import taboolib.common.io.newFile
 import taboolib.common.platform.Plugin
+import taboolib.common.platform.Schedule
 import taboolib.common.platform.event.SubscribeEvent
+import taboolib.common.platform.function.getDataFolder
 import taboolib.common.platform.function.releaseResourceFile
-import taboolib.common.platform.function.submit
+import taboolib.expansion.releaseDataContainer
+import taboolib.expansion.setupDataContainer
+import taboolib.expansion.setupPlayerDatabase
 import taboolib.module.configuration.Config
 import taboolib.module.configuration.SecuredFile
 
@@ -17,20 +20,19 @@ import taboolib.module.configuration.SecuredFile
  */
 object Zaphkiel : Plugin() {
 
-    @Config(migrate = true)
+    @Config
     lateinit var conf: SecuredFile
         private set
 
-    val database by lazy {
-        Database()
+    override fun onEnable() {
+        if (conf.getBoolean("Database.enable")) {
+            setupPlayerDatabase(conf.getConfigurationSection("Database"), "${conf.getString("prefix")}_2")
+        } else {
+            setupPlayerDatabase(newFile(getDataFolder(), "data.db"))
+        }
     }
 
-    val playerVars = HashMap<String, Vars>()
-
-    override fun onActive() {
-        submit(delay = 20) { reload() }
-    }
-
+    @Schedule(delay = 20)
     fun reload() {
         if (!ZaphkielAPI.folderItem.exists()) {
             releaseResourceFile("item/def.yml")
@@ -43,12 +45,12 @@ object Zaphkiel : Plugin() {
     }
 
     @SubscribeEvent
-    internal fun e(e: PlayerJoinEvent) {
-        submit { playerVars[e.player.name] = Vars(e.player.name, database[e.player.name].toMutableMap()) }
+    fun e(e: PlayerJoinEvent) {
+        e.player.setupDataContainer()
     }
 
     @SubscribeEvent
-    internal fun e(e: PlayerQuitEvent) {
-        playerVars.remove(e.player.name)
+    fun e(e: PlayerQuitEvent) {
+        e.player.releaseDataContainer()
     }
 }

@@ -1,8 +1,12 @@
 package ink.ptms.zaphkiel
 
+import com.google.gson.Gson
+import com.google.gson.JsonObject
+import com.google.gson.JsonParser
 import ink.ptms.zaphkiel.api.*
 import ink.ptms.zaphkiel.api.event.ItemBuildEvent
 import ink.ptms.zaphkiel.api.event.PluginReloadEvent
+import ink.ptms.zaphkiel.api.internal.ItemKey
 import ink.ptms.zaphkiel.module.meta.Meta
 import ink.ptms.zaphkiel.module.meta.MetaKey
 import org.bukkit.Bukkit
@@ -39,9 +43,7 @@ object ZaphkielAPI {
     val registeredModel = HashMap<String, Model>()
     val registeredDisplay = HashMap<String, Display>()
     val registeredGroup = HashMap<String, Group>()
-    val registeredMeta = runningClasses
-        .filter { it.isAnnotationPresent(MetaKey::class.java) }
-        .associateBy { it.getAnnotation(MetaKey::class.java).value }
+    val registeredMeta = runningClasses.filter { it.isAnnotationPresent(MetaKey::class.java) }.associateBy { it.getAnnotation(MetaKey::class.java).value }
 
     fun getItem(id: String): ItemStream? {
         return registeredItem[id]?.build(null)
@@ -52,11 +54,11 @@ object ZaphkielAPI {
     }
 
     fun getItemStack(id: String): ItemStack? {
-        return registeredItem[id]?.build(null)?.save()
+        return registeredItem[id]?.build(null)?.saveNow()
     }
 
     fun getItemStack(id: String, player: Player?): ItemStack? {
-        return registeredItem[id]?.build(player)?.save()
+        return registeredItem[id]?.build(player)?.saveNow()
     }
 
     fun getName(item: ItemStack): String? {
@@ -110,7 +112,7 @@ object ZaphkielAPI {
             }
             val rebuild = rebuild(player, item!!)
             if (rebuild.rebuild) {
-                rebuild.save()
+                rebuild.saveNow()
             }
         }
     }
@@ -123,7 +125,7 @@ object ZaphkielAPI {
         if (itemStream.isVanilla()) {
             return itemStream
         }
-        val pre = ItemBuildEvent.Rebuild(player, itemStream, itemStream.shouldRefresh())
+        val pre = ItemBuildEvent.Rebuild(player, itemStream, itemStream.isOutdated())
         if (!pre.call()) {
             return itemStream
         }
@@ -204,35 +206,7 @@ object ZaphkielAPI {
         }
     }
 
-    fun asEquipmentSlot(id: String): BukkitEquipment? {
-        return BukkitEquipment.fromString(id)
-    }
-
-    fun asItemFlag(name: String): ItemFlag? {
-        try {
-            return ItemFlag.valueOf(name)
-        } catch (t: Throwable) {
-        }
-        return null
-    }
-
-    fun asEnchantment(name: String): Enchantment? {
-        try {
-            return Enchantment::class.java.getProperty(name.toUpperCase(), fixed = true)
-        } catch (t: Throwable) {
-        }
-        return null
-    }
-
-    fun asPotionEffect(name: String): PotionEffectType? {
-        try {
-            return PotionEffectType::class.java.getProperty(name.toUpperCase(), fixed = true)
-        } catch (t: Throwable) {
-        }
-        return null
-    }
-
-    fun getMeta(root: ConfigurationSection): MutableList<Meta> {
+    fun readMeta(root: ConfigurationSection): MutableList<Meta> {
         val copy = SecuredFile()
         return root.getConfigurationSection("meta")?.getKeys(false)?.mapNotNull { id ->
             if (id.endsWith("!!")) {
@@ -252,5 +226,54 @@ object ZaphkielAPI {
             meta.locked = locked
             meta
         }?.toMutableList() ?: ArrayList()
+    }
+
+    fun serialize(itemStack: ItemStack): JsonObject {
+        return serialize(read(itemStack))
+    }
+
+    fun serialize(itemStream: ItemStream): JsonObject {
+        if (itemStream.isVanilla()) {
+            error("This item is not extension item.")
+        }
+        val json = JsonObject()
+        json.addProperty("id", itemStream.getZaphkielName())
+        json.add("data", itemStream.getZaphkielData().serializeData())
+        val unique = itemStream.getZaphkielUniqueData()
+        if (unique != null) {
+            json.add("unique", unique.serializeData())
+        }
+        return json
+    }
+
+    fun deserialize(json: String): ItemStream {
+        return deserialize(JsonParser().parse(json).asJsonObject)
+    }
+
+    fun deserialize(json: JsonObject): ItemStream {
+        val itemStream = getItem(json["id"]!!.asString) ?: error("This item is not extension item.")
+        val zap = itemStream.getZaphkielCompound()!!
+        zap[ItemKey.DATA.key] = json["data"].deserializeData()
+        zap[ItemKey.UNIQUE.key] = json["unique"].deserializeData()
+        return itemStream
+    }
+
+    /**
+     * adapt 相关工具
+     */
+    fun asItemFlag(name: String): ItemFlag? {
+        return kotlin.runCatching { ItemFlag.valueOf(name) }.getOrNull()
+    }
+
+    fun asEnchantment(name: String): Enchantment? {
+        return kotlin.runCatching { Enchantment::class.java.getProperty<Enchantment>(name.toUpperCase(), fixed = true) }.getOrNull()
+    }
+
+    fun asEquipmentSlot(id: String): BukkitEquipment? {
+        return BukkitEquipment.fromString(id)
+    }
+
+    fun asPotionEffect(name: String): PotionEffectType? {
+        return kotlin.runCatching { PotionEffectType::class.java.getProperty<PotionEffectType>(name.toUpperCase(), fixed = true) }.getOrNull()
     }
 }

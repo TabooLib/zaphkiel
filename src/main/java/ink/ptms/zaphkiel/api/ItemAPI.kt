@@ -1,6 +1,5 @@
 package ink.ptms.zaphkiel.api
 
-import ink.ptms.zaphkiel.Zaphkiel
 import ink.ptms.zaphkiel.ZaphkielAPI
 import org.bukkit.Bukkit
 import org.bukkit.Particle
@@ -15,6 +14,7 @@ import taboolib.common.platform.function.adaptPlayer
 import taboolib.common.platform.function.console
 import taboolib.common.util.random
 import taboolib.common5.Coerce
+import taboolib.expansion.getDataContainer
 import taboolib.library.xseries.parseToMaterial
 import taboolib.module.nms.ItemTagData
 import taboolib.platform.BukkitPlugin
@@ -56,22 +56,22 @@ open class ItemAPI(val item: Item, val itemStack: ItemStack, val player: Player)
     }
 
     fun toCooldown(player: Player, gameTick: Int) {
-        val vars = Zaphkiel.playerVars[player.name] ?: return
+        val vars = player.getDataContainer()
         vars["cooldown.${item.id}"] = System.currentTimeMillis() + (gameTick * 50L)
     }
 
     fun toCooldown(player: Player, index: String, gameTick: Int) {
-        val vars = Zaphkiel.playerVars[player.name] ?: return
+        val vars = player.getDataContainer()
         vars["cooldown.$index"] = System.currentTimeMillis() + (gameTick * 50L)
     }
 
     fun isCooldown(player: Player): Boolean {
-        val vars = Zaphkiel.playerVars[player.name] ?: return true
+        val vars = player.getDataContainer()
         return Coerce.toLong(vars["cooldown.${item.id}"]) > System.currentTimeMillis()
     }
 
     fun isCooldown(player: Player, index: String): Boolean {
-        val vars = Zaphkiel.playerVars[player.name] ?: return true
+        val vars = player.getDataContainer()
         return Coerce.toLong(vars["cooldown.$index"]) > System.currentTimeMillis()
     }
 
@@ -93,6 +93,46 @@ open class ItemAPI(val item: Item, val itemStack: ItemStack, val player: Player)
         return (itemStream.getZaphkielData()["durability_current"] ?: ItemTagData(max.asInt())).asInt()
     }
 
+    fun damage(value: Int): Boolean {
+        return toRepair(-value)
+    }
+
+    fun repair(value: Int): Boolean {
+        return toRepair(value)
+    }
+
+    fun giveEffect(name: String, duration: Int, amplifier: Int) {
+        player.addPotionEffect(PotionEffect(PotionEffectType.getByName(name.toUpperCase())!!, duration, amplifier))
+    }
+
+    fun removeEffect(name: String) {
+        player.removePotionEffect(PotionEffectType.getByName(name.toUpperCase())!!)
+    }
+
+    fun replace() {
+        isReplaced = true
+        val data = itemStream.getZaphkielData()
+        if (data.containsKey("durability_replace")) {
+            val replace = data["durability_replace"]!!.asString()
+            val replaceItem = if (replace.startsWith("minecraft:")) {
+                ItemStack(replace.substring("minecraft:".length).parseToMaterial())
+            } else {
+                ZaphkielAPI.getItem(replace, player)!!.saveNow()
+            }
+            itemStack.type = replaceItem.type
+            itemStack.itemMeta = replaceItem.itemMeta
+        } else {
+            itemStack.amount = 0
+        }
+    }
+
+    fun save() {
+        if (!isReplaced) {
+            itemStream.rebuild(player)
+        }
+    }
+
+    @Deprecated("过时方法")
     fun toRepair(value: Int): Boolean {
         isChanged = true
         val data = itemStream.getZaphkielData()
@@ -117,37 +157,6 @@ open class ItemAPI(val item: Item, val itemStack: ItemStack, val player: Player)
                 itemStack.amount = 0
             }
             false
-        }
-    }
-
-    fun giveEffect(name: String, duration: Int, amplifier: Int) {
-        player.addPotionEffect(PotionEffect(PotionEffectType.getByName(name.toUpperCase())!!, duration, amplifier))
-    }
-
-    fun removeEffect(name: String) {
-        player.removePotionEffect(PotionEffectType.getByName(name.toUpperCase())!!)
-    }
-
-    fun replace() {
-        isReplaced = true
-        val data = itemStream.getZaphkielData()
-        if (data.containsKey("durability_replace")) {
-            val replace = data["durability_replace"]!!.asString()
-            val replaceItem = if (replace.startsWith("minecraft:")) {
-                ItemStack(replace.substring("minecraft:".length).parseToMaterial())
-            } else {
-                ZaphkielAPI.getItem(replace, player)!!.save()
-            }
-            itemStack.type = replaceItem.type
-            itemStack.itemMeta = replaceItem.itemMeta
-        } else {
-            itemStack.amount = 0
-        }
-    }
-
-    fun save() {
-        if (!isReplaced) {
-            itemStream.rebuild(player)
         }
     }
 

@@ -30,6 +30,5 @@ class Group(
                 colored()
             }, -1)
         }
-
     }
 }
