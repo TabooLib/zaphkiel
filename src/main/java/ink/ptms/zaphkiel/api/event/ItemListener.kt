@@ -4,7 +4,8 @@ import ink.ptms.zaphkiel.ZaphkielAPI
 import ink.ptms.zaphkiel.api.ItemStream
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
-import org.bukkit.event.entity.EntityPickupItemEvent
+import org.bukkit.event.block.Action
+import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.player.*
@@ -12,6 +13,7 @@ import org.bukkit.inventory.EquipmentSlot
 import taboolib.common.platform.Schedule
 import taboolib.common.platform.event.EventPriority
 import taboolib.common.platform.event.SubscribeEvent
+import taboolib.platform.util.isAir
 import taboolib.platform.util.isNotAir
 
 /**
@@ -33,81 +35,194 @@ internal object ItemListener {
         }
     }
 
-    fun Player.select() {
-        inventory.filter { it.isNotAir() }.forEach {
-            val event = ItemEvent.Select(ZaphkielAPI.read(it), this)
-            event.call()
-            if (event.save) {
-                event.itemStream.rebuildToItemStack(this@select)
-            }
-        }
-    }
-
     @SubscribeEvent
     fun e(e: PlayerJoinEvent) {
-        e.player.select()
+        e.player.onSelect()
     }
 
     @SubscribeEvent(priority = EventPriority.MONITOR, ignoreCancelled = true)
     fun e(e: PlayerChangedWorldEvent) {
-        e.player.select()
+        e.player.onSelect()
     }
 
+    /**
+     * 当玩家物品发生损坏时
+     * 触发事件
+     */
+    @SubscribeEvent(ignoreCancelled = true)
+    fun e(e: PlayerItemBreakEvent) {
+        val itemStream = ZaphkielAPI.read(e.brokenItem)
+        if (itemStream.isExtension()) {
+            itemStream.getZaphkielItem().invokeScript("onItemBreak", e, e.brokenItem)
+        }
+    }
+
+    /**
+     * 当玩家消耗物品时
+     * 触发事件及脚本
+     */
     @SubscribeEvent(priority = EventPriority.MONITOR, ignoreCancelled = true)
     fun e(e: PlayerItemConsumeEvent) {
-        if (e.item.isNotAir()) {
-            val event = ItemEvent.Consume(ZaphkielAPI.read(e.item), e)
-            event.call()
-            if (event.save) {
-                event.itemStream.rebuildToItemStack(e.player)
+        val itemStack = e.item
+        if (itemStack.isAir()) {
+            return
+        }
+        val itemStream = ZaphkielAPI.read(itemStack)
+        if (itemStream.isExtension()) {
+            // 触发事件
+            ItemEvent.Consume(itemStream, e).also { it.call() }
+            // 执行脚本
+            itemStream.getZaphkielItem().invokeScript("onConsume", e, itemStack)
+            // 更新物品
+            if (e.item == e.player.inventory.itemInMainHand) {
+                e.player.inventory.setItemInMainHand(itemStack)
+            } else {
+                e.player.inventory.setItemInOffHand(itemStack)
             }
         }
     }
 
+    /**
+     * 当玩家与空气或方块发生交互时
+     * 触发事件及脚本
+     */
     @SubscribeEvent
     fun e(e: PlayerInteractEvent) {
-        if (e.item.isNotAir()) {
-            val event = ItemEvent.Interact(ZaphkielAPI.read(e.item!!), e)
-            event.call()
-            if (event.save) {
-                event.itemStream.rebuildToItemStack(e.player)
+        if (e.item.isAir()) {
+            return
+        }
+        val itemStream = ZaphkielAPI.read(e.item!!)
+        if (itemStream.isVanilla()) {
+            return
+        }
+        // 触发事件
+        val event = ItemEvent.Interact(itemStream, e)
+        event.call()
+        if (event.save) {
+            event.itemStream.rebuildToItemStack(e.player)
+        }
+        // 执行脚本
+        when (e.action) {
+            Action.LEFT_CLICK_AIR, Action.LEFT_CLICK_BLOCK -> {
+                itemStream.getZaphkielItem().invokeScript("onLeftClick", e, e.item!!)
+            }
+            Action.RIGHT_CLICK_AIR, Action.RIGHT_CLICK_BLOCK -> {
+                itemStream.getZaphkielItem().invokeScript("onRightClick", e, e.item!!)
+            }
+            else -> {
             }
         }
     }
 
+    /**
+     * 当玩家与实体发生交互时
+     * 触发事件及脚本
+     */
     @SubscribeEvent
     fun e(e: PlayerInteractEntityEvent) {
         if (e.player.inventory.itemInMainHand.isNotAir() && e.hand == EquipmentSlot.HAND) {
-            val event = ItemEvent.InteractEntity(ZaphkielAPI.read(e.player.inventory.itemInMainHand), e)
+            val itemStream = ZaphkielAPI.read(e.player.inventory.itemInMainHand)
+            if (itemStream.isVanilla()) {
+                return
+            }
+            val event = ItemEvent.InteractEntity(itemStream, e)
             event.call()
             if (event.save) {
                 event.itemStream.rebuildToItemStack(e.player)
             }
+            itemStream.getZaphkielItem().invokeScript("onLeftClickEntity", e, e.player.inventory.itemInMainHand)
         }
     }
 
+    /**
+     * 当玩家切换副手时
+     * 触发脚本
+     */
+    @SubscribeEvent(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    fun e(e: PlayerSwapHandItemsEvent) {
+        if (e.offHandItem.isNotAir()) {
+            val itemStream = ZaphkielAPI.read(e.offHandItem!!)
+            if (itemStream.isExtension()) {
+                itemStream.getZaphkielItem().invokeScript("onSwapToOffhand", e, e.offHandItem!!)
+            }
+        }
+        if (e.mainHandItem.isNotAir()) {
+            val itemStream = ZaphkielAPI.read(e.mainHandItem!!)
+            if (itemStream.isExtension()) {
+                itemStream.getZaphkielItem().invokeScript("onSwapToMainHand", e, e.mainHandItem!!)
+            }
+        }
+    }
+
+    /**
+     * 当玩家破坏方块时
+     * 触发脚本
+     */
+    @SubscribeEvent(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    fun e(e: BlockBreakEvent) {
+        if (e.player.inventory.itemInMainHand.isAir()) {
+            return
+        }
+        val itemStream = ZaphkielAPI.read(e.player.inventory.itemInMainHand)
+        if (itemStream.isExtension()) {
+            itemStream.getZaphkielItem().invokeScript("onBlockBreak", e.player, e, e.player.inventory.itemInMainHand)
+        }
+    }
+
+    /**
+     * 当玩家丢弃物品时
+     * 触发事件及脚本
+     */
     @SubscribeEvent(priority = EventPriority.MONITOR, ignoreCancelled = true)
     fun e(e: PlayerDropItemEvent) {
         if (e.itemDrop.itemStack.isNotAir()) {
-            val event = ItemEvent.Drop(ZaphkielAPI.read(e.itemDrop.itemStack), e)
+            val itemStream = ZaphkielAPI.read(e.itemDrop.itemStack)
+            if (itemStream.isVanilla()) {
+                return
+            }
+            val event = ItemEvent.Drop(itemStream, e)
             event.call()
             if (event.save) {
                 e.itemDrop.itemStack = event.itemStream.rebuildToItemStack(e.player)
             }
-        }
-    }
-
-    @SubscribeEvent(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    fun e(e: EntityPickupItemEvent) {
-        if (e.item.itemStack.isNotAir() && e.entity is Player) {
-            val event = ItemEvent.Pick(ZaphkielAPI.read(e.item.itemStack), e)
-            event.call()
-            if (event.save) {
-                e.item.itemStack = event.itemStream.rebuildToItemStack(e.entity as Player)
+            // 若脚本修改物品则写回事件
+            itemStream.getZaphkielItem().invokeScript("onDrop", e.player, e, e.itemDrop.itemStack)?.thenAccept {
+                if (it != null) {
+                    e.itemDrop.itemStack = it.itemStack
+                }
             }
         }
     }
 
+    /**
+     * 当玩家捡起物品时
+     * 触发事件及脚本
+     */
+    @SubscribeEvent(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    fun e(e: PlayerPickupItemEvent) {
+        if (e.item.itemStack.isNotAir()) {
+            val itemStream = ZaphkielAPI.read(e.item.itemStack)
+            if (itemStream.isVanilla()) {
+                return
+            }
+            val event = ItemEvent.Pick(itemStream, e)
+            event.call()
+            if (event.save) {
+                e.item.itemStack = event.itemStream.rebuildToItemStack(e.player)
+            }
+            // 若脚本修改物品则写回事件
+            itemStream.getZaphkielItem().invokeScript("onPick", e.player, e, e.item.itemStack)?.thenAccept {
+                if (it != null) {
+                    e.item.itemStack = it.itemStack
+                }
+            }
+        }
+    }
+
+    /**
+     * 当玩家在背包中点击物品时
+     * 触发事件
+     */
     @SubscribeEvent(priority = EventPriority.MONITOR, ignoreCancelled = true)
     fun e(e: InventoryClickEvent) {
         val itemStreamCurrent = if (e.currentItem.isNotAir()) ZaphkielAPI.read(e.currentItem!!) else null
@@ -128,6 +243,16 @@ internal object ItemListener {
         }
         if (event.saveButton && itemStreamButton != null) {
             itemStreamButton.rebuildToItemStack(e.whoClicked as Player)
+        }
+    }
+
+    private fun Player.onSelect() {
+        inventory.filter { it.isNotAir() }.forEach {
+            val event = ItemEvent.Select(ZaphkielAPI.read(it), this)
+            event.call()
+            if (event.save) {
+                event.itemStream.rebuildToItemStack(this@onSelect)
+            }
         }
     }
 }

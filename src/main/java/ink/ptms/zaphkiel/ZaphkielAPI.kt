@@ -5,10 +5,10 @@ import com.google.gson.JsonParser
 import ink.ptms.zaphkiel.api.*
 import ink.ptms.zaphkiel.api.event.ItemBuildEvent
 import ink.ptms.zaphkiel.api.event.PluginReloadEvent
-import ink.ptms.zaphkiel.api.internal.ItemKey
-import ink.ptms.zaphkiel.module.meta.Meta
-import ink.ptms.zaphkiel.module.meta.MetaKey
-import ink.ptms.zaphkiel.module.meta.MetaUnique
+import ink.ptms.zaphkiel.api.ItemKey
+import ink.ptms.zaphkiel.item.meta.Meta
+import ink.ptms.zaphkiel.item.meta.MetaKey
+import ink.ptms.zaphkiel.item.meta.MetaUnique
 import org.apache.commons.lang.time.DateFormatUtils
 import org.bukkit.Bukkit
 import org.bukkit.enchantments.Enchantment

@@ -2,8 +2,6 @@ package ink.ptms.zaphkiel.api
 
 import ink.ptms.zaphkiel.ZaphkielAPI
 import ink.ptms.zaphkiel.api.event.ItemBuildEvent
-import ink.ptms.zaphkiel.api.internal.ItemKey
-import ink.ptms.zaphkiel.api.internal.Translator
 import org.bukkit.entity.Player
 import org.bukkit.event.Cancellable
 import org.bukkit.event.Event
@@ -18,6 +16,7 @@ import taboolib.library.xseries.parseToMaterial
 import taboolib.module.configuration.SecuredFile
 import taboolib.module.nms.ItemTag
 import taboolib.module.nms.ItemTagData
+import java.util.concurrent.CompletableFuture
 
 /**
  * @author sky
@@ -72,24 +71,6 @@ class Item(
         saveToString().digest("sha-1")
     }
 
-    fun eval(key: String, player: Player, event: Event, itemStack: ItemStack) {
-        eventMap[key]?.run {
-            if (cancel && event is Cancellable) {
-                event.isCancelled = true
-            }
-            eval(player, event, itemStack, eventData)
-        }
-    }
-
-    fun eval(key: String, event: PlayerEvent, itemStack: ItemStack) {
-        eventMap[key]?.run {
-            if (cancel && event is Cancellable) {
-                event.isCancelled = true
-            }
-            eval(event.player, event, itemStack, eventData)
-        }
-    }
-
     fun buildItemStack(player: Player?): ItemStack {
         return build(player).toItemStack()
     }
@@ -116,6 +97,26 @@ class Item(
         val post = ItemBuildEvent.Post(player, pre.itemStream, pre.name, pre.lore)
         post.call()
         return post.itemStream
+    }
+
+    fun invokeScript(key: String, event: PlayerEvent, itemStack: ItemStack): CompletableFuture<ItemEvent.ItemResult?>? {
+        eventMap[key]?.run {
+            if (cancelEvent && event is Cancellable) {
+                event.isCancelled = true
+            }
+            return invoke(event.player, event, itemStack, eventData)
+        }
+        return null
+    }
+
+    fun invokeScript(key: String, player: Player, event: Event, itemStack: ItemStack): CompletableFuture<ItemEvent.ItemResult?>? {
+        eventMap[key]?.run {
+            if (cancelEvent && event is Cancellable) {
+                event.isCancelled = true
+            }
+            return invoke(player, event, itemStack, eventData)
+        }
+        return null
     }
 
     private fun getUpdateData(map: MutableMap<String, ItemTagData?>, section: ConfigurationSection, path: String = ""): MutableMap<String, ItemTagData?> {

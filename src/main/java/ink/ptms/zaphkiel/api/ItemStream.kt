@@ -2,7 +2,6 @@ package ink.ptms.zaphkiel.api
 
 import ink.ptms.zaphkiel.ZaphkielAPI
 import ink.ptms.zaphkiel.api.event.ItemReleaseEvent
-import ink.ptms.zaphkiel.api.internal.ItemKey
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import taboolib.module.nms.*

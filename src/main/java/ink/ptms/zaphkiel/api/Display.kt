@@ -1,9 +1,7 @@
 package ink.ptms.zaphkiel.api
 
 import ink.ptms.zaphkiel.ZaphkielAPI
-import ink.ptms.zaphkiel.api.internal.StructureList
-import ink.ptms.zaphkiel.api.internal.StructureSingle
-import ink.ptms.zaphkiel.module.meta.Meta
+import ink.ptms.zaphkiel.item.meta.Meta
 import taboolib.library.configuration.ConfigurationSection
 
 /**

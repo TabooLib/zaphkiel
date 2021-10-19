@@ -4,10 +4,7 @@ import ink.ptms.zaphkiel.api.ItemStream
 import org.bukkit.entity.Player
 import org.bukkit.event.entity.EntityPickupItemEvent
 import org.bukkit.event.inventory.InventoryClickEvent
-import org.bukkit.event.player.PlayerDropItemEvent
-import org.bukkit.event.player.PlayerInteractEntityEvent
-import org.bukkit.event.player.PlayerInteractEvent
-import org.bukkit.event.player.PlayerItemConsumeEvent
+import org.bukkit.event.player.*
 import taboolib.platform.type.BukkitProxyEvent
 
 /**
@@ -45,17 +42,14 @@ class ItemEvent {
 
         override val allowCancelled: Boolean
             get() = false
-
-        var save = false
     }
 
-    class Pick(val itemStream: ItemStream, val bukkitEvent: EntityPickupItemEvent) : BukkitProxyEvent() {
+    class Pick(val itemStream: ItemStream, val bukkitEvent: PlayerPickupItemEvent) : BukkitProxyEvent() {
 
         override val allowCancelled: Boolean
             get() = false
 
         var save = false
-        val player = bukkitEvent.entity as Player
     }
 
     class Drop(val itemStream: ItemStream, val bukkitEvent: PlayerDropItemEvent) : BukkitProxyEvent() {

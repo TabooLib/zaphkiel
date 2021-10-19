@@ -128,10 +128,11 @@ open class ItemAPI(val item: Item, val itemStack: ItemStack, val player: Player)
         }
     }
 
-    fun save() {
-        if (!isReplaced) {
-            itemStream.rebuildToItemStack(player)
-        }
+    /**
+     * 保存物品并返回 ItemStack 实例
+     */
+    fun save(): ItemStack {
+        return if (!isReplaced) itemStream.rebuildToItemStack(player) else itemStack
     }
 
     @Deprecated("过时方法")

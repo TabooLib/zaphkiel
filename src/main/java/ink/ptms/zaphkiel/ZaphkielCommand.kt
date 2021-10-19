@@ -85,7 +85,7 @@ object ZaphkielCommand {
         execute<CommandSender> { sender, _, _ ->
             Zaphkiel.conf.reload()
             Zaphkiel.reload()
-            notify(sender, "插件已重载.")
+            notify(sender, "Successful.")
         }
     }
 
