@@ -1,5 +1,6 @@
 package ink.ptms.zaphkiel
 
+import org.bukkit.Bukkit
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import taboolib.common.io.newFile
@@ -42,6 +43,8 @@ object Zaphkiel : Plugin() {
         }
         ZaphkielAPI.reloadDisplay()
         ZaphkielAPI.reloadItem()
+        // 更新背包
+        Bukkit.getOnlinePlayers().forEach { ZaphkielAPI.checkUpdate(it, it.inventory) }
     }
 
     @SubscribeEvent

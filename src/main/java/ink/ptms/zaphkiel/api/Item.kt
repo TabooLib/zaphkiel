@@ -91,7 +91,7 @@ class Item(
     }
 
     fun buildItemStack(player: Player?): ItemStack {
-        return build(player).saveNow()
+        return build(player).toItemStack()
     }
 
     fun build(player: Player?): ItemStream {

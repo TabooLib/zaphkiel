@@ -19,7 +19,6 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.potion.PotionEffectType
 import taboolib.common.io.runningClasses
 import taboolib.common.platform.function.getDataFolder
-import taboolib.common.platform.function.info
 import taboolib.common.reflect.Reflex.Companion.getProperty
 import taboolib.common.reflect.Reflex.Companion.invokeConstructor
 import taboolib.common5.FileWatcher
@@ -40,67 +39,45 @@ import java.util.*
 @Suppress("UNCHECKED_CAST")
 object ZaphkielAPI {
 
+    /**
+     * 已加载的文件
+     */
     val loaded = ArrayList<File>()
+
+    /**
+     * 物品与展示方案目录
+     */
     val folderItem = File(getDataFolder(), "item")
     val folderDisplay = File(getDataFolder(), "display")
+
+    /**
+     * 已注册的物品
+     */
     val registeredItem = HashMap<String, Item>()
+
+    /**
+     * 已注册的模型
+     */
     val registeredModel = HashMap<String, Model>()
+
+    /**
+     * 已注册的展示
+     */
     val registeredDisplay = HashMap<String, Display>()
+
+    /**
+     * 已注册的分组
+     */
     val registeredGroup = HashMap<String, Group>()
+
+    /**
+     * 已注册的元数据
+     */
     val registeredMeta = runningClasses.filter { it.isAnnotationPresent(MetaKey::class.java) }.associateBy { it.getAnnotation(MetaKey::class.java).value }
 
-    fun getItem(id: String): ItemStream? {
-        return registeredItem[id]?.build(null)
-    }
-
-    fun getItem(id: String, player: Player?): ItemStream? {
-        return registeredItem[id]?.build(player)
-    }
-
-    fun getItemStack(id: String): ItemStack? {
-        return registeredItem[id]?.build(null)?.saveNow()
-    }
-
-    fun getItemStack(id: String, player: Player?): ItemStack? {
-        return registeredItem[id]?.build(player)?.saveNow()
-    }
-
-    fun getName(item: ItemStack): String? {
-        val read = read(item)
-        return if (read.isExtension()) {
-            read.getZaphkielName()
-        } else {
-            null
-        }
-    }
-
-    fun getData(item: ItemStack): ItemTag? {
-        val read = read(item)
-        return if (read.isExtension()) {
-            read.getZaphkielData()
-        } else {
-            null
-        }
-    }
-
-    fun getUnique(item: ItemStack): ItemTag? {
-        val read = read(item)
-        return if (read.isExtension()) {
-            read.getZaphkielUniqueData()
-        } else {
-            null
-        }
-    }
-
-    fun getItem(item: ItemStack): Item? {
-        val read = read(item)
-        return if (read.isExtension()) {
-            read.getZaphkielItem()
-        } else {
-            null
-        }
-    }
-
+    /**
+     * 读取 Zaphkiel 物品流
+     */
     fun read(item: ItemStack): ItemStream {
         if (item.isAir()) {
             error("Could not read empty item.")
@@ -108,48 +85,113 @@ object ZaphkielAPI {
         return ItemStream(item)
     }
 
-    fun rebuild(player: Player?, inventory: Inventory) {
+    /**
+     * 获取物品流
+     */
+    fun getItem(id: String, player: Player? = null): ItemStream? {
+        return registeredItem[id]?.build(player)
+    }
+
+    /**
+     * 获取物品流并构建成 ItemStack
+     */
+    fun getItemStack(id: String, player: Player? = null): ItemStack? {
+        return registeredItem[id]?.build(player)?.toItemStack()
+    }
+
+    /**
+     * 获取 Zaphkiel 物品名称（序号）
+     */
+    fun getName(item: ItemStack): String? {
+        val read = read(item)
+        return if (read.isExtension()) read.getZaphkielName() else null
+    }
+
+    /**
+     * 获取 Zaphkiel 物品活跃数据
+     */
+    fun getData(item: ItemStack): ItemTag? {
+        val read = read(item)
+        return if (read.isExtension()) read.getZaphkielData() else null
+    }
+
+    /**
+     * 获取 Zaphkiel 物品唯一数据
+     */
+    fun getUnique(item: ItemStack): ItemTag? {
+        val read = read(item)
+        return if (read.isExtension()) read.getZaphkielUniqueData() else null
+    }
+
+    /**
+     * 获取 Zaphkiel 物品实例
+     */
+    fun getItem(item: ItemStack): Item? {
+        val read = read(item)
+        return if (read.isExtension()) read.getZaphkielItem() else null
+    }
+
+    /**
+     * 检查并更新背包中的所有物品
+     */
+    fun checkUpdate(player: Player?, inventory: Inventory) {
         (0 until inventory.size).forEach { i ->
             val item = inventory.getItem(i)
             if (item.isAir()) {
                 return@forEach
             }
-            val rebuild = rebuild(player, item!!)
+            val rebuild = checkUpdate(player, item!!)
             if (rebuild.rebuild) {
-                rebuild.saveNow()
+                rebuild.toItemStack()
             }
         }
     }
 
-    fun rebuild(player: Player?, item: ItemStack): ItemStream {
+    /**
+     * 检查并更新物品
+     * 这个方法的作用是检查更新，而非完全重构
+     */
+    fun checkUpdate(player: Player?, item: ItemStack): ItemStream {
         if (item.isAir()) {
-            error("Could not read empty item.")
+            error("air")
         }
         val itemStream = ItemStream(item)
         if (itemStream.isVanilla()) {
             return itemStream
         }
-        val pre = ItemBuildEvent.Rebuild(player, itemStream, itemStream.isOutdated())
-        if (!pre.call()) {
-            return itemStream
+        val event = ItemBuildEvent.CheckUpdate(player, itemStream, itemStream.isOutdated())
+        return if (event.call()) {
+            // 使用 ItemStream#rebuild 方法会生成新的 ItemStreamGenerated 实例
+            // 将会重新生成物品名称与描述，产生更多的计算
+            // 现在看来 nameLock、loreLock 这种设计并不是特别出色
+            // 在 1.6.1 版本时想过移除，但是没有意义
+            itemStream.rebuild = true
+            itemStream.getZaphkielItem().build(player, itemStream)
+        } else {
+            itemStream
         }
-        itemStream.rebuild = true
-        return itemStream.getZaphkielItem().build(player, itemStream)
     }
 
+    /**
+     * 重新加载物品与模型文件
+     * 这个操作会清空缓存
+     */
     fun reloadItem() {
         loaded.forEach { FileWatcher.INSTANCE.removeListener(it) }
         registeredItem.clear()
         registeredModel.clear()
-        reloadModel(folderItem)
-        reloadItem(folderItem)
+        loadModelFromFile(folderItem)
+        loadItemFromFile(folderItem)
         PluginReloadEvent.Item().call()
-        info("Loaded ${registeredItem.size} item(s) and ${registeredModel.size} model(s).")
     }
 
-    fun reloadItem(file: File) {
+    /**
+     * 从文件中加载物品
+     * 这个操作不会清空缓存
+     */
+    fun loadItemFromFile(file: File) {
         if (file.isDirectory) {
-            file.listFiles()?.forEach { reloadItem(it) }
+            file.listFiles()?.forEach { loadItemFromFile(it) }
         } else {
             val keys = ArrayList<String>()
             val task = Runnable {
@@ -169,9 +211,7 @@ object ZaphkielAPI {
                     }
                     keys.add(key)
                 }
-                Bukkit.getOnlinePlayers().forEach { player ->
-                    rebuild(player, player.inventory)
-                }
+                Bukkit.getOnlinePlayers().forEach { checkUpdate(it, it.inventory) }
             }
             task.run()
             loaded.add(file)
@@ -181,9 +221,13 @@ object ZaphkielAPI {
         }
     }
 
-    fun reloadModel(file: File) {
+    /**
+     * 从文件中加载模型文件
+     * 这个操作不会清空缓存
+     */
+    fun loadModelFromFile(file: File) {
         if (file.isDirectory) {
-            file.listFiles()?.forEach { reloadModel(it) }
+            file.listFiles()?.forEach { loadModelFromFile(it) }
         } else {
             val conf = SecuredFile.loadConfiguration(file)
             conf.getKeys(false).filter { it.endsWith("$") }.forEach { key ->
@@ -192,24 +236,32 @@ object ZaphkielAPI {
         }
     }
 
+    /**
+     * 重新加载展示方案
+     * 这个操作会清空缓存
+     */
     fun reloadDisplay() {
         registeredDisplay.clear()
-        reloadDisplay(folderDisplay)
+        loadDisplayFromFile(folderDisplay)
         PluginReloadEvent.Display().call()
-        info("Loaded ${registeredDisplay.size} display plan(s).")
     }
 
-    fun reloadDisplay(file: File) {
+    /**
+     * 从文件中加载展示方案
+     * 这个操作不会清空缓存
+     */
+    fun loadDisplayFromFile(file: File) {
         if (file.isDirectory) {
-            file.listFiles()?.forEach { reloadDisplay(it) }
+            file.listFiles()?.forEach { loadDisplayFromFile(it) }
         } else {
             val conf = SecuredFile.loadConfiguration(file)
-            conf.getKeys(false).forEach { key ->
-                registeredDisplay[key] = Display(conf.getConfigurationSection(key)!!)
-            }
+            conf.getKeys(false).forEach { registeredDisplay[it] = Display(conf.getConfigurationSection(it)!!) }
         }
     }
 
+    /**
+     * 从配置文件中读取元数据配置
+     */
     fun readMeta(root: ConfigurationSection): MutableList<Meta> {
         val copy = SecuredFile()
         return root.getConfigurationSection("meta")?.getKeys(false)?.mapNotNull { id ->
@@ -232,6 +284,9 @@ object ZaphkielAPI {
         }?.toMutableList() ?: ArrayList()
     }
 
+    /**
+     * 序列化相关方法
+     */
     fun serialize(itemStack: ItemStack): JsonObject {
         return serialize(read(itemStack))
     }
@@ -276,7 +331,7 @@ object ZaphkielAPI {
     }
 
     /**
-     * adapt 相关工具
+     * adapt 相关方法
      */
     fun asItemFlag(name: String): ItemFlag? {
         return kotlin.runCatching { ItemFlag.valueOf(name) }.getOrNull()

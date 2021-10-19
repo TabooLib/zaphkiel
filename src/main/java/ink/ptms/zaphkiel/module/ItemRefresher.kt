@@ -21,34 +21,32 @@ internal object ItemRefresher {
 
     @Schedule(period = 100, async = true)
     fun tick() {
-        Bukkit.getOnlinePlayers().forEach { player -> ZaphkielAPI.rebuild(player, player.inventory) }
+        Bukkit.getOnlinePlayers().forEach { player -> ZaphkielAPI.checkUpdate(player, player.inventory) }
     }
 
     @SubscribeEvent
     fun e(e: PlayerJoinEvent) {
-        ZaphkielAPI.rebuild(e.player, e.player.inventory)
+        ZaphkielAPI.checkUpdate(e.player, e.player.inventory)
     }
 
     @SubscribeEvent
     fun e(e: PlayerRespawnEvent) {
-        ZaphkielAPI.rebuild(e.player, e.player.inventory)
+        ZaphkielAPI.checkUpdate(e.player, e.player.inventory)
     }
 
     @SubscribeEvent(priority = EventPriority.MONITOR, ignoreCancelled = true)
     fun e(e: PlayerDropItemEvent) {
-        ZaphkielAPI.rebuild(e.player, e.itemDrop.itemStack).run {
-            if (this.rebuild) {
-                e.itemDrop.itemStack = this.saveNow()
-            }
+        val itemStream = ZaphkielAPI.checkUpdate(e.player, e.itemDrop.itemStack)
+        if (itemStream.rebuild) {
+            e.itemDrop.itemStack = itemStream.toItemStack()
         }
     }
 
     @SubscribeEvent(priority = EventPriority.MONITOR, ignoreCancelled = true)
     fun e(e: PlayerPickupItemEvent) {
-        ZaphkielAPI.rebuild(e.player, e.item.itemStack).run {
-            if (this.rebuild) {
-                e.item.itemStack = this.saveNow()
-            }
+        val itemStream = ZaphkielAPI.checkUpdate(e.player, e.item.itemStack)
+        if (itemStream.rebuild) {
+            e.item.itemStack = itemStream.toItemStack()
         }
     }
 
@@ -56,7 +54,7 @@ internal object ItemRefresher {
     fun e(e: InventoryOpenEvent) {
         if (e.inventory.location != null) {
             submit(async = true) {
-                ZaphkielAPI.rebuild(e.player as Player, e.inventory)
+                ZaphkielAPI.checkUpdate(e.player as Player, e.inventory)
             }
         }
     }

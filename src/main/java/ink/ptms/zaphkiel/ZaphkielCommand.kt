@@ -17,7 +17,6 @@ import taboolib.module.chat.colored
 import taboolib.module.nms.getName
 import taboolib.platform.util.giveItem
 import taboolib.platform.util.hoverItem
-import taboolib.platform.util.serializeToByteArray
 
 /**
  * @author sky
@@ -44,7 +43,7 @@ object ZaphkielCommand {
             try {
                 val json = ZaphkielAPI.serialize(sender.itemInHand)
                 notify(sender, "序列化: $json")
-                val item = ZaphkielAPI.deserialize(json).rebuild(sender)
+                val item = ZaphkielAPI.deserialize(json).rebuildToItemStack(sender)
                 TellrawJson().sendTo(adaptPlayer(sender)) {
                     append("§c[Zaphkiel] §7反序列化: ").append(item.getName()).hoverItem(item)
                 }

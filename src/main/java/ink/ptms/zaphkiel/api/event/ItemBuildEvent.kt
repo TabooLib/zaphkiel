@@ -46,16 +46,16 @@ class ItemBuildEvent {
     }
 
     /**
-     * 重构之前
+     * 检查更新
      * 可被取消
      * 递交至构建事件之前
      */
-    class Rebuild(val player: Player?, val itemStream: ItemStream, fromRefresh: Boolean) : BukkitProxyEvent() {
+    class CheckUpdate(val player: Player?, val itemStream: ItemStream, isOutdated: Boolean) : BukkitProxyEvent() {
 
         val item = itemStream.getZaphkielItem()
 
         init {
-            isCancelled = !fromRefresh
+            isCancelled = !isOutdated
         }
     }
 }

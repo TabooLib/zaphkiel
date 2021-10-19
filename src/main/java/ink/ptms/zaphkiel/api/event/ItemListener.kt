@@ -27,7 +27,7 @@ internal object ItemListener {
                 val event = ItemEvent.AsyncTick(ZaphkielAPI.read(item), it)
                 event.call()
                 if (event.save) {
-                    event.itemStream.rebuild(it)
+                    event.itemStream.rebuildToItemStack(it)
                 }
             }
         }
@@ -38,7 +38,7 @@ internal object ItemListener {
             val event = ItemEvent.Select(ZaphkielAPI.read(it), this)
             event.call()
             if (event.save) {
-                event.itemStream.rebuild(this@select)
+                event.itemStream.rebuildToItemStack(this@select)
             }
         }
     }
@@ -59,7 +59,7 @@ internal object ItemListener {
             val event = ItemEvent.Consume(ZaphkielAPI.read(e.item), e)
             event.call()
             if (event.save) {
-                event.itemStream.rebuild(e.player)
+                event.itemStream.rebuildToItemStack(e.player)
             }
         }
     }
@@ -70,7 +70,7 @@ internal object ItemListener {
             val event = ItemEvent.Interact(ZaphkielAPI.read(e.item!!), e)
             event.call()
             if (event.save) {
-                event.itemStream.rebuild(e.player)
+                event.itemStream.rebuildToItemStack(e.player)
             }
         }
     }
@@ -81,7 +81,7 @@ internal object ItemListener {
             val event = ItemEvent.InteractEntity(ZaphkielAPI.read(e.player.inventory.itemInMainHand), e)
             event.call()
             if (event.save) {
-                event.itemStream.rebuild(e.player)
+                event.itemStream.rebuildToItemStack(e.player)
             }
         }
     }
@@ -92,7 +92,7 @@ internal object ItemListener {
             val event = ItemEvent.Drop(ZaphkielAPI.read(e.itemDrop.itemStack), e)
             event.call()
             if (event.save) {
-                e.itemDrop.itemStack = event.itemStream.rebuild(e.player)
+                e.itemDrop.itemStack = event.itemStream.rebuildToItemStack(e.player)
             }
         }
     }
@@ -103,7 +103,7 @@ internal object ItemListener {
             val event = ItemEvent.Pick(ZaphkielAPI.read(e.item.itemStack), e)
             event.call()
             if (event.save) {
-                e.item.itemStack = event.itemStream.rebuild(e.entity as Player)
+                e.item.itemStack = event.itemStream.rebuildToItemStack(e.entity as Player)
             }
         }
     }
@@ -124,10 +124,10 @@ internal object ItemListener {
         val event = ItemEvent.InventoryClick(itemStreamCurrent, itemStreamButton, e)
         event.call()
         if (event.saveCurrent && itemStreamCurrent != null) {
-            itemStreamCurrent.rebuild(e.whoClicked as Player)
+            itemStreamCurrent.rebuildToItemStack(e.whoClicked as Player)
         }
         if (event.saveButton && itemStreamButton != null) {
-            itemStreamButton.rebuild(e.whoClicked as Player)
+            itemStreamButton.rebuildToItemStack(e.whoClicked as Player)
         }
     }
 }

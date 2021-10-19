@@ -30,14 +30,14 @@ internal object ItemInternet {
         val files = Zaphkiel.conf.getStringList("InternetItem.item").map { host ->
             File(folder, host.digest("sha-1")).also { it.writeText(URL(host).readText()) }
         }
-        files.forEach { ZaphkielAPI.reloadModel(it) }
-        files.forEach { ZaphkielAPI.reloadItem(it) }
+        files.forEach { ZaphkielAPI.loadModelFromFile(it) }
+        files.forEach { ZaphkielAPI.loadItemFromFile(it) }
     }
 
     fun reloadDisplay() {
         val folder = File(ZaphkielAPI.folderDisplay, "__cache__")
         Zaphkiel.conf.getStringList("InternetItem.display").forEach { host ->
-            ZaphkielAPI.reloadDisplay(File(folder, host.digest("sha-1")).also { it.writeText(URL(host).readText()) })
+            ZaphkielAPI.loadDisplayFromFile(File(folder, host.digest("sha-1")).also { it.writeText(URL(host).readText()) })
         }
     }
 

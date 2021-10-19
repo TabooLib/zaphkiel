@@ -12,7 +12,7 @@ data class ItemEvent(
     val item: Item,
     val name: String,
     val script: List<String>,
-    val cancel: Boolean = false
+    val cancel: Boolean = false,
 ) {
 
     fun eval(player: Player, event: Event, itemStack: ItemStack, data: Map<String, Any>) {
@@ -21,10 +21,9 @@ data class ItemEvent(
             val itemAPI = itemStream.getItemAPI(player)
             KetherShell.eval(script, namespace = listOf("zaphkiel"), sender = adaptPlayer(player)) {
                 rootFrame().variables().also { vars ->
-                    data.forEach { (k, v) ->
-                        vars.set(k, v)
-                    }
+                    data.forEach { (k, v) -> vars.set(k, v) }
                     vars.set("@ItemAPI", itemAPI)
+                    vars.set("@ItemEvent", event)
                     vars.set("@ItemStream", itemStream)
                 }
             }.thenRun {

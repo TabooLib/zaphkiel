@@ -29,16 +29,16 @@ fun Player.openGroupMenu() {
         }
         setNextPage(51) { _, hasNextPage ->
             if (hasNextPage) {
-                buildItem(XMaterial.SPECTRAL_ARROW) { name = "§7下一页" }
+                buildItem(XMaterial.SPECTRAL_ARROW) { name = "§7Next" }
             } else {
-                buildItem(XMaterial.ARROW) { name = "§8下一页" }
+                buildItem(XMaterial.ARROW) { name = "§8Next" }
             }
         }
         setPreviousPage(47) { _, hasPreviousPage ->
             if (hasPreviousPage) {
-                buildItem(XMaterial.SPECTRAL_ARROW) { name = "§7上一页" }
+                buildItem(XMaterial.SPECTRAL_ARROW) { name = "§7Previous" }
             } else {
-                buildItem(XMaterial.ARROW) { name = "§8上一页" }
+                buildItem(XMaterial.ARROW) { name = "§8Previous" }
             }
         }
     }
@@ -55,27 +55,27 @@ fun Player.openItemMenu(group: Group) {
         onGenerate { _, element, _, _ ->
             element.buildItemStack(this@openItemMenu).modifyLore {
                 add("")
-                add("§7序号: ${element.id}")
+                add("§7ID: ${element.id}")
             }
         }
         onClick { _, element ->
             giveItem(element.buildItemStack(this@openItemMenu))
         }
-        set(49, buildItem(XMaterial.BOOK) { name = "§7返回" }) {
+        set(49, buildItem(XMaterial.BOOK) { name = "§7Groups" }) {
             openGroupMenu()
         }
         setNextPage(51) { _, hasNextPage ->
             if (hasNextPage) {
-                buildItem(XMaterial.SPECTRAL_ARROW) { name = "§7下一页" }
+                buildItem(XMaterial.SPECTRAL_ARROW) { name = "§7Next" }
             } else {
-                buildItem(XMaterial.ARROW) { name = "§8下一页" }
+                buildItem(XMaterial.ARROW) { name = "§8Next" }
             }
         }
         setPreviousPage(47) { _, hasPreviousPage ->
             if (hasPreviousPage) {
-                buildItem(XMaterial.SPECTRAL_ARROW) { name = "§7上一页" }
+                buildItem(XMaterial.SPECTRAL_ARROW) { name = "§7Previous" }
             } else {
-                buildItem(XMaterial.ARROW) { name = "§8上一页" }
+                buildItem(XMaterial.ARROW) { name = "§8Previous" }
             }
         }
     }

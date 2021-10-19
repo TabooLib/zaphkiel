@@ -114,14 +114,15 @@ open class ItemAPI(val item: Item, val itemStack: ItemStack, val player: Player)
         isReplaced = true
         val data = itemStream.getZaphkielData()
         if (data.containsKey("durability_replace")) {
-            val replace = data["durability_replace"]!!.asString()
-            val replaceItem = if (replace.startsWith("minecraft:")) {
-                ItemStack(replace.substring("minecraft:".length).parseToMaterial())
+            val replace = data["durability_replace"]!!.asString().split("~")
+            val replaceItem = if (replace[0].startsWith("minecraft:")) {
+                ItemStack(replace[0].substring("minecraft:".length).parseToMaterial())
             } else {
-                ZaphkielAPI.getItem(replace, player)!!.saveNow()
+                ZaphkielAPI.getItem(replace[0], player)!!.toItemStack()
             }
             itemStack.type = replaceItem.type
             itemStack.itemMeta = replaceItem.itemMeta
+            itemStack.durability = Coerce.toShort(replace.getOrNull(1) ?: "0")
         } else {
             itemStack.amount = 0
         }
@@ -129,7 +130,7 @@ open class ItemAPI(val item: Item, val itemStack: ItemStack, val player: Player)
 
     fun save() {
         if (!isReplaced) {
-            itemStream.rebuild(player)
+            itemStream.rebuildToItemStack(player)
         }
     }
 

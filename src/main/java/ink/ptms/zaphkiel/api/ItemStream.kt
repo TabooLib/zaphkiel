@@ -14,7 +14,7 @@ import taboolib.module.nms.*
 open class ItemStream(val itemStack: ItemStack, val compound: ItemTag = itemStack.getItemTag()) {
 
     /**
-     * 是否重构
+     * 是否经历过重构步骤
      */
     var rebuild: Boolean = false
 
@@ -73,10 +73,26 @@ open class ItemStream(val itemStack: ItemStack, val compound: ItemTag = itemStac
     }
 
     /**
-     * 立即保存物品实例
-     * 因该方法存在误导，所以在 1.4.1 版本替换为 saveNow。
+     * 重构物品，并返回新的 ItemStream 实例
      */
-    fun saveNow(): ItemStack {
+    fun rebuild(player: Player? = null): ItemStream {
+        val item = getZaphkielItem()
+        val itemStreamGenerated = ItemStreamGenerated(itemStack, item.name.toMutableMap(), item.lore.toMutableMap(), compound)
+        return item.build(player, itemStreamGenerated)
+    }
+
+    /**
+     * 重构物品实例，并保存为 ItemStack 对象
+     */
+    fun rebuildToItemStack(player: Player? = null): ItemStack {
+        return rebuild(player).toItemStack()
+    }
+
+    /**
+     * 保存为 ItemStack 对象
+     * 原方法名（save）存在误导，于 1.4.1 版本替换为 toItemStack。
+     */
+    fun toItemStack(): ItemStack {
         val itemMeta = itemStack.setItemTag(compound).itemMeta
         if (itemMeta != null) {
             val event = ItemReleaseEvent(itemStack.type, itemStack.durability.toInt(), itemMeta, this)
@@ -86,15 +102,6 @@ open class ItemStream(val itemStack: ItemStack, val compound: ItemTag = itemStac
             itemStack.durability = event.data.toShort()
         }
         return itemStack
-    }
-
-    /**
-     * 重构物品实例
-     */
-    fun rebuild(player: Player?): ItemStack {
-        val item = getZaphkielItem()
-        val itemStreamGenerated = ItemStreamGenerated(itemStack, item.name.toMutableMap(), item.lore.toMutableMap(), compound)
-        return item.build(player, itemStreamGenerated).saveNow()
     }
 
     /**
