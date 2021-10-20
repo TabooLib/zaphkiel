@@ -1,7 +1,10 @@
-package ink.ptms.zaphkiel.api.event
+package ink.ptms.zaphkiel.item
 
 import ink.ptms.zaphkiel.ZaphkielAPI
 import ink.ptms.zaphkiel.api.ItemStream
+import ink.ptms.zaphkiel.api.event.ItemBuildEvent
+import ink.ptms.zaphkiel.api.event.ItemEvent
+import ink.ptms.zaphkiel.api.event.ItemReleaseEvent
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
@@ -36,6 +39,21 @@ internal object ItemListener {
     }
 
     @SubscribeEvent
+    fun e(e: ItemBuildEvent.Pre) {
+        e.itemStream.getZaphkielItem().invokeScript("onBuild", e.player, e, e.itemStream, "zaphkiel-build")
+    }
+
+    @SubscribeEvent
+    fun e(e: ItemReleaseEvent) {
+        e.itemStream.getZaphkielItem().invokeScript("onRelease", e.player, e, e.itemStream, "zaphkiel-build")
+    }
+
+    @SubscribeEvent
+    fun e(e: ItemReleaseEvent.Display) {
+        e.itemStream.getZaphkielItem().invokeScript("onReleaseDisplay", e.player, e, e.itemStream, "zaphkiel-build")
+    }
+
+    @SubscribeEvent
     fun e(e: PlayerJoinEvent) {
         e.player.onSelect()
     }
@@ -53,7 +71,7 @@ internal object ItemListener {
     fun e(e: PlayerItemBreakEvent) {
         val itemStream = ZaphkielAPI.read(e.brokenItem)
         if (itemStream.isExtension()) {
-            itemStream.getZaphkielItem().invokeScript("onItemBreak", e, e.brokenItem)
+            itemStream.getZaphkielItem().invokeScript("onItemBreak", e, itemStream)
         }
     }
 
@@ -72,7 +90,7 @@ internal object ItemListener {
             // 触发事件
             ItemEvent.Consume(itemStream, e).also { it.call() }
             // 执行脚本
-            itemStream.getZaphkielItem().invokeScript("onConsume", e, itemStack)
+            itemStream.getZaphkielItem().invokeScript("onConsume", e, itemStream)
             // 更新物品
             if (e.item == e.player.inventory.itemInMainHand) {
                 e.player.inventory.setItemInMainHand(itemStack)
@@ -104,10 +122,10 @@ internal object ItemListener {
         // 执行脚本
         when (e.action) {
             Action.LEFT_CLICK_AIR, Action.LEFT_CLICK_BLOCK -> {
-                itemStream.getZaphkielItem().invokeScript("onLeftClick", e, e.item!!)
+                itemStream.getZaphkielItem().invokeScript("onLeftClick", e, itemStream)
             }
             Action.RIGHT_CLICK_AIR, Action.RIGHT_CLICK_BLOCK -> {
-                itemStream.getZaphkielItem().invokeScript("onRightClick", e, e.item!!)
+                itemStream.getZaphkielItem().invokeScript("onRightClick", e, itemStream)
             }
             else -> {
             }
@@ -130,7 +148,7 @@ internal object ItemListener {
             if (event.save) {
                 event.itemStream.rebuildToItemStack(e.player)
             }
-            itemStream.getZaphkielItem().invokeScript("onLeftClickEntity", e, e.player.inventory.itemInMainHand)
+            itemStream.getZaphkielItem().invokeScript("onLeftClickEntity", e, itemStream)
         }
     }
 
@@ -143,13 +161,13 @@ internal object ItemListener {
         if (e.offHandItem.isNotAir()) {
             val itemStream = ZaphkielAPI.read(e.offHandItem!!)
             if (itemStream.isExtension()) {
-                itemStream.getZaphkielItem().invokeScript("onSwapToOffhand", e, e.offHandItem!!)
+                itemStream.getZaphkielItem().invokeScript("onSwapToOffhand", e, itemStream)
             }
         }
         if (e.mainHandItem.isNotAir()) {
             val itemStream = ZaphkielAPI.read(e.mainHandItem!!)
             if (itemStream.isExtension()) {
-                itemStream.getZaphkielItem().invokeScript("onSwapToMainHand", e, e.mainHandItem!!)
+                itemStream.getZaphkielItem().invokeScript("onSwapToMainHand", e, itemStream)
             }
         }
     }
@@ -165,7 +183,7 @@ internal object ItemListener {
         }
         val itemStream = ZaphkielAPI.read(e.player.inventory.itemInMainHand)
         if (itemStream.isExtension()) {
-            itemStream.getZaphkielItem().invokeScript("onBlockBreak", e.player, e, e.player.inventory.itemInMainHand)
+            itemStream.getZaphkielItem().invokeScript("onBlockBreak", e.player, e, itemStream)
         }
     }
 
@@ -186,7 +204,7 @@ internal object ItemListener {
                 e.itemDrop.itemStack = event.itemStream.rebuildToItemStack(e.player)
             }
             // 若脚本修改物品则写回事件
-            itemStream.getZaphkielItem().invokeScript("onDrop", e.player, e, e.itemDrop.itemStack)?.thenAccept {
+            itemStream.getZaphkielItem().invokeScript("onDrop", e.player, e, itemStream)?.thenAccept {
                 if (it != null) {
                     e.itemDrop.itemStack = it.itemStack
                 }
@@ -211,7 +229,7 @@ internal object ItemListener {
                 e.item.itemStack = event.itemStream.rebuildToItemStack(e.player)
             }
             // 若脚本修改物品则写回事件
-            itemStream.getZaphkielItem().invokeScript("onPick", e.player, e, e.item.itemStack)?.thenAccept {
+            itemStream.getZaphkielItem().invokeScript("onPick", e.player, e, itemStream)?.thenAccept {
                 if (it != null) {
                     e.item.itemStack = it.itemStack
                 }

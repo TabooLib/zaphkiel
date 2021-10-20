@@ -72,7 +72,7 @@ class Item(
     }
 
     fun buildItemStack(player: Player?): ItemStack {
-        return build(player).toItemStack()
+        return build(player).toItemStack(player)
     }
 
     fun build(player: Player?): ItemStream {
@@ -99,24 +99,20 @@ class Item(
         return post.itemStream
     }
 
-    fun invokeScript(key: String, event: PlayerEvent, itemStack: ItemStack): CompletableFuture<ItemEvent.ItemResult?>? {
-        eventMap[key]?.run {
-            if (cancelEvent && event is Cancellable) {
-                event.isCancelled = true
-            }
-            return invoke(event.player, event, itemStack, eventData)
+    fun invokeScript(key: String, event: PlayerEvent, itemStream: ItemStream, namespace: String = "zaphkiel-internal"): CompletableFuture<ItemEvent.ItemResult?>? {
+        val itemEvent = eventMap[key] ?: return null
+        if (itemEvent.isCancelled && event is Cancellable) {
+            event.isCancelled = true
         }
-        return null
+        return itemEvent.invoke(event.player, event, itemStream, eventData, namespace)
     }
 
-    fun invokeScript(key: String, player: Player, event: Event, itemStack: ItemStack): CompletableFuture<ItemEvent.ItemResult?>? {
-        eventMap[key]?.run {
-            if (cancelEvent && event is Cancellable) {
-                event.isCancelled = true
-            }
-            return invoke(player, event, itemStack, eventData)
+    fun invokeScript(key: String, player: Player?, event: Event, itemStream: ItemStream, namespace: String = "zaphkiel-internal"): CompletableFuture<ItemEvent.ItemResult?>? {
+        val itemEvent = eventMap[key] ?: return null
+        if (itemEvent.isCancelled && event is Cancellable) {
+            event.isCancelled = true
         }
-        return null
+        return itemEvent.invoke(player, event, itemStream, eventData, namespace)
     }
 
     private fun getUpdateData(map: MutableMap<String, ItemTagData?>, section: ConfigurationSection, path: String = ""): MutableMap<String, ItemTagData?> {

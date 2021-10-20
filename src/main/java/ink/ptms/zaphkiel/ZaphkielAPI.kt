@@ -96,7 +96,7 @@ object ZaphkielAPI {
      * 获取物品流并构建成 ItemStack
      */
     fun getItemStack(id: String, player: Player? = null): ItemStack? {
-        return registeredItem[id]?.build(player)?.toItemStack()
+        return registeredItem[id]?.build(player)?.toItemStack(player)
     }
 
     /**
@@ -142,7 +142,7 @@ object ZaphkielAPI {
             }
             val rebuild = checkUpdate(player, item!!)
             if (rebuild.rebuild) {
-                rebuild.toItemStack()
+                rebuild.toItemStack(player)
             }
         }
     }

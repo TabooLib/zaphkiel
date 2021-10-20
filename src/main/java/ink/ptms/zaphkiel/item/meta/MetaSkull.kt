@@ -2,8 +2,13 @@ package ink.ptms.zaphkiel.item.meta
 
 import com.mojang.authlib.GameProfile
 import com.mojang.authlib.properties.Property
+import me.arcaniax.hdb.api.HeadDatabaseAPI
 import org.bukkit.inventory.meta.ItemMeta
 import org.bukkit.inventory.meta.SkullMeta
+import taboolib.common.platform.event.OptionalEvent
+import taboolib.common.platform.event.SubscribeEvent
+import taboolib.common.platform.function.warning
+import taboolib.common.reflect.Reflex.Companion.getProperty
 import taboolib.common.reflect.Reflex.Companion.setProperty
 import taboolib.library.configuration.ConfigurationSection
 import java.util.*
@@ -19,6 +24,7 @@ class MetaSkull(root: ConfigurationSection) : Meta(root) {
     val skullTexture = if (root.contains("meta.skull.textures")) {
         SkullTexture(root.getString("meta.skull.textures.value").toString(), root.getString("meta.skull.textures.id"))
     } else null
+    val skullHeadDatabase = root.getString("meta.skull.head-database")
 
     override fun build(itemMeta: ItemMeta) {
         if (itemMeta is SkullMeta) {
@@ -29,6 +35,20 @@ class MetaSkull(root: ConfigurationSection) : Meta(root) {
                 itemMeta.setProperty("profile", GameProfile(skullTexture.uuid, null).also {
                     it.properties.put("textures", Property("textures", skullTexture.textures))
                 })
+            }
+            if (skullHeadDatabase != null) {
+                if (headDatabaseLoaded) {
+                    val api = HeadDatabaseAPI()
+                    val itemHead = api.getItemHead(skullHeadDatabase)
+                    if (itemHead != null) {
+                        val profile = itemHead.itemMeta!!.getProperty<GameProfile>("profile")!!
+                        itemMeta.setProperty("profile", GameProfile(profile.id, null).also {
+                            it.properties.put("textures", profile.properties.get("textures") as Property)
+                        })
+                    }
+                } else {
+                    warning("HeadDatabase is not loaded")
+                }
             }
         }
     }
@@ -47,5 +67,16 @@ class MetaSkull(root: ConfigurationSection) : Meta(root) {
     class SkullTexture(val textures: String, uuid: String?) {
 
         val uuid: UUID? = if (uuid != null) UUID.fromString(uuid) else null
+    }
+
+    companion object {
+
+        var headDatabaseLoaded = false
+            private set
+
+        @SubscribeEvent(bind = "me.arcaniax.hdb.api.DatabaseLoadEvent")
+        fun e(e: OptionalEvent) {
+            headDatabaseLoaded = true
+        }
     }
 }

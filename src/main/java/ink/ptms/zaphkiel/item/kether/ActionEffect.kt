@@ -70,11 +70,10 @@ class ActionEffect {
          */
         @KetherParser(["effect"], namespace = "zaphkiel", shared = true)
         fun parser() = scriptParser {
-            when (it.expects("give", "remove", "clear")) {
-                "give" -> Give(it.next(ArgTypes.ACTION), it.next(ArgTypes.ACTION), it.next(ArgTypes.ACTION))
-                "remove" -> Remove(it.next(ArgTypes.ACTION))
-                "clear" -> Clear()
-                else -> error("out of case")
+            it.switch {
+                case("give") { Give(it.next(ArgTypes.ACTION), it.next(ArgTypes.ACTION), it.next(ArgTypes.ACTION)) }
+                case("clear") { Clear() }
+                case("remove") { Remove(it.next(ArgTypes.ACTION)) }
             }
         }
     }

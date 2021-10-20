@@ -49,7 +49,7 @@ internal object ItemBuilder {
         if (e.itemStream is ItemStreamGenerated) {
             val display = ZaphkielAPI.registeredDisplay[e.item.display]
             if (display != null) {
-                val event = ItemReleaseEvent.Display(e.itemStream, e.itemStream.name, e.itemStream.lore)
+                val event = ItemReleaseEvent.Display(e.itemStream, e.itemStream.name, e.itemStream.lore, e.player)
                 event.call()
                 val product = display.toProductTrim(event.name, event.lore)
                 e.itemMeta.setDisplayName(product.name?.colored() ?: "")
@@ -66,7 +66,7 @@ internal object ItemBuilder {
             if (e.item.nameLocked || e.item.loreLocked) {
                 val display = ZaphkielAPI.registeredDisplay[e.item.display]
                 if (display != null) {
-                    val event = ItemReleaseEvent.Display(e.itemStream, e.item.name.toMutableMap(), e.item.lore.toMutableMap())
+                    val event = ItemReleaseEvent.Display(e.itemStream, e.item.name.toMutableMap(), e.item.lore.toMutableMap(), e.player)
                     event.call()
                     val product = display.toProductTrim(event.name, event.lore)
                     if (e.item.nameLocked) {

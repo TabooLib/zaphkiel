@@ -24,11 +24,8 @@ class ActionMythic {
 
         @KetherParser(["mm"], namespace = "zaphkiel", shared = true)
         fun parser() = scriptParser {
-            when (it.expects("castskill")) {
-                "castskill" -> {
-                    CastSkill(it.next(ArgTypes.ACTION))
-                }
-                else -> error("out of case")
+            it.switch {
+                case("castskill") { CastSkill(it.next(ArgTypes.ACTION)) }
             }
         }
     }

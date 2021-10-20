@@ -4,6 +4,7 @@ import taboolib.common5.Coerce
 import taboolib.library.kether.ArgTypes
 import taboolib.library.kether.ParsedAction
 import taboolib.module.kether.*
+import taboolib.module.nms.ItemTagData
 import java.util.concurrent.CompletableFuture
 
 /**
@@ -35,16 +36,39 @@ class ActionItem {
 
     companion object {
 
+        /**
+         * item repair
+         * item damage
+         * item data *key
+         * item data *key to *value
+         */
         @KetherParser(["item"], namespace = "zaphkiel", shared = true)
         fun parser() = scriptParser {
-            when (it.expects("repair", "damage")) {
-                "repair" -> {
-                    Repair(it.next(ArgTypes.ACTION))
+            it.switch {
+                case("repair") { Repair(it.next(ArgTypes.ACTION)) }
+                case("damage") { Damage(it.next(ArgTypes.ACTION)) }
+                case("data") {
+                    val key = it.next(ArgTypes.ACTION)
+                    try {
+                        it.mark()
+                        it.expects("to")
+                        val value = it.next(ArgTypes.ACTION)
+                        actionNow {
+                            newFrame(key).run<Any>().thenApply { key ->
+                                newFrame(value).run<Any>().also { value ->
+                                    itemStream().getZaphkielData().putDeep(key.toString(), ItemTagData.toNBT(value))
+                                }
+                            }
+                        }
+                    } catch (ex: Throwable) {
+                        it.reset()
+                        actionNow {
+                            newFrame(key).run<Any>().thenApply { key ->
+                                itemStream().getZaphkielData().getDeep(key.toString()).unsafeData()
+                            }
+                        }
+                    }
                 }
-                "damage" -> {
-                    Damage(it.next(ArgTypes.ACTION))
-                }
-                else -> error("out of case")
             }
         }
     }

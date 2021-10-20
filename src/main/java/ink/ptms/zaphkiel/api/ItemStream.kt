@@ -84,17 +84,17 @@ open class ItemStream(val itemStack: ItemStack, val compound: ItemTag = itemStac
      * 重构物品实例，并保存为 ItemStack 对象
      */
     fun rebuildToItemStack(player: Player? = null): ItemStack {
-        return rebuild(player).toItemStack()
+        return rebuild(player).toItemStack(player)
     }
 
     /**
      * 保存为 ItemStack 对象
      * 原方法名（save）存在误导，于 1.4.1 版本替换为 toItemStack。
      */
-    fun toItemStack(): ItemStack {
+    fun toItemStack(player: Player? = null): ItemStack {
         val itemMeta = itemStack.setItemTag(compound).itemMeta
         if (itemMeta != null) {
-            val event = ItemReleaseEvent(itemStack.type, itemStack.durability.toInt(), itemMeta, this)
+            val event = ItemReleaseEvent(itemStack.type, itemStack.durability.toInt(), itemMeta, this, player)
             event.call()
             itemStack.type = event.icon
             itemStack.itemMeta = event.itemMeta

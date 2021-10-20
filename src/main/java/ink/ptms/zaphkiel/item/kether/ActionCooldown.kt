@@ -53,8 +53,8 @@ class ActionCooldown {
          */
         @KetherParser(["cooldown"], namespace = "zaphkiel", shared = true)
         fun parser() = scriptParser {
-            when (it.expects("check", "set")) {
-                "check" -> {
+            it.switch {
+                case("check") {
                     try {
                         it.mark()
                         it.expects("by", "at", "for", "with")
@@ -64,7 +64,7 @@ class ActionCooldown {
                         Check(false)
                     }
                 }
-                "set" -> {
+                case("set") {
                     val gameTick = it.next(ArgTypes.ACTION)
                     try {
                         it.mark()
@@ -75,7 +75,6 @@ class ActionCooldown {
                         Set(gameTick, false)
                     }
                 }
-                else -> error("out of case")
             }
         }
     }
