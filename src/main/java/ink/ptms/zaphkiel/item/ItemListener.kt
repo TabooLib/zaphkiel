@@ -58,7 +58,7 @@ internal object ItemListener {
     @SubscribeEvent
     fun e(e: EntityDamageByEntityEvent) {
         val attacker = e.attacker
-        if (attacker is Player) {
+        if (attacker is Player && attacker.itemInHand.isNotAir()) {
             val itemStream = ZaphkielAPI.read(attacker.itemInHand)
             if (itemStream.isExtension()) {
                 itemStream.getZaphkielItem().invokeScript("onAttack", attacker, e, itemStream)
