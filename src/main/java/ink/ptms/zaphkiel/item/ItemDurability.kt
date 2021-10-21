@@ -65,7 +65,7 @@ internal object ItemDurability {
             if (itemStream.getZaphkielData().containsKey("durability")) {
                 e.isCancelled = true
             }
-            itemStream.getZaphkielItem().invokeScript("onDamage", e, e.item)
+            itemStream.getZaphkielItem().invokeScript("onDamage", e, itemStream)
         }
     }
 }

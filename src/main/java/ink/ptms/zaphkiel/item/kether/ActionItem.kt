@@ -55,16 +55,16 @@ class ActionItem {
                         val value = it.next(ArgTypes.ACTION)
                         actionNow {
                             newFrame(key).run<Any>().thenApply { key ->
-                                newFrame(value).run<Any>().also { value ->
+                                newFrame(value).run<Any>().thenApply { value ->
                                     itemStream().getZaphkielData().putDeep(key.toString(), ItemTagData.toNBT(value))
                                 }
                             }
                         }
                     } catch (ex: Throwable) {
                         it.reset()
-                        actionNow {
+                        actionFuture {
                             newFrame(key).run<Any>().thenApply { key ->
-                                itemStream().getZaphkielData().getDeep(key.toString()).unsafeData()
+                                it.complete(itemStream().getZaphkielData().getDeep(key.toString())?.unsafeData())
                             }
                         }
                     }

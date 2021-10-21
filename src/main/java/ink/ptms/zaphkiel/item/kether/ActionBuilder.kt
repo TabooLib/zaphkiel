@@ -29,15 +29,17 @@ object ActionBuilder {
             case("icon") {
                 val value = it.next(ArgTypes.ACTION)
                 actionNow {
-                    itemEvent<ItemReleaseEvent>().icon = value.toString().parseToMaterial()
-                    0
+                    newFrame(value).run<Any>().thenAccept { value ->
+                        itemEvent<ItemReleaseEvent>().icon = value.toString().parseToMaterial()
+                    }
                 }
             }
             case("data") {
                 val value = it.next(ArgTypes.ACTION)
                 actionNow {
-                    itemEvent<ItemReleaseEvent>().data = Coerce.toInteger(value.toString())
-                    0
+                    newFrame(value).run<Any>().thenAccept { value ->
+                        itemEvent<ItemReleaseEvent>().data = Coerce.toInteger(value.toString())
+                    }
                 }
             }
             case("name") {
