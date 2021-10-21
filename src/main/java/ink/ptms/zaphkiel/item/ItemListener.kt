@@ -9,6 +9,7 @@ import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
 import org.bukkit.event.block.BlockBreakEvent
+import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.player.*
@@ -16,6 +17,7 @@ import org.bukkit.inventory.EquipmentSlot
 import taboolib.common.platform.Schedule
 import taboolib.common.platform.event.EventPriority
 import taboolib.common.platform.event.SubscribeEvent
+import taboolib.platform.util.attacker
 import taboolib.platform.util.isAir
 import taboolib.platform.util.isNotAir
 
@@ -51,6 +53,17 @@ internal object ItemListener {
     @SubscribeEvent
     fun e(e: ItemReleaseEvent.Display) {
         e.itemStream.getZaphkielItem().invokeScript("onReleaseDisplay", e.player, e, e.itemStream, "zaphkiel-build")
+    }
+
+    @SubscribeEvent
+    fun e(e: EntityDamageByEntityEvent) {
+        val attacker = e.attacker
+        if (attacker is Player) {
+            val itemStream = ZaphkielAPI.read(attacker.itemInHand)
+            if (itemStream.isExtension()) {
+                itemStream.getZaphkielItem().invokeScript("onAttack", attacker, e, itemStream)
+            }
+        }
     }
 
     @SubscribeEvent
