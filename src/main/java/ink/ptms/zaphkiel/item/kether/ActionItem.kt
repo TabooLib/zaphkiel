@@ -45,6 +45,7 @@ class ActionItem {
         @KetherParser(["item"], namespace = "zaphkiel", shared = true)
         fun parser() = scriptParser {
             it.switch {
+                case("consume") { actionNow { itemStream().itemStack.amount-- } }
                 case("repair") { Repair(it.next(ArgTypes.ACTION)) }
                 case("damage") { Damage(it.next(ArgTypes.ACTION)) }
                 case("data") {

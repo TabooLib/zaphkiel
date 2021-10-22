@@ -161,7 +161,7 @@ internal object ItemListener {
             if (event.save) {
                 event.itemStream.rebuildToItemStack(e.player)
             }
-            itemStream.getZaphkielItem().invokeScript("onLeftClickEntity", e, itemStream)
+            itemStream.getZaphkielItem().invokeScript("onRightClickEntity", e, itemStream)
         }
     }
 
