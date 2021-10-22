@@ -192,7 +192,7 @@ object ZaphkielAPI {
     fun loadItemFromFile(file: File) {
         if (file.isDirectory) {
             file.listFiles()?.forEach { loadItemFromFile(it) }
-        } else {
+        } else if (file.name.endsWith(".yml")) {
             val keys = ArrayList<String>()
             val task = Runnable {
                 keys.forEach { registeredItem.remove(it) }
@@ -228,7 +228,7 @@ object ZaphkielAPI {
     fun loadModelFromFile(file: File) {
         if (file.isDirectory) {
             file.listFiles()?.forEach { loadModelFromFile(it) }
-        } else {
+        } else if (file.name.endsWith(".yml")) {
             val conf = SecuredFile.loadConfiguration(file)
             conf.getKeys(false).filter { it.endsWith("$") }.forEach { key ->
                 registeredModel[key.substring(0, key.length - 1)] = Model(conf.getConfigurationSection(key)!!)
@@ -253,7 +253,7 @@ object ZaphkielAPI {
     fun loadDisplayFromFile(file: File) {
         if (file.isDirectory) {
             file.listFiles()?.forEach { loadDisplayFromFile(it) }
-        } else {
+        } else if (file.name.endsWith(".yml")) {
             val conf = SecuredFile.loadConfiguration(file)
             conf.getKeys(false).forEach { registeredDisplay[it] = Display(conf.getConfigurationSection(it)!!) }
         }
