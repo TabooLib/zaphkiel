@@ -18,14 +18,23 @@ internal object ItemDurability {
     var durability: String? = null
     var durabilitySymbol: List<String>? = null
 
-    fun createBar(current: Int, max: Int): String {
-        return durability!!.replace("%symbol%", (1..max).joinToString("") { i ->
-            if (current >= i) {
-                "§f${durabilitySymbol!!.getOrElse(0) { "" }}"
-            } else {
-                "§7${durabilitySymbol!!.getOrElse(1) { "" }}"
-            }
-        })
+    fun createBar(current: Int, max: Int, display: String = durability!!, symbol: List<String> = durabilitySymbol!!, scale: Int = -1): String {
+        return if (scale == -1) {
+            display.replace("%symbol%", (1..max).joinToString("") { i ->
+                if (current >= i) {
+                    "§f${symbol.getOrElse(0) { "" }}"
+                } else {
+                    "§7${symbol.getOrElse(1) { "" }}"
+                }
+            })
+        } else {
+            display.replace("%symbol%", taboolib.common5.util.createBar(
+                "§7${symbol.getOrElse(1) { "" }}",
+                "§f${symbol.getOrElse(0) { "" }}",
+                scale,
+                current / max.toDouble()
+            ))
+        }
     }
 
     @SubscribeEvent
@@ -41,15 +50,19 @@ internal object ItemDurability {
     fun e(e: ItemReleaseEvent.Display) {
         val max = e.itemStream.getZaphkielData()["durability"] ?: return
         val current = e.itemStream.getZaphkielData()["durability_current"] ?: ItemTagData(max.asInt())
-        val displayInfo = e.itemStream.getZaphkielItem().config.getString("meta.durability_display.${current.asInt()}")
-        if (displayInfo != null) {
-            e.addName("DURABILITY", displayInfo)
-            e.addLore("DURABILITY", displayInfo)
-        } else {
-            val display = createBar(current.asInt(), max.asInt())
-            e.addName("DURABILITY", display)
-            e.addLore("DURABILITY", display)
+        val config = e.itemStream.getZaphkielItem().config.getConfigurationSection("meta.durability")
+        val display = config?.getString("display") ?: durability!!
+        if (display == "none") {
+            return
         }
+        val displaySymbol = if (config?.contains("display-symbol") == true) {
+            listOf(config.getString("display-symbol.0"), config.getString("display-symbol.1"))
+        } else {
+            durabilitySymbol!!
+        }
+        val bar = createBar(current.asInt(), max.asInt(), display, displaySymbol, config?.getInt("scale", -1) ?: -1)
+        e.addName("DURABILITY", bar)
+        e.addLore("DURABILITY", bar)
     }
 
     @SubscribeEvent
