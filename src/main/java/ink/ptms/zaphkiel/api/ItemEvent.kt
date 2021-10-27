@@ -1,10 +1,8 @@
 package ink.ptms.zaphkiel.api
 
-import ink.ptms.zaphkiel.ZaphkielAPI
 import org.bukkit.entity.Player
 import org.bukkit.event.Event
 import org.bukkit.inventory.ItemStack
-import taboolib.common.platform.function.adaptCommandSender
 import taboolib.common.platform.function.adaptPlayer
 import taboolib.module.kether.KetherShell
 import taboolib.module.kether.printKetherErrorMessage
@@ -16,7 +14,13 @@ data class ItemEvent(val item: Item, val name: String, val script: List<String>,
      * 执行脚本
      * 若返回内容为空则代表物品没有发生变动
      */
-    fun invoke(player: Player?, event: Event, itemStream: ItemStream, data: Map<String, Any>, namespace: String = "zaphkiel-internal"): CompletableFuture<ItemResult?> {
+    fun invoke(
+        player: Player?,
+        event: Event,
+        itemStream: ItemStream,
+        data: Map<String, Any>,
+        namespace: String = "zaphkiel-internal",
+    ): CompletableFuture<ItemResult?> {
         val future = CompletableFuture<ItemResult?>()
         try {
             val itemAPI = if (player != null) itemStream.getItemAPI(player) else null

@@ -2,12 +2,12 @@ package ink.ptms.zaphkiel.item.meta
 
 import ink.ptms.zaphkiel.ZaphkielAPI
 import org.bukkit.attribute.AttributeModifier
-import taboolib.library.configuration.ConfigurationSection
 import org.bukkit.entity.Player
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.meta.ItemMeta
 import org.bukkit.util.NumberConversions
 import taboolib.common5.Coerce
+import taboolib.library.configuration.ConfigurationSection
 import taboolib.module.nms.*
 import java.util.*
 

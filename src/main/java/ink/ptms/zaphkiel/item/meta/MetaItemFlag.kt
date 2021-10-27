@@ -1,9 +1,9 @@
 package ink.ptms.zaphkiel.item.meta
 
 import ink.ptms.zaphkiel.ZaphkielAPI
-import taboolib.library.configuration.ConfigurationSection
 import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.meta.ItemMeta
+import taboolib.library.configuration.ConfigurationSection
 import java.util.*
 
 @MetaKey("itemflag")

@@ -2,6 +2,7 @@ package ink.ptms.zaphkiel.item.kether
 
 import ink.ptms.zaphkiel.api.event.ItemBuildEvent
 import ink.ptms.zaphkiel.api.event.ItemReleaseEvent
+import org.bukkit.event.Cancellable
 import org.bukkit.event.Event
 import taboolib.common5.Coerce
 import taboolib.library.kether.ArgTypes
@@ -16,6 +17,16 @@ import taboolib.module.kether.*
  * @since 2021/10/20 10:42 下午
  */
 object ActionBuilder {
+
+    @KetherParser(["cancel"], namespace = "zaphkiel-build")
+    fun cancel() = scriptParser {
+        actionNow {
+            val e = itemEvent<Event>()
+            if (e is Cancellable) {
+                e.isCancelled = true
+            }
+        }
+    }
 
     /**
      * build name *123 to *123

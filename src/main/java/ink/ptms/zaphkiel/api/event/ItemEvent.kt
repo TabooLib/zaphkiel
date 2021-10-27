@@ -2,7 +2,6 @@ package ink.ptms.zaphkiel.api.event
 
 import ink.ptms.zaphkiel.api.ItemStream
 import org.bukkit.entity.Player
-import org.bukkit.event.entity.EntityPickupItemEvent
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.player.*
 import taboolib.platform.type.BukkitProxyEvent

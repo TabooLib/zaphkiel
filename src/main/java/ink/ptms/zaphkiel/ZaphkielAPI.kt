@@ -5,7 +5,6 @@ import com.google.gson.JsonParser
 import ink.ptms.zaphkiel.api.*
 import ink.ptms.zaphkiel.api.event.ItemBuildEvent
 import ink.ptms.zaphkiel.api.event.PluginReloadEvent
-import ink.ptms.zaphkiel.api.ItemKey
 import ink.ptms.zaphkiel.item.meta.Meta
 import ink.ptms.zaphkiel.item.meta.MetaKey
 import ink.ptms.zaphkiel.item.meta.MetaUnique

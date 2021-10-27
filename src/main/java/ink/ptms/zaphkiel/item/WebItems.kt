@@ -8,7 +8,6 @@ import taboolib.common.io.deepDelete
 import taboolib.common.io.digest
 import taboolib.common.platform.Awake
 import taboolib.common.platform.event.SubscribeEvent
-import taboolib.common.platform.function.info
 import taboolib.common.platform.function.submit
 import java.io.File
 import java.net.URL

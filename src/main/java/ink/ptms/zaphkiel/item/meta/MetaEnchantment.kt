@@ -1,10 +1,10 @@
 package ink.ptms.zaphkiel.item.meta
 
 import ink.ptms.zaphkiel.ZaphkielAPI
-import taboolib.library.configuration.ConfigurationSection
 import org.bukkit.inventory.meta.EnchantmentStorageMeta
 import org.bukkit.inventory.meta.ItemMeta
 import org.bukkit.util.NumberConversions
+import taboolib.library.configuration.ConfigurationSection
 
 @MetaKey("enchantment")
 class MetaEnchantment(root: ConfigurationSection) : Meta(root) {
