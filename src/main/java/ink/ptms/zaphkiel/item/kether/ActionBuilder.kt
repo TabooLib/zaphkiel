@@ -18,7 +18,7 @@ import taboolib.module.kether.*
  */
 object ActionBuilder {
 
-    @KetherParser(["cancel"], namespace = "zaphkiel-build")
+    @KetherParser(["cancel"], namespace = "zaphkiel")
     fun cancel() = scriptParser {
         actionNow {
             val e = itemEvent<Event>()
