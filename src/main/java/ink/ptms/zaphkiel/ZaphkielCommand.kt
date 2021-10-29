@@ -81,11 +81,24 @@ object ZaphkielCommand {
     }
 
     @CommandBody
+    val rebuild = subCommand {
+        execute<Player> { sender, _, _ ->
+            val itemStream = ZaphkielAPI.read(sender.itemInHand)
+            if (itemStream.isExtension()) {
+                sender.setItemInHand(itemStream.rebuildToItemStack(sender))
+                notify(sender, "成功.")
+            } else {
+                notify(sender, "不是 Zaphkiel 物品.")
+            }
+        }
+    }
+
+    @CommandBody
     val reload = subCommand {
         execute<CommandSender> { sender, _, _ ->
             Zaphkiel.conf.reload()
             Zaphkiel.reload()
-            notify(sender, "Successful.")
+            notify(sender, "成功.")
         }
     }
 
