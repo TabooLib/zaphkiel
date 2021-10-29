@@ -2,6 +2,8 @@ package ink.ptms.zaphkiel.api
 
 import ink.ptms.zaphkiel.ZaphkielAPI
 import ink.ptms.zaphkiel.api.event.ItemBuildEvent
+import ink.ptms.zaphkiel.item.kether.split
+import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.event.Cancellable
 import org.bukkit.event.Event
@@ -12,7 +14,9 @@ import taboolib.common.io.digest
 import taboolib.common.platform.function.severe
 import taboolib.common.util.asList
 import taboolib.library.configuration.ConfigurationSection
+import taboolib.library.xseries.parseToItemStack
 import taboolib.library.xseries.parseToMaterial
+import taboolib.library.xseries.parseToXMaterial
 import taboolib.module.configuration.SecuredFile
 import taboolib.module.nms.ItemTag
 import taboolib.module.nms.ItemTagData
@@ -168,8 +172,7 @@ class Item(
 
         fun parseIcon(config: ConfigurationSection): ItemStack {
             val node = if (config.contains("icon!!")) "icon!!" else "icon"
-            val args = config.getString(node, "STONE")!!.split("~")
-            return ItemStack(args[0].parseToMaterial(), 1, NumberConversions.toShort(args.getOrElse(1) { "0" }))
+            return config.getString(node, "STONE")!!.parseToXMaterial().parseItem() ?: ItemStack(Material.STONE)
         }
 
         fun parseName(config: ConfigurationSection): MutableMap<String, String> {
@@ -186,12 +189,11 @@ class Item(
             val map = HashMap<String, MutableList<String>>()
             val node = if (config.contains("lore!!")) "lore!!" else "lore"
             val lore = config.getConfigurationSection(node) ?: return HashMap()
+            val autowrap = lore.getInt("~autowrap")
+            lore.set("~autowrap", null)
             lore.getKeys(false).forEach { key ->
-                if (config.isList("$node.$key")) {
-                    map[key] = config.getStringList("$node.$key")
-                } else {
-                    map[key] = mutableListOf(config.getString("$node.$key")!!)
-                }
+                val list = if (config.isList("$node.$key")) config.getStringList("$node.$key") else mutableListOf(config.getString("$node.$key")!!)
+                map[key] = if (autowrap > 0) list.split(autowrap).toMutableList() else list
             }
             return map
         }
