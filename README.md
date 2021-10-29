@@ -11,5 +11,4 @@ gradlew.bat clean build
 ./gradlew clean build
 ```
 
-**JavaDoc**  
-https://jd.ptms.ink/zaphkiel
+**JavaDoc**：https://jd.ptms.ink/zaphkiel
