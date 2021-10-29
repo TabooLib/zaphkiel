@@ -3,6 +3,7 @@ plugins {
     `maven-publish`
     id("io.izzel.taboolib") version "1.30"
     id("org.jetbrains.kotlin.jvm") version "1.5.10"
+    id("org.jetbrains.dokka") version "1.5.30"
 }
 
 taboolib {
@@ -39,6 +40,7 @@ dependencies {
     compileOnly("ink.ptms.core:v11605:11605")
     compileOnly(kotlin("stdlib"))
     compileOnly(fileTree("libs"))
+    dokkaHtmlPlugin("org.jetbrains.dokka:kotlin-as-java-plugin:1.5.30")
 }
 
 tasks.withType<JavaCompile> {
