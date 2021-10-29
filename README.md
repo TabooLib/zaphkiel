@@ -10,3 +10,6 @@ gradlew.bat clean build
 ```shell
 ./gradlew clean build
 ```
+
+**JavaDoc**  
+https://jd.ptms.ink/zaphkiel
