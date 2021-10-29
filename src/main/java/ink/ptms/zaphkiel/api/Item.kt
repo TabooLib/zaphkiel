@@ -192,8 +192,10 @@ class Item(
             val autowrap = lore.getInt("~autowrap")
             lore.set("~autowrap", null)
             lore.getKeys(false).forEach { key ->
-                val list = if (config.isList("$node.$key")) config.getStringList("$node.$key") else mutableListOf(config.getString("$node.$key")!!)
-                map[key] = if (autowrap > 0) list.split(autowrap).toMutableList() else list
+                var list = if (config.isList("$node.$key")) config.getStringList("$node.$key") else mutableListOf(config.getString("$node.$key")!!)
+                list = list.flatMap { it.split('\n') }
+                list = if (autowrap > 0) list.split(autowrap).toMutableList() else list
+                map[key] = list
             }
             return map
         }
