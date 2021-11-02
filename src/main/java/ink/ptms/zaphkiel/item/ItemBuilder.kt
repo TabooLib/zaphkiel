@@ -1,6 +1,7 @@
 package ink.ptms.zaphkiel.item
 
 import ink.ptms.zaphkiel.ZaphkielAPI
+import ink.ptms.zaphkiel.api.ItemSignal
 import ink.ptms.zaphkiel.api.ItemStreamGenerated
 import ink.ptms.zaphkiel.api.event.ItemBuildEvent
 import ink.ptms.zaphkiel.api.event.ItemReleaseEvent
@@ -21,11 +22,11 @@ internal object ItemBuilder {
     @SubscribeEvent
     fun e(e: ItemBuildEvent.Post) {
         e.itemStream.dropMeta.forEach {
-            dropMeta[it]?.drop(e.player, e.itemStream.compound)
+            dropMeta[it]?.drop(e.player, e.itemStream.sourceCompound)
         }
         e.item.meta.forEach {
-            if (it.locked || !e.itemStream.rebuild) {
-                it.build(e.player, e.itemStream.compound)
+            if (it.locked || ItemSignal.UPDATE_CHECKED !in e.itemStream.signal) {
+                it.build(e.player, e.itemStream.sourceCompound)
             }
         }
         e.itemStream.setZaphkielMetaHistory(e.item.meta.map { it.id })
@@ -41,7 +42,7 @@ internal object ItemBuilder {
             }
         }
         e.item.meta.forEach {
-            if (it.locked || !e.itemStream.rebuild) {
+            if (it.locked || ItemSignal.UPDATE_CHECKED !in e.itemStream.signal) {
                 it.build(e)
                 it.build(e.itemMeta)
             }

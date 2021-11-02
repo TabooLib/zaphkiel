@@ -1,6 +1,6 @@
 package ink.ptms.zaphkiel
 
-import ink.ptms.zaphkiel.api.internal.openGroupMenu
+import ink.ptms.zaphkiel.item.openGroupMenu
 import org.bukkit.Bukkit
 import org.bukkit.Sound
 import org.bukkit.command.CommandSender

@@ -1,13 +1,27 @@
 package ink.ptms.zaphkiel.item
 
 import ink.ptms.zaphkiel.Zaphkiel
+import ink.ptms.zaphkiel.ZaphkielAPI
+import ink.ptms.zaphkiel.api.ItemSignal
 import ink.ptms.zaphkiel.api.ItemStream
 import ink.ptms.zaphkiel.api.event.ItemReleaseEvent
 import ink.ptms.zaphkiel.api.event.PluginReloadEvent
+import org.bukkit.Bukkit
+import org.bukkit.Material
+import org.bukkit.Particle
+import org.bukkit.Sound
+import org.bukkit.entity.Player
+import org.bukkit.event.player.PlayerItemBreakEvent
 import org.bukkit.event.player.PlayerItemDamageEvent
+import org.bukkit.inventory.ItemStack
 import taboolib.common.platform.event.EventPriority
 import taboolib.common.platform.event.SubscribeEvent
+import taboolib.common.platform.function.submit
+import taboolib.common.util.random
+import taboolib.common5.Coerce
+import taboolib.library.xseries.parseToMaterial
 import taboolib.module.nms.ItemTagData
+import taboolib.module.nms.getItemTag
 
 /**
  * @author sky
@@ -42,7 +56,7 @@ internal object ItemDurability {
         val max = e.itemStream.getZaphkielData()["durability"] ?: return
         val current = e.itemStream.getZaphkielData()["durability_current"] ?: return
         val percent = current.asDouble() / max.asDouble()
-        val durability = e.itemStream.itemStack.type.maxDurability
+        val durability = e.itemStream.sourceItem.type.maxDurability
         e.data = (durability - (durability * percent)).toInt()
     }
 
@@ -80,5 +94,75 @@ internal object ItemDurability {
             }
             itemStream.getZaphkielItem().invokeScript("onDamage", e, itemStream)
         }
+    }
+}
+
+/**
+ * 获取物品最大耐久度
+ */
+fun ItemStream.getMaxDurability(): Int {
+    return (getZaphkielData()["durability"] ?: ItemTagData(-1)).asInt()
+}
+
+/**
+ * 获取物品当前耐久度
+ */
+fun ItemStream.getCurrentDurability(): Int {
+    val max = getZaphkielData()["durability"] ?: return -1
+    return (getZaphkielData()["durability_current"] ?: ItemTagData(max.asInt())).asInt()
+}
+
+/**
+ * 扣除耐久度
+ */
+fun ItemStream.damageItem(value: Int): Boolean {
+    return repairItem(-value)
+}
+
+/**
+ * 恢复耐久度
+ */
+fun ItemStream.repairItem(value: Int, player: Player? = null): Boolean {
+    val data = getZaphkielData()
+    val max = data["durability"] ?: return true
+    val current = data["durability_current"] ?: ItemTagData(max.asInt())
+    val currentLatest = (current.asInt() + value).coerceIn(0..max.asInt())
+    // 当耐久度大于 0
+    return if (currentLatest > 0) {
+        signal += ItemSignal.DURABILITY_UPDATE
+        data["durability_current"] = ItemTagData(currentLatest)
+        true
+    } else {
+        signal += ItemSignal.DURABILITY_DESTROY
+        // 残骸
+        val remains = getZaphkielItem().config.getString("meta.durability.remains")
+        if (remains != null) {
+            val replace = remains.split("~")
+            // 获取替换后的物品
+            val replaceItem = if (replace[0].startsWith("minecraft:")) {
+                ItemStack(replace[0].substring("minecraft:".length).parseToMaterial())
+            } else {
+                ZaphkielAPI.getItemStack(replace[0], player) ?: ItemStack(Material.STONE)
+            }
+            sourceItem.type = replaceItem.type
+            sourceItem.itemMeta = replaceItem.itemMeta
+            sourceItem.durability = Coerce.toShort(replace.getOrNull(1) ?: "0")
+            sourceCompound.clear()
+            sourceCompound.putAll(replaceItem.getItemTag())
+        } else {
+            val itemStack = sourceItem.clone()
+            if (player != null) {
+                Bukkit.getPluginManager().callEvent(PlayerItemBreakEvent(player, sourceItem))
+                // 播放特效
+                submit(async = true, delay = 1) {
+                    if (itemStack.type.maxDurability > 0) {
+                        player.playSound(player.location, Sound.ENTITY_ITEM_BREAK, 1f, random(0.5, 1.5).toFloat())
+                    }
+                    player.world.spawnParticle(Particle.ITEM_CRACK, player.location.add(0.0, 1.0, 0.0), 15, 0.0, 0.0, 0.0, 0.1)
+                }
+            }
+            sourceItem.amount = 0
+        }
+        false
     }
 }

@@ -1,5 +1,7 @@
 package ink.ptms.zaphkiel.item.kether
 
+import ink.ptms.zaphkiel.item.isItemInCooldown
+import ink.ptms.zaphkiel.item.setItemInCooldown
 import org.bukkit.entity.Player
 import taboolib.common5.Coerce
 import taboolib.library.kether.ArgTypes
@@ -21,9 +23,9 @@ class ActionCooldown {
         override fun run(frame: ScriptFrame): CompletableFuture<Boolean> {
             val viewer = frame.script().sender?.castSafely<Player>() ?: error("No player selected.")
             return if (byPlayer) {
-                CompletableFuture.completedFuture(frame.itemAPI().isCooldown(viewer))
+                CompletableFuture.completedFuture(frame.itemStream().isItemInCooldown(viewer))
             } else {
-                CompletableFuture.completedFuture(frame.itemAPI().isCooldown())
+                CompletableFuture.completedFuture(frame.itemStream().isItemInCooldown())
             }
         }
     }
@@ -32,11 +34,11 @@ class ActionCooldown {
 
         override fun run(frame: ScriptFrame): CompletableFuture<Void> {
             val viewer = frame.script().sender?.castSafely<Player>() ?: error("No player selected.")
-            frame.newFrame(gameTick).run<Any>().thenApply {
+            frame.newFrame(gameTick).run<Any>().thenAccept {
                 if (byPlayer) {
-                    CompletableFuture.completedFuture(frame.itemAPI().toCooldown(viewer, Coerce.toInteger(it)))
+                    CompletableFuture.completedFuture(frame.itemStream().setItemInCooldown(Coerce.toInteger(it), viewer))
                 } else {
-                    CompletableFuture.completedFuture(frame.itemAPI().toCooldown(Coerce.toInteger(it)))
+                    CompletableFuture.completedFuture(frame.itemStream().setItemInCooldown(Coerce.toInteger(it)))
                 }
             }
             return CompletableFuture.completedFuture(null)

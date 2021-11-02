@@ -83,7 +83,9 @@ item_rotten_flesh:
       - '&fRipped flesh from black sheep.'
   data:
     durability: 3
-    durability_replace: minecraft:bone
+  meta:
+    durability:
+      remains: minecraft:bone
   event:
     from: base_food
     data:

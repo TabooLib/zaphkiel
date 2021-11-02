@@ -1,4 +1,4 @@
-package ink.ptms.zaphkiel.api.internal
+package ink.ptms.zaphkiel.item
 
 import ink.ptms.zaphkiel.ZaphkielAPI
 import ink.ptms.zaphkiel.api.Group

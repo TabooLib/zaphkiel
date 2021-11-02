@@ -9,13 +9,10 @@ import org.bukkit.event.Cancellable
 import org.bukkit.event.Event
 import org.bukkit.event.player.PlayerEvent
 import org.bukkit.inventory.ItemStack
-import org.bukkit.util.NumberConversions
 import taboolib.common.io.digest
 import taboolib.common.platform.function.severe
 import taboolib.common.util.asList
 import taboolib.library.configuration.ConfigurationSection
-import taboolib.library.xseries.parseToItemStack
-import taboolib.library.xseries.parseToMaterial
 import taboolib.library.xseries.parseToXMaterial
 import taboolib.module.configuration.SecuredFile
 import taboolib.module.nms.ItemTag
@@ -81,7 +78,7 @@ class Item(
 
     fun build(player: Player?): ItemStream {
         val itemStream = ItemStreamGenerated(icon.clone(), name.toMutableMap(), lore.toMutableMap())
-        val compound = itemStream.compound.computeIfAbsent("zaphkiel") { ItemTag() }.asCompound()
+        val compound = itemStream.sourceCompound.computeIfAbsent("zaphkiel") { ItemTag() }.asCompound()
         compound[ItemKey.ID.key] = ItemTagData(id)
         compound[ItemKey.DATA.key] = Translator.toNBTCompound(ItemTag(), data)
         return build(player, itemStream)
@@ -97,7 +94,7 @@ class Item(
             return itemStream
         }
         updateData.forEach { (k, v) -> itemStream.getZaphkielData().putDeep(k, v) }
-        pre.itemStream.compound["zaphkiel"]!!.asCompound()[ItemKey.HASH.key] = ItemTagData(hash)
+        pre.itemStream.sourceCompound["zaphkiel"]!!.asCompound()[ItemKey.HASH.key] = ItemTagData(hash)
         val post = ItemBuildEvent.Post(player, pre.itemStream, pre.name, pre.lore)
         post.call()
         return post.itemStream

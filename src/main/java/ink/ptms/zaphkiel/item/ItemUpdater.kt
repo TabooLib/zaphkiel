@@ -1,6 +1,7 @@
 package ink.ptms.zaphkiel.item
 
 import ink.ptms.zaphkiel.ZaphkielAPI
+import ink.ptms.zaphkiel.api.ItemSignal
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryOpenEvent
@@ -37,7 +38,7 @@ internal object ItemUpdater {
     @SubscribeEvent(priority = EventPriority.MONITOR, ignoreCancelled = true)
     fun e(e: PlayerDropItemEvent) {
         val itemStream = ZaphkielAPI.checkUpdate(e.player, e.itemDrop.itemStack)
-        if (itemStream.rebuild) {
+        if (ItemSignal.UPDATE_CHECKED in itemStream.signal) {
             e.itemDrop.itemStack = itemStream.toItemStack(e.player)
         }
     }
@@ -45,7 +46,7 @@ internal object ItemUpdater {
     @SubscribeEvent(priority = EventPriority.MONITOR, ignoreCancelled = true)
     fun e(e: PlayerPickupItemEvent) {
         val itemStream = ZaphkielAPI.checkUpdate(e.player, e.item.itemStack)
-        if (itemStream.rebuild) {
+        if (ItemSignal.UPDATE_CHECKED in itemStream.signal) {
             e.item.itemStack = itemStream.toItemStack(e.player)
         }
     }

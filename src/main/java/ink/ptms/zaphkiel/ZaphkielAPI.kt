@@ -20,10 +20,8 @@ import taboolib.common.io.runningClasses
 import taboolib.common.platform.function.getDataFolder
 import taboolib.common.reflect.Reflex.Companion.getProperty
 import taboolib.common.reflect.Reflex.Companion.invokeConstructor
-import taboolib.common.util.asList
 import taboolib.common5.FileWatcher
 import taboolib.library.configuration.ConfigurationSection
-import taboolib.module.chat.colored
 import taboolib.module.configuration.SecuredFile
 import taboolib.module.nms.ItemTag
 import taboolib.module.nms.ItemTagData
@@ -142,7 +140,7 @@ object ZaphkielAPI {
                 return@forEach
             }
             val rebuild = checkUpdate(player, item!!)
-            if (rebuild.rebuild) {
+            if (ItemSignal.UPDATE_CHECKED in rebuild.signal) {
                 rebuild.toItemStack(player)
             }
         }
@@ -166,7 +164,7 @@ object ZaphkielAPI {
             // 将会重新生成物品名称与描述，产生更多的计算
             // 现在看来 nameLock、loreLock 这种设计并不是特别出色
             // 在 1.6.1 版本时想过移除，但是没有意义
-            itemStream.rebuild = true
+            itemStream.signal += ItemSignal.UPDATE_CHECKED
             itemStream.getZaphkielItem().build(player, itemStream)
         } else {
             itemStream

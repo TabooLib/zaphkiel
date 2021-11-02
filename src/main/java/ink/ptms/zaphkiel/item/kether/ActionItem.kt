@@ -1,5 +1,7 @@
 package ink.ptms.zaphkiel.item.kether
 
+import ink.ptms.zaphkiel.item.damageItem
+import ink.ptms.zaphkiel.item.repairItem
 import taboolib.common5.Coerce
 import taboolib.library.kether.ArgTypes
 import taboolib.library.kether.ParsedAction
@@ -19,18 +21,14 @@ class ActionItem {
     class Damage(val amount: ParsedAction<*>) : ScriptAction<Void>() {
 
         override fun run(frame: ScriptFrame): CompletableFuture<Void> {
-            return frame.newFrame(amount).run<Any>().thenAcceptAsync({
-                frame.itemAPI().toRepair(-Coerce.toInteger(it))
-            }, frame.context().executor)
+            return frame.newFrame(amount).run<Any>().thenAcceptAsync({ frame.itemStream().damageItem(Coerce.toInteger(it)) }, frame.context().executor)
         }
     }
 
     class Repair(val amount: ParsedAction<*>) : ScriptAction<Void>() {
 
         override fun run(frame: ScriptFrame): CompletableFuture<Void> {
-            return frame.newFrame(amount).run<Any>().thenAcceptAsync({
-                frame.itemAPI().toRepair(Coerce.toInteger(it))
-            }, frame.context().executor)
+            return frame.newFrame(amount).run<Any>().thenAcceptAsync({ frame.itemStream().repairItem(Coerce.toInteger(it)) }, frame.context().executor)
         }
     }
 
@@ -45,7 +43,7 @@ class ActionItem {
         @KetherParser(["item"], namespace = "zaphkiel", shared = true)
         fun parser() = scriptParser {
             it.switch {
-                case("consume") { actionNow { itemStream().itemStack.amount-- } }
+                case("consume") { actionNow { itemStream().sourceItem.amount-- } }
                 case("repair") { Repair(it.next(ArgTypes.ACTION)) }
                 case("damage") { Damage(it.next(ArgTypes.ACTION)) }
                 case("data") {
