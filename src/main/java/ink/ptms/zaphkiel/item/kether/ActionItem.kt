@@ -3,6 +3,7 @@ package ink.ptms.zaphkiel.item.kether
 import ink.ptms.zaphkiel.item.damageItem
 import ink.ptms.zaphkiel.item.getCurrentDurability
 import ink.ptms.zaphkiel.item.repairItem
+import org.bukkit.entity.Player
 import taboolib.common5.Coerce
 import taboolib.library.kether.ArgTypes
 import taboolib.library.kether.ParsedAction
@@ -22,14 +23,16 @@ class ActionItem {
     class Damage(val amount: ParsedAction<*>) : ScriptAction<Void>() {
 
         override fun run(frame: ScriptFrame): CompletableFuture<Void> {
-            return frame.newFrame(amount).run<Any>().thenAcceptAsync({ frame.itemStream().damageItem(Coerce.toInteger(it)) }, frame.context().executor)
+            val viewer = frame.script().sender?.castSafely<Player>()
+            return frame.newFrame(amount).run<Any>().thenAcceptAsync({ frame.itemStream().damageItem(Coerce.toInteger(it), viewer) }, frame.context().executor)
         }
     }
 
     class Repair(val amount: ParsedAction<*>) : ScriptAction<Void>() {
 
         override fun run(frame: ScriptFrame): CompletableFuture<Void> {
-            return frame.newFrame(amount).run<Any>().thenAcceptAsync({ frame.itemStream().repairItem(Coerce.toInteger(it)) }, frame.context().executor)
+            val viewer = frame.script().sender?.castSafely<Player>()
+            return frame.newFrame(amount).run<Any>().thenAcceptAsync({ frame.itemStream().repairItem(Coerce.toInteger(it), viewer) }, frame.context().executor)
         }
     }
 
@@ -52,7 +55,7 @@ class ActionItem {
                     val key = it.next(ArgTypes.ACTION)
                     try {
                         it.mark()
-                        it.expects("to")
+                        it.expect("to")
                         val value = it.next(ArgTypes.ACTION)
                         actionNow {
                             newFrame(key).run<Any>().thenApply { key ->

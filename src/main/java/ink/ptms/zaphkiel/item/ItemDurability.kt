@@ -118,8 +118,8 @@ fun ItemStream.getCurrentDurability(): Int {
 /**
  * 扣除耐久度
  */
-fun ItemStream.damageItem(value: Int): Boolean {
-    return repairItem(-value)
+fun ItemStream.damageItem(value: Int, player: Player? = null): Boolean {
+    return repairItem(-value, player)
 }
 
 /**
@@ -161,7 +161,7 @@ fun ItemStream.repairItem(value: Int, player: Player? = null): Boolean {
                     if (itemStack.type.maxDurability > 0) {
                         player.playSound(player.location, Sound.ENTITY_ITEM_BREAK, 1f, random(0.5, 1.5).toFloat())
                     }
-                    player.world.spawnParticle(Particle.ITEM_CRACK, player.location.add(0.0, 1.0, 0.0), 15, 0.0, 0.0, 0.0, 0.1)
+                    player.world.spawnParticle(Particle.ITEM_CRACK, player.location.add(0.0, 1.0, 0.0), 15, 0.0, 0.0, 0.0, 0.1, itemStack)
                 }
             }
             sourceItem.amount = 0
