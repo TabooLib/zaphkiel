@@ -48,7 +48,7 @@ internal object ItemDurability {
                 scale,
                 current / max.toDouble()
             ))
-        }
+        }.replace("%current%", current.toString()).replace("%max%", max.toString())
     }
 
     @SubscribeEvent
