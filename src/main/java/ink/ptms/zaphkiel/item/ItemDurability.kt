@@ -33,13 +33,10 @@ internal object ItemDurability {
     var durabilitySymbol: List<String>? = null
 
     fun createBar(current: Int, max: Int, display: String = durability!!, symbol: List<String> = durabilitySymbol!!, scale: Int = -1): String {
+        val percent = Coerce.format((current / max.toDouble()) * 100).toString()
         return if (scale == -1) {
             display.replace("%symbol%", (1..max).joinToString("") { i ->
-                if (current >= i) {
-                    "§f${symbol.getOrElse(0) { "" }}"
-                } else {
-                    "§7${symbol.getOrElse(1) { "" }}"
-                }
+                if (current >= i) "§f${symbol.getOrElse(0) { "" }}" else "§7${symbol.getOrElse(1) { "" }}"
             })
         } else {
             display.replace("%symbol%", taboolib.common5.util.createBar(
@@ -48,7 +45,7 @@ internal object ItemDurability {
                 scale,
                 current / max.toDouble()
             ))
-        }.replace("%current%", current.toString()).replace("%max%", max.toString())
+        }.replace("%current%", current.toString()).replace("%max%", max.toString()).replace("%percent%", percent)
     }
 
     @SubscribeEvent
