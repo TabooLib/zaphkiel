@@ -55,9 +55,12 @@ internal object ItemDurability {
     fun e(e: ItemReleaseEvent) {
         val max = e.itemStream.getZaphkielData()["durability"] ?: return
         val current = e.itemStream.getZaphkielData()["durability_current"] ?: return
-        val percent = current.asDouble() / max.asDouble()
-        val durability = e.itemStream.sourceItem.type.maxDurability
-        e.data = (durability - (durability * percent)).toInt()
+        val mapping = e.itemStream.getZaphkielItem().config.getBoolean("meta.durability.damage-mapping", true)
+        if (mapping) {
+            val percent = current.asDouble() / max.asDouble()
+            val durability = e.itemStream.sourceItem.type.maxDurability
+            e.data = (durability - (durability * percent)).toInt()
+        }
     }
 
     @SubscribeEvent
