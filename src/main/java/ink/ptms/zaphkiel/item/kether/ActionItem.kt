@@ -1,6 +1,7 @@
 package ink.ptms.zaphkiel.item.kether
 
 import ink.ptms.zaphkiel.item.damageItem
+import ink.ptms.zaphkiel.item.getCurrentDurability
 import ink.ptms.zaphkiel.item.repairItem
 import taboolib.common5.Coerce
 import taboolib.library.kether.ArgTypes
@@ -43,6 +44,7 @@ class ActionItem {
         @KetherParser(["item"], namespace = "zaphkiel", shared = true)
         fun parser() = scriptParser {
             it.switch {
+                case("durability") { actionNow { itemStream().getCurrentDurability() }}
                 case("consume") { actionNow { itemStream().sourceItem.amount-- } }
                 case("repair") { Repair(it.next(ArgTypes.ACTION)) }
                 case("damage") { Damage(it.next(ArgTypes.ACTION)) }
