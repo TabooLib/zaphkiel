@@ -4,6 +4,7 @@ import org.bukkit.entity.Player
 import org.bukkit.event.Event
 import org.bukkit.inventory.ItemStack
 import taboolib.common.platform.function.adaptPlayer
+import taboolib.common.platform.function.warning
 import taboolib.module.kether.KetherShell
 import taboolib.module.kether.printKetherErrorMessage
 import java.util.concurrent.CompletableFuture
@@ -43,6 +44,7 @@ data class ItemEvent(val item: Item, val name: String, val script: List<String>,
             }
         } catch (e: Throwable) {
             future.complete(null)
+            warning("error item: ${item.id}")
             e.printKetherErrorMessage()
         }
         return future
