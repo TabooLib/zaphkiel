@@ -1,4 +1,4 @@
-name: Chemdah Build
+name: Zaphkiel Release
 on: [ release ]
 jobs:
   build:

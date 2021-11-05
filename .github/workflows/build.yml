@@ -1,4 +1,4 @@
-name: Chemdah Build
+name: Zaphkiel Build
 on: [ push ]
 jobs:
   build:
