@@ -17,6 +17,7 @@ import taboolib.module.chat.colored
 import taboolib.module.nms.getName
 import taboolib.platform.util.giveItem
 import taboolib.platform.util.hoverItem
+import taboolib.platform.util.isAir
 
 /**
  * @author sky
@@ -83,6 +84,10 @@ object ZaphkielCommand {
     @CommandBody
     val rebuild = subCommand {
         execute<Player> { sender, _, _ ->
+            if (sender.itemInHand.isAir()){
+                notify(sender, "请手持物品.")
+                return@execute
+            }
             val itemStream = ZaphkielAPI.read(sender.itemInHand)
             if (itemStream.isExtension()) {
                 sender.setItemInHand(itemStream.rebuildToItemStack(sender))
