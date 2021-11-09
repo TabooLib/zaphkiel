@@ -8,7 +8,9 @@ import taboolib.common5.Coerce
 import taboolib.library.kether.ArgTypes
 import taboolib.library.kether.ParsedAction
 import taboolib.module.kether.*
+import taboolib.module.nms.ItemTag
 import taboolib.module.nms.ItemTagData
+import taboolib.module.nms.ItemTagList
 import java.util.concurrent.CompletableFuture
 
 /**
@@ -68,7 +70,20 @@ class ActionItem {
                         it.reset()
                         actionFuture {
                             newFrame(key).run<Any>().thenApply { key ->
-                                it.complete(itemStream().getZaphkielData().getDeep(key.toString())?.unsafeData())
+                                val tag = itemStream().getZaphkielData().getDeep(key.toString())?.unsafeData()
+                                if (tag == null) {
+                                    it.complete(null)
+                                    return@thenApply
+                                }
+                                fun convert(any: Any): Any {
+                                    return when (any) {
+                                        is ItemTag -> any.map { i -> i.key to convert(i.value) }.toMap()
+                                        is ItemTagList -> any.map { i -> convert(i) }.toList()
+                                        is ItemTagData -> any.unsafeData()
+                                        else -> any
+                                    }
+                                }
+                                it.complete(convert(tag))
                             }
                         }
                     }

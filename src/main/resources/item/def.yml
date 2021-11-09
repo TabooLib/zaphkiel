@@ -7,6 +7,10 @@ item_intensify_sword:
     TYPE: '&9Sword'
     LORE:
       - '&6An indestructible golden sword.'
+  data:
+    attribute-plus:
+      攻击力: 10
+      防御力: 10-20
   meta:
     unbreakable!!: true
     unique: true
