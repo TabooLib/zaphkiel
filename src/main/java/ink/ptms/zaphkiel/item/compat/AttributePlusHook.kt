@@ -24,9 +24,8 @@ object AttributePlusHook {
     fun e(e: InventoryClickEvent) {
         if (e.whoClicked !is Player)
             return
-        if (e.slot !in 36 until 39)
-            return
-        setAttribute(e.whoClicked as Player, e.rawSlot)
+        if (e.slot in 36 until 39)
+            setAttribute(e.whoClicked as Player, e.rawSlot)
     }
 
     @SubscribeEvent
