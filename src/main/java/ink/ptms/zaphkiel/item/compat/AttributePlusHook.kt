@@ -25,7 +25,7 @@ object AttributePlusHook {
         if (e.whoClicked !is Player)
             return
         if (e.slot in 36 until 39)
-            setAttribute(e.whoClicked as Player, e.rawSlot)
+            setAttribute(e.whoClicked as Player, e.slot)
     }
 
     @SubscribeEvent
