@@ -33,6 +33,7 @@ repositories {
 }
 
 dependencies {
+    compileOnly("public:AttributePlus:3.2.1")
     compileOnly("public:HeadDatabase:1.3.0")
     compileOnly("public:Tiphareth:1.0.0")
     compileOnly("public:MythicMobs:4.11.0")

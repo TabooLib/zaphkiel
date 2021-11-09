@@ -20,7 +20,7 @@ import taboolib.common5.Coerce
  * @author sky
  * @since 2021/5/24 11:47 上午
  */
-internal class MythicHook {
+internal object MythicHook {
 
     @SubscribeEvent(bind = "io.lumine.xikage.mythicmobs.api.bukkit.events.MythicMobDeathEvent")
     fun e1(oe: OptionalEvent) {
