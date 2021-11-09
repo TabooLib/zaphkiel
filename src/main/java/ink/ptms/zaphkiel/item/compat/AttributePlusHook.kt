@@ -37,27 +37,4 @@ internal object AttributePlusHook {
             }
         }
     }
-
-//    @SubscribeEvent(bind = "org.serverct.ersha.api.event.AttrUpdateAttributeEvent\$Before")
-//    fun e2(e: OptionalEvent) {
-//        val attributeData = e.source.getProperty<AttributeData>("attributeData")!!
-//        val sourceEntity = attributeData.sourceEntity
-//        if (sourceEntity is Player) {
-//            val attrData = AttributeAPI.getAttrData(sourceEntity)
-//            val items = BukkitEquipment.values().mapNotNull { it.getItem(sourceEntity) }.filter { it.isNotAir() }
-//            items.forEachIndexed { index, item ->
-//                val itemStream = ZaphkielAPI.read(item)
-//                if (itemStream.isVanilla()) {
-//                    return
-//                }
-//                val attribute = itemStream.getZaphkielData()["attribute-plus"]?.asCompound() ?: return
-//                val map = HashMap<String, Array<Number>>()
-//                attribute.forEach { (key, data) ->
-//                    val args = data.asString().split("-")
-//                    map[key] = arrayOf(Coerce.toDouble(args[0]), Coerce.toDouble(args.getOrElse(1) { args[0] }))
-//                }
-//                AttributeAPI.addSourceAttribute(attrData, "Zaphkiel.$index", map, false)
-//            }
-//        }
-//    }
 }
