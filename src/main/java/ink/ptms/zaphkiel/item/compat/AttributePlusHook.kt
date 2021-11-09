@@ -16,8 +16,7 @@ internal object AttributePlusHook {
 
     @SubscribeEvent(bind = "org.serverct.ersha.api.event.AttrUpdateAttributeEvent\$After")
     fun e(e: OptionalEvent) {
-        val event = e.get<AttrUpdateAttributeEvent.After>()
-        val attributeData = event.getProperty<AttributeData>("attributeData")!!
+        val attributeData = e.source.getProperty<AttributeData>("attributeData")!!
         val sourceEntity = attributeData.sourceEntity
         if (sourceEntity is Player) {
             val attrData = AttributeAPI.getAttrData(sourceEntity)

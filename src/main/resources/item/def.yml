@@ -20,14 +20,15 @@ item_wooden_sword:
     TYPE: '&9Sword'
     LORE:
       - '&fCan be bought everywhere.'
+  data:
+    durability: 10
   meta:
+    durability:
+      remains: minecraft:stick
     attribute:
       mainhand:
         damage: +7
         attackspeed: +10%
-  data:
-    durability: 10
-    durability_replace: minecraft:stick
   event:
     onDamage!!: |-
       item damage *1
