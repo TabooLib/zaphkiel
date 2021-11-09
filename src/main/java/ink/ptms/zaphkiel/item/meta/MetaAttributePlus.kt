@@ -1,11 +1,8 @@
 package ink.ptms.zaphkiel.item.meta
 
-import org.bukkit.attribute.AttributeModifier
 import org.bukkit.entity.Player
-import org.bukkit.inventory.meta.ItemMeta
 import taboolib.library.configuration.ConfigurationSection
 import taboolib.module.nms.*
-import java.util.*
 
 @MetaKey("attribute-plus")
 class MetaAttributePlus(root: ConfigurationSection) : Meta(root) {
