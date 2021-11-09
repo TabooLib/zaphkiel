@@ -23,6 +23,6 @@ class MetaAttributePlus(root: ConfigurationSection) : Meta(root) {
     }
 
     override fun toString(): String {
-        return "MetaAttribute(attributePlusList=$attributePlusList)"
+        return "MetaAttributePlus(attributePlusList=$attributePlusList)"
     }
 }
