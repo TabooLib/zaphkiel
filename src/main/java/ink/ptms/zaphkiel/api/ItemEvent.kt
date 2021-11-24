@@ -32,6 +32,8 @@ data class ItemEvent(val item: Item, val name: String, val script: List<String>,
                 }
                 rootFrame().variables().also { vars ->
                     data.forEach { (k, v) -> vars.set(k, v) }
+                    vars.set("event", event)
+                    vars.set("itemStream", itemStream)
                     vars.set("@ItemEvent", event)
                     vars.set("@ItemStream", itemStream)
                 }
