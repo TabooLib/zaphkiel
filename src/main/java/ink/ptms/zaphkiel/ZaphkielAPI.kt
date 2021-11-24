@@ -18,6 +18,7 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.potion.PotionEffectType
 import taboolib.common.io.runningClasses
 import taboolib.common.platform.function.getDataFolder
+import taboolib.common.platform.function.info
 import taboolib.common.reflect.Reflex.Companion.getProperty
 import taboolib.common.reflect.Reflex.Companion.invokeConstructor
 import taboolib.common5.FileWatcher
