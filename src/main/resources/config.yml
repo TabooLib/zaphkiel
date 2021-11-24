@@ -18,6 +18,12 @@ Durability:
     0: ◆
     1: ◇
 
+Data:
+  display: '&8[ &f%symbol% &8]'
+  display-symbol:
+    0: ◆
+    1: ◇
+
 InternetItem:
   item:
   # - https://.../item-internet.yml
