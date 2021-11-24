@@ -63,6 +63,7 @@ class ActionItem {
                             newFrame(key).run<Any>().thenApply { key ->
                                 newFrame(value).run<Any>().thenApply { value ->
                                     itemStream().getZaphkielData().putDeep(key.toString(), ItemTagData.toNBT(value))
+                                    itemStream().toItemStack(script().sender?.castSafely<Player>() ?: error("No player selected."))
                                 }
                             }
                         }
