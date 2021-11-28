@@ -18,7 +18,7 @@ import java.util.concurrent.CompletableFuture
  * @author sky
  * @since 2021/3/16 2:56 下午
  */
-class ActionEffect {
+class ActionPotion {
 
     class Give(val name: ParsedAction<*>, val duration: ParsedAction<*>, val amplifier: ParsedAction<*>) : ScriptAction<Void>() {
 
@@ -68,7 +68,7 @@ class ActionEffect {
         /**
          * effect give *SPEED *10 *10
          */
-        @KetherParser(["effect"], namespace = "zaphkiel", shared = true)
+        @KetherParser(["potion"], namespace = "zaphkiel", shared = true)
         fun parser() = scriptParser {
             it.switch {
                 case("give") { Give(it.next(ArgTypes.ACTION), it.next(ArgTypes.ACTION), it.next(ArgTypes.ACTION)) }
