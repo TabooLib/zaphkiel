@@ -17,6 +17,7 @@ import taboolib.library.xseries.parseToXMaterial
 import taboolib.module.configuration.SecuredFile
 import taboolib.module.nms.ItemTag
 import taboolib.module.nms.ItemTagData
+import taboolib.platform.compat.replacePlaceholder
 import java.util.concurrent.CompletableFuture
 
 /**
@@ -93,9 +94,23 @@ class Item(
         if (!pre.call()) {
             return itemStream
         }
+
         updateData.forEach { (k, v) -> itemStream.getZaphkielData().putDeep(k, v) }
         pre.itemStream.sourceCompound["zaphkiel"]!!.asCompound()[ItemKey.HASH.key] = ItemTagData(hash)
-        val post = ItemBuildEvent.Post(player, pre.itemStream, pre.name, pre.lore)
+
+        // 使用papi替换变量
+        val lore = player?.let {
+            mutableMapOf<String, MutableList<String>>().apply {
+                pre.lore.forEach { (key, value) ->
+                    value.forEachIndexed { index, s ->
+                        value[index] = s.replacePlaceholder(player)
+                    }
+                    put(key, value)
+                }
+            }
+        }
+
+        val post = ItemBuildEvent.Post(player, pre.itemStream, pre.name, lore ?: pre.lore)
         post.call()
         return post.itemStream
     }

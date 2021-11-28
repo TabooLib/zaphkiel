@@ -11,7 +11,11 @@ taboolib {
         contributors {
             name("坏黑")
         }
+        dependencies {
+            name("PlaceholderAPI").optional(true)
+        }
     }
+
     install("common")
     install("common-5")
     install("module-configuration")

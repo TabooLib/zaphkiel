@@ -112,15 +112,15 @@ base_food$:
           if check &regain_hunger not null then {
               player food level add &regain_hunger
           }
-          if check &effect not null then {
-              for e in &effect then {
+          if check &potion not null then {
+              for e in &potion then {
                   set i to split &e with " "
-                  effect give elem *0 in &i elem *1 in &i elem *2 in &i
+                  potion give elem *0 in &i elem *1 in &i elem *2 in &i
               }
           }
-          if check &effect_remove not null then {
-              for e in &effect_remove then {
-                  effect remove &e
+          if check &potion_remove not null then {
+              for e in &potion_remove then {
+                  potion remove &e
               }
           }
       }

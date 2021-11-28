@@ -1,5 +1,6 @@
 package ink.ptms.zaphkiel.item.kether
 
+import ink.ptms.zaphkiel.api.ItemSignal
 import ink.ptms.zaphkiel.item.damageItem
 import ink.ptms.zaphkiel.item.getCurrentDurability
 import ink.ptms.zaphkiel.item.repairItem
@@ -49,10 +50,11 @@ class ActionItem {
         @KetherParser(["item"], namespace = "zaphkiel", shared = true)
         fun parser() = scriptParser {
             it.switch {
-                case("durability") { actionNow { itemStream().getCurrentDurability() }}
+                case("durability") { actionNow { itemStream().getCurrentDurability() } }
                 case("consume") { actionNow { itemStream().sourceItem.amount-- } }
                 case("repair") { Repair(it.next(ArgTypes.ACTION)) }
                 case("damage") { Damage(it.next(ArgTypes.ACTION)) }
+                case("update") { actionNow { itemStream().signal.add(ItemSignal.UPDATE_CHECKED) } }
                 case("data") {
                     val key = it.next(ArgTypes.ACTION)
                     try {
