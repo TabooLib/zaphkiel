@@ -94,23 +94,18 @@ class Item(
         if (!pre.call()) {
             return itemStream
         }
-
         updateData.forEach { (k, v) -> itemStream.getZaphkielData().putDeep(k, v) }
         pre.itemStream.sourceCompound["zaphkiel"]!!.asCompound()[ItemKey.HASH.key] = ItemTagData(hash)
-
         // 使用papi替换变量
-        val lore = player?.let {
-            mutableMapOf<String, MutableList<String>>().apply {
-                pre.lore.forEach { (key, value) ->
-                    value.forEachIndexed { index, s ->
-                        value[index] = s.replacePlaceholder(player)
-                    }
-                    put(key, value)
-                }
+        val placeholderReplaced = if (player != null) {
+            val map = HashMap<String, MutableList<String>>()
+            pre.lore.forEach { (key, lore) ->
+                lore.forEachIndexed { index, line -> lore[index] = line.replacePlaceholder(player) }
+                map[key] = lore
             }
-        }
-
-        val post = ItemBuildEvent.Post(player, pre.itemStream, pre.name, lore ?: pre.lore)
+            map
+        } else null
+        val post = ItemBuildEvent.Post(player, pre.itemStream, pre.name, placeholderReplaced ?: pre.lore)
         post.call()
         return post.itemStream
     }

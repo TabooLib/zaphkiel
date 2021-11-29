@@ -19,7 +19,7 @@ Durability:
     1: ◇
 
 InternetItem:
-  item:
+  item: []
   # - https://.../item-internet.yml
-  display:
+  display: []
   # - https://.../display-internet.yml

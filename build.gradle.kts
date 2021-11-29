@@ -15,10 +15,9 @@ taboolib {
             name("PlaceholderAPI").optional(true)
         }
     }
-
     install("common")
     install("common-5")
-    install("module-configuration")
+    install("module-configuration-legacy")
     install("module-database")
     install("module-kether")
     install("module-chat")
@@ -29,7 +28,7 @@ taboolib {
     install("platform-bukkit")
     install("expansion-command-helper", "expansion-player-database")
     classifier = null
-    version = "6.0.4-5"
+    version = "6.0.5-12"
 }
 
 repositories {
