@@ -214,12 +214,12 @@ internal object ItemListener {
             val event = ItemEvent.Drop(itemStream, e)
             event.call()
             if (event.save) {
-                e.itemDrop.itemStack = event.itemStream.rebuildToItemStack(e.player)
+                e.itemDrop.setItemStack(event.itemStream.rebuildToItemStack(e.player))
             }
             // 若脚本修改物品则写回事件
             itemStream.getZaphkielItem().invokeScript("onDrop", e.player, e, itemStream)?.thenAccept {
                 if (it != null) {
-                    e.itemDrop.itemStack = it.itemStack
+                    e.itemDrop.setItemStack(it.itemStack)
                 }
             }
         }
@@ -239,12 +239,12 @@ internal object ItemListener {
             val event = ItemEvent.Pick(itemStream, e)
             event.call()
             if (event.save) {
-                e.item.itemStack = event.itemStream.rebuildToItemStack(e.player)
+                e.item.setItemStack(event.itemStream.rebuildToItemStack(e.player))
             }
             // 若脚本修改物品则写回事件
             itemStream.getZaphkielItem().invokeScript("onPick", e.player, e, itemStream)?.thenAccept {
                 if (it != null) {
-                    e.item.itemStack = it.itemStack
+                    e.item.setItemStack(it.itemStack)
                 }
             }
         }

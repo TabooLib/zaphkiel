@@ -13,7 +13,7 @@ import taboolib.expansion.releaseDataContainer
 import taboolib.expansion.setupDataContainer
 import taboolib.expansion.setupPlayerDatabase
 import taboolib.module.configuration.Config
-import taboolib.module.configuration.SecuredFile
+import taboolib.module.configuration.Configuration
 
 /**
  * @author sky
@@ -22,12 +22,12 @@ import taboolib.module.configuration.SecuredFile
 object Zaphkiel : Plugin() {
 
     @Config
-    lateinit var conf: SecuredFile
+    lateinit var conf: Configuration
         private set
 
     override fun onEnable() {
         if (conf.getBoolean("Database.enable")) {
-            setupPlayerDatabase(conf.getConfigurationSection("Database"), "${conf.getString("prefix")}_2")
+            setupPlayerDatabase(conf.getConfigurationSection("Database")!!, "${conf.getString("prefix")}_2")
         } else {
             setupPlayerDatabase(newFile(getDataFolder(), "data.db"))
         }

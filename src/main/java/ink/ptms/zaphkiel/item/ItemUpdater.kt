@@ -39,7 +39,7 @@ internal object ItemUpdater {
     fun e(e: PlayerDropItemEvent) {
         val itemStream = ZaphkielAPI.checkUpdate(e.player, e.itemDrop.itemStack)
         if (ItemSignal.UPDATE_CHECKED in itemStream.signal) {
-            e.itemDrop.itemStack = itemStream.toItemStack(e.player)
+            e.itemDrop.setItemStack(itemStream.toItemStack(e.player))
         }
     }
 
@@ -47,7 +47,7 @@ internal object ItemUpdater {
     fun e(e: PlayerPickupItemEvent) {
         val itemStream = ZaphkielAPI.checkUpdate(e.player, e.item.itemStack)
         if (ItemSignal.UPDATE_CHECKED in itemStream.signal) {
-            e.item.itemStack = itemStream.toItemStack(e.player)
+            e.item.setItemStack(itemStream.toItemStack(e.player))
         }
     }
 

@@ -9,7 +9,8 @@ import ink.ptms.zaphkiel.item.meta.Meta
 import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common.reflect.Reflex.Companion.invokeConstructor
 import taboolib.module.chat.colored
-import taboolib.module.configuration.SecuredFile
+import taboolib.module.configuration.Configuration
+import taboolib.module.configuration.Type
 
 /**
  * @author sky
@@ -17,7 +18,7 @@ import taboolib.module.configuration.SecuredFile
  */
 internal object ItemBuilder {
 
-    val dropMeta by lazy { ZaphkielAPI.registeredMeta.map { it.value.invokeConstructor(SecuredFile()) as Meta }.associateBy { it.id } }
+    val dropMeta by lazy { ZaphkielAPI.registeredMeta.map { it.value.invokeConstructor(Configuration.empty(Type.YAML)) as Meta }.associateBy { it.id } }
 
     @SubscribeEvent
     fun e(e: ItemBuildEvent.Post) {

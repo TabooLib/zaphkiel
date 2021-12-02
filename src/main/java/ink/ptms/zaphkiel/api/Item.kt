@@ -14,7 +14,8 @@ import taboolib.common.platform.function.severe
 import taboolib.common.util.asList
 import taboolib.library.configuration.ConfigurationSection
 import taboolib.library.xseries.parseToXMaterial
-import taboolib.module.configuration.SecuredFile
+import taboolib.module.configuration.Configuration
+import taboolib.module.configuration.Type
 import taboolib.module.nms.ItemTag
 import taboolib.module.nms.ItemTagData
 import taboolib.platform.compat.replacePlaceholder
@@ -41,7 +42,7 @@ class Item(
 
     val displayInstance = ZaphkielAPI.registeredDisplay[display]
     val updateData = getUpdateData(HashMap(), data)
-    val eventData: Map<String, Any> = config.getConfigurationSection("event.data")?.getValues(false) ?: emptyMap()
+    val eventData: Map<String, Any?> = config.getConfigurationSection("event.data")?.getValues(false) ?: emptyMap()
     val eventMap: Map<String, ItemEvent> = run {
         val map = HashMap<String, ItemEvent>()
         if (model.isNotEmpty()) {
@@ -63,7 +64,7 @@ class Item(
         it.addAll(displayInstance?.meta ?: emptyList())
     }
 
-    val hash = SecuredFile().run {
+    val hash = Configuration.empty(Type.YAML).run {
         set("value", config)
         val display = ZaphkielAPI.registeredDisplay[display]
         if (display != null) {
@@ -129,7 +130,7 @@ class Item(
     private fun getUpdateData(map: MutableMap<String, ItemTagData?>, section: ConfigurationSection, path: String = ""): MutableMap<String, ItemTagData?> {
         section.getKeys(false).forEach { key ->
             if (key.endsWith("!!")) {
-                map[path + key.substring(0, key.length - 2)] = Translator.toNBTBase(config.get("data.$path$key"))
+                map[path + key.substring(0, key.length - 2)] = Translator.toNBTBase(config["data.$path$key"])
             } else if (section.isConfigurationSection(key)) {
                 getUpdateData(map, section.getConfigurationSection(key)!!, "$path$key.")
             }
@@ -197,12 +198,12 @@ class Item(
             val node = if (config.contains("lore!!")) "lore!!" else "lore"
             val lore = config.getConfigurationSection(node) ?: return HashMap()
             val autowrap = lore.getInt("~autowrap")
-            lore.set("~autowrap", null)
+            lore["~autowrap"] = null
             lore.getKeys(false).forEach { key ->
                 var list = if (config.isList("$node.$key")) config.getStringList("$node.$key") else mutableListOf(config.getString("$node.$key")!!)
                 list = list.flatMap { it.split('\n') }
                 list = if (autowrap > 0) list.split(autowrap).toMutableList() else list
-                map[key] = list
+                map[key] = list.toMutableList()
             }
             return map
         }
@@ -213,9 +214,9 @@ class Item(
             event.getKeys(false).forEach { key ->
                 if (key.endsWith("!!")) {
                     val substring = key.substring(0, key.length - 2)
-                    map[substring] = ItemEvent(item, substring, config.get("event.$key")!!.asList(), true)
+                    map[substring] = ItemEvent(item, substring, config["event.$key"]!!.asList(), true)
                 } else {
-                    map[key] = ItemEvent(item, key, config.get("event.$key")!!.asList())
+                    map[key] = ItemEvent(item, key, config["event.$key"]!!.asList())
                 }
             }
             return map

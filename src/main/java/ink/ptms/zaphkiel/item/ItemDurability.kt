@@ -70,7 +70,7 @@ internal object ItemDurability {
             return
         }
         val displaySymbol = if (config?.contains("display-symbol") == true) {
-            listOf(config.getString("display-symbol.0"), config.getString("display-symbol.1"))
+            listOf(config.getString("display-symbol.0")!!, config.getString("display-symbol.1")!!)
         } else {
             durabilitySymbol!!
         }
@@ -82,7 +82,7 @@ internal object ItemDurability {
     @SubscribeEvent
     fun e(e: PluginReloadEvent.Item) {
         durability = Zaphkiel.conf.getString("Durability.display")
-        durabilitySymbol = arrayListOf(Zaphkiel.conf.getString("Durability.display-symbol.0"), Zaphkiel.conf.getString("Durability.display-symbol.1"))
+        durabilitySymbol = arrayListOf(Zaphkiel.conf.getString("Durability.display-symbol.0")!!, Zaphkiel.conf.getString("Durability.display-symbol.1")!!)
     }
 
     @SubscribeEvent(priority = EventPriority.MONITOR, ignoreCancelled = true)

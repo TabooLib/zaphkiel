@@ -21,7 +21,7 @@ data class ItemEvent(val item: Item, val name: String, val script: List<String>,
         player: Player?,
         event: Event,
         itemStream: ItemStream,
-        data: Map<String, Any>,
+        data: Map<String, Any?>,
         namespace: String = "zaphkiel-internal",
     ): CompletableFuture<ItemResult?> {
         val future = CompletableFuture<ItemResult?>()

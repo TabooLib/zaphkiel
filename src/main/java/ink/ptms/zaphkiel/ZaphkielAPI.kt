@@ -8,7 +8,7 @@ import ink.ptms.zaphkiel.api.event.PluginReloadEvent
 import ink.ptms.zaphkiel.item.meta.Meta
 import ink.ptms.zaphkiel.item.meta.MetaKey
 import ink.ptms.zaphkiel.item.meta.MetaUnique
-import org.apache.commons.lang.time.DateFormatUtils
+import org.apache.commons.lang3.time.DateFormatUtils
 import org.bukkit.Bukkit
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Player
@@ -22,7 +22,8 @@ import taboolib.common.reflect.Reflex.Companion.getProperty
 import taboolib.common.reflect.Reflex.Companion.invokeConstructor
 import taboolib.common5.FileWatcher
 import taboolib.library.configuration.ConfigurationSection
-import taboolib.module.configuration.SecuredFile
+import taboolib.module.configuration.Configuration
+import taboolib.module.configuration.Type
 import taboolib.module.nms.ItemTag
 import taboolib.module.nms.ItemTagData
 import taboolib.module.nms.ItemTagSerializer
@@ -196,7 +197,7 @@ object ZaphkielAPI {
             val task = Runnable {
                 keys.forEach { registeredItem.remove(it) }
                 var group: Group? = null
-                val conf = SecuredFile.loadConfiguration(file)
+                val conf = Configuration.loadFromFile(file)
                 if (conf.contains("__group__")) {
                     val name = file.name.substring(0, file.name.indexOf("."))
                     group = Group(name, file, conf.getConfigurationSection("__group__")!!, priority = conf.getInt("__group__.priority"))
@@ -228,7 +229,7 @@ object ZaphkielAPI {
         if (file.isDirectory) {
             file.listFiles()?.forEach { loadModelFromFile(it) }
         } else if (file.name.endsWith(".yml")) {
-            val conf = SecuredFile.loadConfiguration(file)
+            val conf = Configuration.loadFromFile(file)
             conf.getKeys(false).filter { it.endsWith("$") }.forEach { key ->
                 registeredModel[key.substring(0, key.length - 1)] = Model(conf.getConfigurationSection(key)!!)
             }
@@ -253,7 +254,7 @@ object ZaphkielAPI {
         if (file.isDirectory) {
             file.listFiles()?.forEach { loadDisplayFromFile(it) }
         } else if (file.name.endsWith(".yml")) {
-            val conf = SecuredFile.loadConfiguration(file)
+            val conf = Configuration.loadFromFile(file)
             conf.getKeys(false).forEach { registeredDisplay[it] = Display(conf.getConfigurationSection(it)!!) }
         }
     }
@@ -262,7 +263,7 @@ object ZaphkielAPI {
      * 从配置文件中读取元数据配置
      */
     fun readMeta(root: ConfigurationSection): MutableList<Meta> {
-        val copy = SecuredFile()
+        val copy = Configuration.empty(Type.YAML)
         return root.getConfigurationSection("meta")?.getKeys(false)?.mapNotNull { id ->
             if (id.endsWith("!!")) {
                 copy.set("meta.${id.substring(0, id.length - 2)}", root.get("meta.$id"))

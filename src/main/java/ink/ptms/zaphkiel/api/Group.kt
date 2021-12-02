@@ -6,7 +6,8 @@ import taboolib.common.platform.function.getDataFolder
 import taboolib.library.configuration.ConfigurationSection
 import taboolib.library.xseries.XItemStack
 import taboolib.library.xseries.XMaterial
-import taboolib.module.configuration.SecuredFile
+import taboolib.module.configuration.Configuration
+import taboolib.module.configuration.Type
 import taboolib.platform.util.buildItem
 import java.io.File
 
@@ -25,7 +26,7 @@ class Group(
     companion object {
 
         val NO_GROUP by lazy {
-            Group("#", File(getDataFolder(), "config.yml"), SecuredFile(), buildItem(XMaterial.BARRIER) {
+            Group("#", File(getDataFolder(), "config.yml"), Configuration.empty(Type.YAML), buildItem(XMaterial.BARRIER) {
                 name = "&7[NO GROUP]"
                 colored()
             }, -1)

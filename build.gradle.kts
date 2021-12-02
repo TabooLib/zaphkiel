@@ -17,7 +17,7 @@ taboolib {
     }
     install("common")
     install("common-5")
-    install("module-configuration-legacy")
+    install("module-configuration")
     install("module-database")
     install("module-kether")
     install("module-chat")
@@ -28,7 +28,7 @@ taboolib {
     install("platform-bukkit")
     install("expansion-command-helper", "expansion-player-database")
     classifier = null
-    version = "6.0.6-5"
+    version = "6.0.6-8"
 }
 
 repositories {
@@ -41,7 +41,7 @@ dependencies {
     compileOnly("public:Tiphareth:1.0.0")
     compileOnly("public:MythicMobs:4.11.0")
     compileOnly("ink.ptms:Sandalphon:1.2.7")
-    compileOnly("ink.ptms.core:v11605:11605")
+    compileOnly("ink.ptms.core:v11600:11600-minimize")
     compileOnly(kotlin("stdlib"))
     compileOnly(fileTree("libs"))
     dokkaHtmlPlugin("org.jetbrains.dokka:kotlin-as-java-plugin:1.5.30")

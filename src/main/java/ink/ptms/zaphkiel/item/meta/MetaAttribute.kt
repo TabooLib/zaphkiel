@@ -117,7 +117,7 @@ class MetaAttribute(root: ConfigurationSection) : Meta(root) {
             BukkitAttribute.MOVEMENT_SPEED -> org.bukkit.attribute.Attribute.GENERIC_MOVEMENT_SPEED
             BukkitAttribute.FLYING_SPEED -> org.bukkit.attribute.Attribute.GENERIC_FLYING_SPEED
             BukkitAttribute.ATTACK_DAMAGE -> org.bukkit.attribute.Attribute.GENERIC_ATTACK_DAMAGE
-            BukkitAttribute.ATTACK_KNOCKBACK -> org.bukkit.attribute.Attribute.GENERIC_ATTACK_KNOCKBACK
+            BukkitAttribute.ATTACK_KNOCKBACK -> org.bukkit.attribute.Attribute.valueOf("GENERIC_ATTACK_KNOCKBACK")
             BukkitAttribute.ATTACK_SPEED -> org.bukkit.attribute.Attribute.GENERIC_ATTACK_SPEED
             BukkitAttribute.ARMOR -> org.bukkit.attribute.Attribute.GENERIC_ARMOR
             BukkitAttribute.ARMOR_TOUGHNESS -> org.bukkit.attribute.Attribute.GENERIC_ARMOR_TOUGHNESS
