@@ -3,10 +3,14 @@ package ink.ptms.zaphkiel.api.event
 import ink.ptms.zaphkiel.api.ItemStream
 import org.bukkit.Material
 import org.bukkit.entity.Player
+import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.ItemMeta
 import taboolib.platform.type.BukkitProxyEvent
 
 /**
+ * 当物品释放时
+ * 可以在该事件下修改即将写入物品栈的 icon、data、itemMeta 信息
+ *
  * @author sky
  * @since 2019-12-25 11:38
  */
@@ -17,6 +21,22 @@ class ItemReleaseEvent(var icon: Material, var data: Int, var itemMeta: ItemMeta
 
     val item = itemStream.getZaphkielItem()
 
+    /**
+     * 当物品释放时
+     * 可以在该事件下修改最终物品栈
+     */
+    class Final(var itemStack: ItemStack, val itemStream: ItemStream, val player: Player? = null): BukkitProxyEvent() {
+
+        override val allowCancelled: Boolean
+            get() = false
+
+        val item = itemStream.getZaphkielItem()
+    }
+
+    /**
+     * 当物品释放时
+     * 可以在该事件下修改名称与描述变量
+     */
     class Display(
         val itemStream: ItemStream,
         val name: MutableMap<String, String>,

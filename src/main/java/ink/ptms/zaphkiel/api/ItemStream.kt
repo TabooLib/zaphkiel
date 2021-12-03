@@ -98,7 +98,9 @@ open class ItemStream(val sourceItem: ItemStack, val sourceCompound: ItemTag = s
             sourceItem.itemMeta = event.itemMeta
             sourceItem.durability = event.data.toShort()
         }
-        return sourceItem
+        val final = ItemReleaseEvent.Final(sourceItem, this, player)
+        final.call()
+        return final.itemStack
     }
 
     /**
