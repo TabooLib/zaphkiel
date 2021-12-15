@@ -22,9 +22,9 @@ import taboolib.common5.Coerce
  */
 internal object MythicHook {
 
-    @SubscribeEvent(bind = "io.lumine.xikage.mythicmobs.api.bukkit.events.MythicMobDeathEvent")
+    @SubscribeEvent(bind = "io.lumine.xikage.mythicmobs.api.bukkit.events.MythicMobSpawnEvent")
     fun e1(oe: OptionalEvent) {
-        val e = oe.get<MythicMobDeathEvent>()
+        val e = oe.get<MythicMobSpawnEvent>()
         val section = e.mob.type.config.fileConfiguration.getConfigurationSection(e.mob.type.internalName + ".Zaphkiel.equipments") ?: return
         submit(delay = 5) {
             MythicUtil.equipment(section, e.entity as? LivingEntity ?: return@submit)
