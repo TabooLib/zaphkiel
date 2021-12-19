@@ -14,6 +14,7 @@ import taboolib.expansion.setupDataContainer
 import taboolib.expansion.setupPlayerDatabase
 import taboolib.module.configuration.Config
 import taboolib.module.configuration.Configuration
+import taboolib.module.kether.Kether
 
 /**
  * @author sky
@@ -31,6 +32,7 @@ object Zaphkiel : Plugin() {
         } else {
             setupPlayerDatabase(newFile(getDataFolder(), "data.db"))
         }
+        Kether.isAllowToleranceParser = true
     }
 
     @Schedule(delay = 20)
