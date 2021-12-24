@@ -23,10 +23,18 @@ fun ItemStream.setItemInCooldown(gameTick: Int, player: Player? = null) {
  * @param player 绑定到玩家（可选参数）
  */
 fun ItemStream.isItemInCooldown(player: Player? = null): Boolean {
+    return getItemInCooldown(player) > 0
+}
+
+/**
+ * 获得物品的剩余冷却时间
+ * @param player 绑定到玩家（可选参数）
+ */
+fun ItemStream.getItemInCooldown(player: Player? = null): Long {
     return if (player != null) {
-        Coerce.toLong(player.getDataContainer()["cooldown.${getZaphkielName()}"]) > System.currentTimeMillis()
+        Coerce.toLong(player.getDataContainer()["cooldown.${getZaphkielName()}"]) - System.currentTimeMillis()
     } else {
         val time = getZaphkielData().getDeep("cooldown.${getZaphkielName()}")?.asLong() ?: 0
-        time > System.currentTimeMillis()
+        time - System.currentTimeMillis()
     }
 }

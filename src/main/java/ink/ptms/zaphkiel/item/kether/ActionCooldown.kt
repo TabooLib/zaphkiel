@@ -1,5 +1,6 @@
 package ink.ptms.zaphkiel.item.kether
 
+import ink.ptms.zaphkiel.item.getItemInCooldown
 import ink.ptms.zaphkiel.item.isItemInCooldown
 import ink.ptms.zaphkiel.item.setItemInCooldown
 import org.bukkit.entity.Player
@@ -26,6 +27,17 @@ class ActionCooldown {
                 CompletableFuture.completedFuture(frame.itemStream().isItemInCooldown(viewer))
             } else {
                 CompletableFuture.completedFuture(frame.itemStream().isItemInCooldown())
+            }
+        }
+    }
+    class Time(val byPlayer: Boolean) : ScriptAction<Long>() {
+
+        override fun run(frame: ScriptFrame): CompletableFuture<Long> {
+            val viewer = frame.script().sender?.castSafely<Player>() ?: error("No player selected.")
+            return if (byPlayer) {
+                CompletableFuture.completedFuture(frame.itemStream().getItemInCooldown(viewer))
+            } else {
+                CompletableFuture.completedFuture(frame.itemStream().getItemInCooldown())
             }
         }
     }
@@ -64,6 +76,16 @@ class ActionCooldown {
                     } catch (ignored: Throwable) {
                         it.reset()
                         Check(false)
+                    }
+                }
+                case("time") {
+                    try {
+                        it.mark()
+                        it.expects("by", "at", "for", "with")
+                        Time(it.expects("player", "item") == "player")
+                    } catch (ignored: Throwable) {
+                        it.reset()
+                        Time(false)
                     }
                 }
                 case("set") {
