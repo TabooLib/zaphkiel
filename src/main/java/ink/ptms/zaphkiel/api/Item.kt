@@ -19,7 +19,11 @@ import taboolib.module.configuration.Type
 import taboolib.module.nms.ItemTag
 import taboolib.module.nms.ItemTagData
 import taboolib.platform.compat.replacePlaceholder
+import taboolib.platform.util.hasItem
+import taboolib.platform.util.isAir
+import taboolib.platform.util.takeItem
 import java.util.concurrent.CompletableFuture
+import java.util.function.Consumer
 
 /**
  * @author sky
@@ -36,7 +40,8 @@ class Item(
     val lore: MutableMap<String, MutableList<String>> = parseLore(config),
     val loreLocked: Boolean = config.contains("lore!!"),
     val data: ConfigurationSection = config.getConfigurationSection("data") ?: config.createSection("data"),
-    val model: MutableList<String> = config.getString("event.from")?.split(",")?.map { it.trim() }?.toMutableList() ?: ArrayList(),
+    val model: MutableList<String> = config.getString("event.from")?.split(",")?.map { it.trim() }?.toMutableList()
+        ?: ArrayList(),
     val group: Group? = null,
 ) {
 
@@ -111,7 +116,12 @@ class Item(
         return post.itemStream
     }
 
-    fun invokeScript(key: String, event: PlayerEvent, itemStream: ItemStream, namespace: String = "zaphkiel-internal"): CompletableFuture<ItemEvent.ItemResult?>? {
+    fun invokeScript(
+        key: String,
+        event: PlayerEvent,
+        itemStream: ItemStream,
+        namespace: String = "zaphkiel-internal"
+    ): CompletableFuture<ItemEvent.ItemResult?>? {
         val itemEvent = eventMap[key] ?: return null
         if (itemEvent.isCancelled && event is Cancellable) {
             event.isCancelled = true
@@ -119,7 +129,13 @@ class Item(
         return itemEvent.invoke(event.player, event, itemStream, eventData, namespace)
     }
 
-    fun invokeScript(key: String, player: Player?, event: Event, itemStream: ItemStream, namespace: String = "zaphkiel-internal"): CompletableFuture<ItemEvent.ItemResult?>? {
+    fun invokeScript(
+        key: String,
+        player: Player?,
+        event: Event,
+        itemStream: ItemStream,
+        namespace: String = "zaphkiel-internal"
+    ): CompletableFuture<ItemEvent.ItemResult?>? {
         val itemEvent = eventMap[key] ?: return null
         if (itemEvent.isCancelled && event is Cancellable) {
             event.isCancelled = true
@@ -127,7 +143,11 @@ class Item(
         return itemEvent.invoke(player, event, itemStream, eventData, namespace)
     }
 
-    private fun getUpdateData(map: MutableMap<String, ItemTagData?>, section: ConfigurationSection, path: String = ""): MutableMap<String, ItemTagData?> {
+    private fun getUpdateData(
+        map: MutableMap<String, ItemTagData?>,
+        section: ConfigurationSection,
+        path: String = ""
+    ): MutableMap<String, ItemTagData?> {
         section.getKeys(false).forEach { key ->
             if (key.endsWith("!!")) {
                 map[path + key.substring(0, key.length - 2)] = Translator.toNBTBase(config["data.$path$key"])
@@ -136,6 +156,40 @@ class Item(
             }
         }
         return map
+    }
+
+    fun isSimilar(itemStack: ItemStack): Boolean {
+        if (itemStack.isAir()) return false
+        return ZaphkielAPI.getItem(itemStack)?.id == id
+    }
+
+    fun hasItem(player: Player, amount: Int = 1): Boolean {
+        return player.inventory.hasItem(amount) {
+            isSimilar(it)
+        }
+    }
+
+    fun takeItem(player: Player, amount: Int = 1): Boolean {
+        if (!hasItem(player, amount)) return false
+        return player.inventory.takeItem(amount) {
+            isSimilar(it)
+        }
+    }
+    fun giveItemOrDrop(player: Player, amount: Int) {
+        giveItem(player, amount) {
+            it.forEach { item ->
+                player.world.dropItem(player.location, item)
+            }
+        }
+    }
+
+    fun giveItem(
+        player: Player, amount: Int = 1,
+        overflow: Consumer<List<ItemStack>>
+    ) {
+        val item = buildItemStack(player)
+        item.amount = amount
+        overflow.accept(player.inventory.addItem(item).values.toList())
     }
 
     override fun equals(other: Any?): Boolean {
@@ -200,7 +254,9 @@ class Item(
             val autowrap = lore.getInt("~autowrap")
             lore["~autowrap"] = null
             lore.getKeys(false).forEach { key ->
-                var list = if (config.isList("$node.$key")) config.getStringList("$node.$key") else mutableListOf(config.getString("$node.$key")!!)
+                var list = if (config.isList("$node.$key")) config.getStringList("$node.$key") else mutableListOf(
+                    config.getString("$node.$key")!!
+                )
                 list = list.flatMap { it.split('\n') }
                 list = if (autowrap > 0) list.split(autowrap).toMutableList() else list
                 map[key] = list.toMutableList()
