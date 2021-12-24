@@ -67,13 +67,16 @@ object ZaphkielCommand {
                 suggestion<CommandSender> { _, _ ->
                     Bukkit.getOnlinePlayers().map { it.name }
                 }
-                execute<Player> { _, context, argument ->
+                execute<CommandSender> { _, context, argument ->
                     Bukkit.getPlayerExact(argument)!!.giveItem(ZaphkielAPI.getItemStack(context.argument(-1))!!)
                 }
                 dynamic(optional = true, commit = "amount") {
-                    execute<Player> { _, context, argument ->
+                    execute<CommandSender> { _, context, argument ->
                         val amount = Coerce.toInteger(argument)
-                        Bukkit.getPlayerExact(context.argument(-1))!!.giveItem(ZaphkielAPI.getItemStack(context.argument(-2))!!, amount)
+                        val player = Bukkit.getPlayerExact(context.argument(-1))!!
+                        val itemStream = ZaphkielAPI.getItem(context.argument(-2), player)!!
+                        itemStream.getZaphkielData()
+                        player.giveItem(itemStream.toItemStack(player), amount)
                     }
                 }
             }
