@@ -2,6 +2,7 @@ package ink.ptms.zaphkiel.item.compat
 
 import ink.ptms.zaphkiel.ZaphkielAPI
 import io.lumine.xikage.mythicmobs.api.bukkit.events.MythicMobDeathEvent
+import io.lumine.xikage.mythicmobs.api.bukkit.events.MythicMobSpawnEvent
 import io.lumine.xikage.mythicmobs.utils.config.ConfigurationSection
 import org.bukkit.Material
 import org.bukkit.entity.LivingEntity
