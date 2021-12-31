@@ -1,7 +1,7 @@
 plugins {
     `java-library`
     `maven-publish`
-    id("io.izzel.taboolib") version "1.32"
+    id("io.izzel.taboolib") version "1.33"
     id("org.jetbrains.kotlin.jvm") version "1.5.10"
     id("org.jetbrains.dokka") version "1.5.30"
 }
@@ -32,6 +32,7 @@ taboolib {
 }
 
 repositories {
+    maven { url = uri("https://repo.tabooproject.org/storages/public/releases") }
     mavenCentral()
 }
 
@@ -59,10 +60,10 @@ configure<JavaPluginConvention> {
 publishing {
     repositories {
         maven {
-            url = uri("https://repo2s.ptms.ink/repository/maven-releases/")
+            url = uri("https://repo.tabooproject.org/storages/public/releases")
             credentials {
-                username = project.findProperty("user").toString()
-                password = project.findProperty("password").toString()
+                username = project.findProperty("taboolibUsername").toString()
+                password = project.findProperty("taboolibPassword").toString()
             }
             authentication {
                 create<BasicAuthentication>("basic")
