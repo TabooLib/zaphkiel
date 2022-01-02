@@ -40,8 +40,7 @@ class Item(
     val lore: MutableMap<String, MutableList<String>> = parseLore(config),
     val loreLocked: Boolean = config.contains("lore!!"),
     val data: ConfigurationSection = config.getConfigurationSection("data") ?: config.createSection("data"),
-    val model: MutableList<String> = config.getString("event.from")?.split(",")?.map { it.trim() }?.toMutableList()
-        ?: ArrayList(),
+    val model: MutableList<String> = config.getString("event.from")?.split(",")?.map { it.trim() }?.toMutableList() ?: ArrayList(),
     val group: Group? = null,
 ) {
 
@@ -120,7 +119,7 @@ class Item(
         key: String,
         event: PlayerEvent,
         itemStream: ItemStream,
-        namespace: String = "zaphkiel-internal"
+        namespace: String = "zaphkiel-internal",
     ): CompletableFuture<ItemEvent.ItemResult?>? {
         val itemEvent = eventMap[key] ?: return null
         if (itemEvent.isCancelled && event is Cancellable) {
@@ -134,7 +133,7 @@ class Item(
         player: Player?,
         event: Event,
         itemStream: ItemStream,
-        namespace: String = "zaphkiel-internal"
+        namespace: String = "zaphkiel-internal",
     ): CompletableFuture<ItemEvent.ItemResult?>? {
         val itemEvent = eventMap[key] ?: return null
         if (itemEvent.isCancelled && event is Cancellable) {
@@ -146,7 +145,7 @@ class Item(
     private fun getUpdateData(
         map: MutableMap<String, ItemTagData?>,
         section: ConfigurationSection,
-        path: String = ""
+        path: String = "",
     ): MutableMap<String, ItemTagData?> {
         section.getKeys(false).forEach { key ->
             if (key.endsWith("!!")) {
@@ -164,29 +163,19 @@ class Item(
     }
 
     fun hasItem(player: Player, amount: Int = 1): Boolean {
-        return player.inventory.hasItem(amount) {
-            isSimilar(it)
-        }
+        return player.inventory.hasItem(amount) { isSimilar(it) }
     }
 
     fun takeItem(player: Player, amount: Int = 1): Boolean {
         if (!hasItem(player, amount)) return false
-        return player.inventory.takeItem(amount) {
-            isSimilar(it)
-        }
-    }
-    fun giveItemOrDrop(player: Player, amount: Int) {
-        giveItem(player, amount) {
-            it.forEach { item ->
-                player.world.dropItem(player.location, item)
-            }
-        }
+        return player.inventory.takeItem(amount) { isSimilar(it) }
     }
 
-    fun giveItem(
-        player: Player, amount: Int = 1,
-        overflow: Consumer<List<ItemStack>>
-    ) {
+    fun giveItemOrDrop(player: Player, amount: Int) {
+        giveItem(player, amount) { it.forEach { item -> player.world.dropItem(player.location, item) } }
+    }
+
+    fun giveItem(player: Player, amount: Int = 1, overflow: Consumer<List<ItemStack>>) {
         val item = buildItemStack(player)
         item.amount = amount
         overflow.accept(player.inventory.addItem(item).values.toList())
