@@ -277,7 +277,7 @@ internal object ItemListener {
         }
     }
 
-    private fun Player.onSelect() {
+    internal fun Player.onSelect() {
         inventory.filter { it.isNotAir() }.forEach {
             val event = ItemEvent.Select(ZaphkielAPI.read(it), this)
             event.call()
