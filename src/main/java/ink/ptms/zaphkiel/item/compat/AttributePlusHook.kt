@@ -13,21 +13,8 @@ import taboolib.type.BukkitEquipment
 
 internal object AttributePlusHook {
 
-    @SubscribeEvent(bind = "org.serverct.ersha.api.event.AttrUpdateAttributeEvent\$Before")
-    fun e1(e: OptionalEvent) {
-        val attributeData = e.source.getProperty<AttributeData>("attributeData")!!
-        val sourceEntity = attributeData.sourceEntity
-        if (sourceEntity is Player) {
-            val attrData = AttributeAPI.getAttrData(sourceEntity)
-            val items = BukkitEquipment.values().mapNotNull { it.getItem(sourceEntity) }.filter { it.isNotAir() }
-            items.forEachIndexed { index, _ ->
-                AttributeAPI.takeSourceAttribute(attrData, "Zaphkiel.$index")
-            }
-        }
-    }
-
     @SubscribeEvent(bind = "org.serverct.ersha.api.event.AttrUpdateAttributeEvent\$After")
-    fun e2(e: OptionalEvent) {
+    fun e1(e: OptionalEvent) {
         val attributeData = e.source.getProperty<AttributeData>("attributeData")!!
         val sourceEntity = attributeData.sourceEntity
         if (sourceEntity is Player) {
@@ -49,4 +36,5 @@ internal object AttributePlusHook {
             }
         }
     }
+
 }
