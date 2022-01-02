@@ -1,7 +1,7 @@
 plugins {
     `java-library`
     `maven-publish`
-    id("io.izzel.taboolib") version "1.33"
+    id("io.izzel.taboolib") version "1.34"
     id("org.jetbrains.kotlin.jvm") version "1.5.10"
     id("org.jetbrains.dokka") version "1.5.30"
 }
@@ -28,16 +28,16 @@ taboolib {
     install("platform-bukkit")
     install("expansion-command-helper", "expansion-player-database")
     classifier = null
-    version = "6.0.7-6"
+    version = "6.0.7-14"
 }
 
 repositories {
-    maven { url = uri("https://repo.tabooproject.org/storages/public/releases") }
+    maven { url = uri("https://repo.tabooproject.org/repository/releases/") }
     mavenCentral()
 }
 
 dependencies {
-    compileOnly("public:AttributePlus:3.2.1")
+    compileOnly("public:AttributePlus:3.2.6")
     compileOnly("public:HeadDatabase:1.3.0")
     compileOnly("public:Tiphareth:1.0.0")
     compileOnly("public:MythicMobs:4.11.0")
@@ -60,7 +60,7 @@ configure<JavaPluginConvention> {
 publishing {
     repositories {
         maven {
-            url = uri("https://repo.tabooproject.org/storages/public/releases")
+            url = uri("https://repo.tabooproject.org/repository/releases")
             credentials {
                 username = project.findProperty("taboolibUsername").toString()
                 password = project.findProperty("taboolibPassword").toString()
