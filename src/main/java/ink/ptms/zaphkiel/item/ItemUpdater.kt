@@ -53,9 +53,11 @@ internal object ItemUpdater {
 
     @SubscribeEvent(priority = EventPriority.MONITOR, ignoreCancelled = true)
     fun e(e: InventoryOpenEvent) {
-        if (e.inventory.location != null) {
-            submit(async = true) {
-                ZaphkielAPI.checkUpdate(e.player as Player, e.inventory)
+        kotlin.runCatching {
+            if (e.inventory.location != null) {
+                submit(async = true) {
+                    ZaphkielAPI.checkUpdate(e.player as Player, e.inventory)
+                }
             }
         }
     }
