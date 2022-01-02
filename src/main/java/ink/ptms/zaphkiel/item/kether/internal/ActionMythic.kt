@@ -1,4 +1,4 @@
-package ink.ptms.zaphkiel.item.kether
+package ink.ptms.zaphkiel.item.kether.internal
 
 import io.lumine.xikage.mythicmobs.MythicMobs
 import org.bukkit.entity.Player
