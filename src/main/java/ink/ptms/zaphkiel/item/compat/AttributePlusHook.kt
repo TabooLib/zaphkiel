@@ -3,7 +3,6 @@ package ink.ptms.zaphkiel.item.compat
 import ink.ptms.zaphkiel.ZaphkielAPI
 import org.bukkit.entity.Player
 import org.serverct.ersha.api.AttributeAPI
-import org.serverct.ersha.api.event.AttrUpdateAttributeEvent
 import org.serverct.ersha.attribute.data.AttributeData
 import taboolib.common.platform.event.OptionalEvent
 import taboolib.common.platform.event.SubscribeEvent
@@ -37,4 +36,5 @@ internal object AttributePlusHook {
             }
         }
     }
+
 }
