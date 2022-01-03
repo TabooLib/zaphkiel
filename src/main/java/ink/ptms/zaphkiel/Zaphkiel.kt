@@ -3,7 +3,9 @@ package ink.ptms.zaphkiel
 import org.bukkit.Bukkit
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
+import taboolib.common.LifeCycle
 import taboolib.common.io.newFile
+import taboolib.common.platform.Awake
 import taboolib.common.platform.Plugin
 import taboolib.common.platform.Schedule
 import taboolib.common.platform.event.SubscribeEvent
@@ -35,7 +37,7 @@ object Zaphkiel : Plugin() {
         Kether.isAllowToleranceParser = true
     }
 
-    @Schedule(delay = 20)
+    @Awake(LifeCycle.LOAD)
     fun reload() {
         if (!ZaphkielAPI.folderItem.exists()) {
             releaseResourceFile("item/def.yml")
