@@ -11,6 +11,7 @@ import org.bukkit.event.player.PlayerPickupItemEvent
 import org.bukkit.event.player.PlayerRespawnEvent
 import taboolib.common.platform.Schedule
 import taboolib.common.platform.event.EventPriority
+import taboolib.common.platform.event.OptionalEvent
 import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common.platform.function.submit
 
@@ -60,5 +61,10 @@ internal object ItemUpdater {
                 }
             }
         }
+    }
+    @SubscribeEvent(bind = "cc.bukkitPlugin.pds.events.PlayerDataLoadCompleteEvent")
+    fun event(e: OptionalEvent) {
+        val player = e.read<Player>("player")!!
+        ZaphkielAPI.checkUpdate(player, player.inventory)
     }
 }
