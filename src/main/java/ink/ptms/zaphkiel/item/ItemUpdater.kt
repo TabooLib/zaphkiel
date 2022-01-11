@@ -18,7 +18,7 @@ import taboolib.common.platform.function.submit
  * @author sky
  * @since 2019-12-16 10:40
  */
-internal object ItemUpdater {
+object ItemUpdater {
 
     @Schedule(period = 100, async = true)
     fun tick() {

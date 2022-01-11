@@ -16,7 +16,7 @@ import taboolib.module.configuration.Type
  * @author sky
  * @since 2019-12-26 9:53
  */
-internal object ItemBuilder {
+object ItemBuilder {
 
     val dropMeta by lazy { ZaphkielAPI.registeredMeta.map { it.value.invokeConstructor(Configuration.empty(Type.YAML)) as Meta }.associateBy { it.id } }
 
