@@ -14,6 +14,8 @@ import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerItemBreakEvent
 import org.bukkit.event.player.PlayerItemDamageEvent
 import org.bukkit.inventory.ItemStack
+import taboolib.common.LifeCycle
+import taboolib.common.platform.Awake
 import taboolib.common.platform.event.EventPriority
 import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common.platform.function.submit
@@ -27,7 +29,7 @@ import taboolib.module.nms.getItemTag
  * @author sky
  * @since 2019-12-16 21:46
  */
-internal object ItemDurability {
+object ItemDurability {
 
     var durability: String? = null
     var durabilitySymbol: List<String>? = null
@@ -81,8 +83,7 @@ internal object ItemDurability {
 
     @SubscribeEvent
     fun e(e: PluginReloadEvent.Item) {
-        durability = Zaphkiel.conf.getString("Durability.display")
-        durabilitySymbol = arrayListOf(Zaphkiel.conf.getString("Durability.display-symbol.0")!!, Zaphkiel.conf.getString("Durability.display-symbol.1")!!)
+        reload()
     }
 
     @SubscribeEvent(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -94,6 +95,12 @@ internal object ItemDurability {
             }
             itemStream.getZaphkielItem().invokeScript("onDamage", e, itemStream)
         }
+    }
+
+    @Awake(LifeCycle.ACTIVE)
+    fun reload() {
+        durability = Zaphkiel.conf.getString("Durability.display")!!
+        durabilitySymbol = arrayListOf(Zaphkiel.conf.getString("Durability.display-symbol.0")!!, Zaphkiel.conf.getString("Durability.display-symbol.1")!!)
     }
 }
 
