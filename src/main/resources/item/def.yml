@@ -35,7 +35,7 @@ item_wooden_sword:
         attackspeed: +10%
   event:
     onDamage!!: |-
-      item damage *1
+      item damage 1
 
 item_enchanted_book:
   display: DISPLAY_ITEM
@@ -102,9 +102,9 @@ base_food$:
   event:
     onConsume!!: |-
       if cooldown check then {
-          tell *"You are temporarily unable to use it."
+          tell "You are temporarily unable to use it."
       } else {
-          item damage *1
+          item damage 1
           cooldown set &cooldown
           if check &regain_health not null then {
               player health add &regain_health
@@ -115,7 +115,7 @@ base_food$:
           if check &potion not null then {
               for e in &potion then {
                   set i to split &e with " "
-                  potion give elem *0 in &i elem *1 in &i elem *2 in &i
+                  potion give elem 0 in &i elem 1 in &i elem 2 in &i
               }
           }
           if check &potion_remove not null then {
