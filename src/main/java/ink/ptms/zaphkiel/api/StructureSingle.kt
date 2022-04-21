@@ -8,14 +8,14 @@ import taboolib.common.util.VariableReader
  */
 class StructureSingle(source: String) {
 
-    val cache = VariableReader(source, '<', '>')
+    val cache = VariableReader("<", ">").readToFlatten(source)
 
     fun buildTrim(vars: Map<String, String>): String {
         return build(vars).trim()
     }
 
     fun build(vars: Map<String, String>): String {
-        return cache.parts.joinToString("") {
+        return cache.joinToString("") {
             if (it.isVariable) {
                 vars[it.text] ?: ""
             } else {
