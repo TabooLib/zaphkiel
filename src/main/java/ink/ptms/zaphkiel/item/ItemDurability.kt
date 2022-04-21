@@ -67,7 +67,7 @@ object ItemDurability {
         val max = e.itemStream.getZaphkielData()["durability"] ?: return
         val current = e.itemStream.getZaphkielData()["durability_current"] ?: ItemTagData(max.asInt())
         val config = e.itemStream.getZaphkielItem().config.getConfigurationSection("meta.durability")
-        val display = config?.getString("display") ?: durability!!
+        val display = config?.getString("display") ?: durability ?: return
         if (display == "none") {
             return
         }
