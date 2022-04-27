@@ -128,19 +128,20 @@ internal object ItemListener {
         }
         // 触发事件
         val event = ItemEvent.Interact(itemStream, e)
-        event.call()
-        if (event.save) {
-            event.itemStream.rebuildToItemStack(e.player)
-        }
-        // 执行脚本
-        when (e.action) {
-            Action.LEFT_CLICK_AIR, Action.LEFT_CLICK_BLOCK -> {
-                itemStream.getZaphkielItem().invokeScript("onLeftClick", e, itemStream)
+        if (event.call()) {
+            if (event.save) {
+                event.itemStream.rebuildToItemStack(e.player)
             }
-            Action.RIGHT_CLICK_AIR, Action.RIGHT_CLICK_BLOCK -> {
-                itemStream.getZaphkielItem().invokeScript("onRightClick", e, itemStream)
-            }
-            else -> {
+            // 执行脚本
+            when (e.action) {
+                Action.LEFT_CLICK_AIR, Action.LEFT_CLICK_BLOCK -> {
+                    itemStream.getZaphkielItem().invokeScript("onLeftClick", e, itemStream)
+                }
+                Action.RIGHT_CLICK_AIR, Action.RIGHT_CLICK_BLOCK -> {
+                    itemStream.getZaphkielItem().invokeScript("onRightClick", e, itemStream)
+                }
+                else -> {
+                }
             }
         }
     }
@@ -157,11 +158,12 @@ internal object ItemListener {
                 return
             }
             val event = ItemEvent.InteractEntity(itemStream, e)
-            event.call()
-            if (event.save) {
-                event.itemStream.rebuildToItemStack(e.player)
+            if (event.call()) {
+                if (event.save) {
+                    event.itemStream.rebuildToItemStack(e.player)
+                }
+                itemStream.getZaphkielItem().invokeScript("onRightClickEntity", e, itemStream)
             }
-            itemStream.getZaphkielItem().invokeScript("onRightClickEntity", e, itemStream)
         }
     }
 

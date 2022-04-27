@@ -23,16 +23,10 @@ class ItemEvent {
 
     class InteractEntity(val itemStream: ItemStream, val bukkitEvent: PlayerInteractEntityEvent) : BukkitProxyEvent() {
 
-        override val allowCancelled: Boolean
-            get() = false
-
         var save = false
     }
 
     class Interact(val itemStream: ItemStream, val bukkitEvent: PlayerInteractEvent) : BukkitProxyEvent() {
-
-        override val allowCancelled: Boolean
-            get() = false
 
         var save = false
     }
