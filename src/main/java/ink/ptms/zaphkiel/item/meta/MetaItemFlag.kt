@@ -10,7 +10,7 @@ import java.util.*
 class MetaItemFlag(root: ConfigurationSection) : Meta(root) {
 
     val itemflag = root.getStringList("meta.itemflag")
-        .mapNotNull { ZaphkielAPI.asItemFlag(it.toString().uppercase(Locale.getDefault())) }
+        .mapNotNull { ZaphkielAPI.asItemFlag(it.uppercase(Locale.getDefault())) }
         .toSet()
         .toTypedArray()
 

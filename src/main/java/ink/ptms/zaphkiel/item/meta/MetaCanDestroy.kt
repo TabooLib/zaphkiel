@@ -9,7 +9,7 @@ import taboolib.module.nms.ItemTagList
 @MetaKey("can-destroy")
 class MetaCanDestroy(root: ConfigurationSection) : Meta(root) {
 
-    val canDestroy = root.get("meta.can-destroy")?.asList()
+    val canDestroy = root["meta.can-destroy"]?.asList()
 
     override fun build(player: Player?, compound: ItemTag) {
         if (canDestroy == null || compound.containsKey("CanDestroy")) {

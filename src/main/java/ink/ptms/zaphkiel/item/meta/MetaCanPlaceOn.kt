@@ -9,7 +9,7 @@ import taboolib.module.nms.ItemTagList
 @MetaKey("can-place-on")
 class MetaCanPlaceOn(root: ConfigurationSection) : Meta(root) {
 
-    val canPlaceOn = root.get("meta.can-place-on")?.asList()
+    val canPlaceOn = root["meta.can-place-on"]?.asList()
 
     override fun build(player: Player?, compound: ItemTag) {
         if (canPlaceOn == null || compound.containsKey("CanPlaceOn")) {

@@ -270,12 +270,13 @@ internal object ItemListener {
             return
         }
         val event = ItemEvent.InventoryClick(itemStreamCurrent, itemStreamButton, e)
-        event.call()
-        if (event.saveCurrent && itemStreamCurrent != null) {
-            itemStreamCurrent.rebuildToItemStack(e.whoClicked as Player)
-        }
-        if (event.saveButton && itemStreamButton != null) {
-            itemStreamButton.rebuildToItemStack(e.whoClicked as Player)
+        if (event.call()) {
+            if (event.saveCurrent && itemStreamCurrent != null) {
+                itemStreamCurrent.rebuildToItemStack(e.whoClicked as Player)
+            }
+            if (event.saveButton && itemStreamButton != null) {
+                itemStreamButton.rebuildToItemStack(e.whoClicked as Player)
+            }
         }
     }
 
