@@ -33,8 +33,15 @@ object ZaphkielCommand {
 
     @CommandBody
     val list = subCommand {
-        execute<Player> { sender, _, _ ->
-            sender.openGroupMenu()
+        execute<CommandSender> { sender, _, _ ->
+            if (sender is Player) {
+                sender.openGroupMenu()
+            } else {
+                notify(sender, "展示方案: &f${ZaphkielAPI.registeredDisplay.keys}")
+                notify(sender, "模型: &f${ZaphkielAPI.registeredModel.keys}")
+                notify(sender, "物品: &f${ZaphkielAPI.registeredItem.keys}")
+                notify(sender, "分组: &f${ZaphkielAPI.registeredGroup.keys}")
+            }
         }
     }
 

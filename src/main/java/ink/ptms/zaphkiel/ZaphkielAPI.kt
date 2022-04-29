@@ -253,11 +253,14 @@ object ZaphkielAPI {
      */
     fun loadDisplayFromFile(file: File, fromItemFile: Boolean = false) {
         if (file.isDirectory) {
-            file.listFiles()?.forEach { loadDisplayFromFile(it) }
+            file.listFiles()?.forEach { loadDisplayFromFile(it, fromItemFile) }
         } else if (file.name.endsWith(".yml")) {
             val conf = Configuration.loadFromFile(file)
             // 如果是从物品文件夹中加载，那么会将所有不包含 display 节点的物品视为 "以特殊形式加载的" 展示方案
-            conf.getKeys(false).filter { !fromItemFile || !conf.contains("$it.display") }.forEach {
+            conf.getKeys(false).forEach {
+                if (fromItemFile && (it.endsWith("$") || conf.contains("$it.display"))) {
+                    return@forEach
+                }
                 registeredDisplay[it] = Display(conf.getConfigurationSection(it)!!)
             }
         }
