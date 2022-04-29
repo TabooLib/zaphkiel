@@ -243,6 +243,7 @@ object ZaphkielAPI {
     fun reloadDisplay() {
         registeredDisplay.clear()
         loadDisplayFromFile(folderDisplay)
+        loadDisplayFromFile(folderItem, fromItemFile = true)
         PluginReloadEvent.Display().call()
     }
 
@@ -250,12 +251,15 @@ object ZaphkielAPI {
      * 从文件中加载展示方案
      * 这个操作不会清空缓存
      */
-    fun loadDisplayFromFile(file: File) {
+    fun loadDisplayFromFile(file: File, fromItemFile: Boolean = false) {
         if (file.isDirectory) {
             file.listFiles()?.forEach { loadDisplayFromFile(it) }
         } else if (file.name.endsWith(".yml")) {
             val conf = Configuration.loadFromFile(file)
-            conf.getKeys(false).forEach { registeredDisplay[it] = Display(conf.getConfigurationSection(it)!!) }
+            // 如果是从物品文件夹中加载，那么会将所有不包含 display 节点的物品视为 "以特殊形式加载的" 展示方案
+            conf.getKeys(false).filter { !fromItemFile || !conf.contains("$it.display") }.forEach {
+                registeredDisplay[it] = Display(conf.getConfigurationSection(it)!!)
+            }
         }
     }
 
@@ -266,9 +270,9 @@ object ZaphkielAPI {
         val copy = Configuration.empty(Type.YAML)
         return root.getConfigurationSection("meta")?.getKeys(false)?.mapNotNull { id ->
             if (id.endsWith("!!")) {
-                copy.set("meta.${id.substring(0, id.length - 2)}", root.get("meta.$id"))
+                copy["meta.${id.substring(0, id.length - 2)}"] = root["meta.$id"]
             } else {
-                copy.set("meta.$id", root.get("meta.$id"))
+                copy["meta.$id"] = root["meta.$id"]
             }
             val locked: Boolean
             val metaClass = if (id.endsWith("!!")) {
