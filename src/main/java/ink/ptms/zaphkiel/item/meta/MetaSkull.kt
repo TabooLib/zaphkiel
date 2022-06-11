@@ -66,7 +66,7 @@ class MetaSkull(root: ConfigurationSection) : Meta(root) {
 
     class SkullTexture(val textures: String, uuid: String?) {
 
-        val uuid: UUID? = if (uuid != null) UUID.fromString(uuid) else null
+        val uuid: UUID = if (uuid != null) UUID.fromString(uuid) else UUID.randomUUID()
     }
 
     companion object {
