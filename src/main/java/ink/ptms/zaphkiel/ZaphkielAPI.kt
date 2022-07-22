@@ -36,7 +36,6 @@ import java.util.*
  * @author sky
  * @since 2019-12-15 20:14
  */
-@Suppress("UNCHECKED_CAST")
 object ZaphkielAPI {
 
     /**

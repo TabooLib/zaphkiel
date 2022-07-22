@@ -28,7 +28,7 @@ taboolib {
     install("platform-bukkit")
     install("expansion-command-helper", "expansion-player-database")
     classifier = null
-    version = "6.0.8-3"
+    version = "6.0.9-40"
 }
 
 repositories {
@@ -40,9 +40,10 @@ dependencies {
     compileOnly("public:AttributePlus:3.2.6")
     compileOnly("public:HeadDatabase:1.3.0")
     compileOnly("public:Tiphareth:1.0.0")
-    compileOnly("public:MythicMobs:4.11.0")
+    taboo("ink.ptms:um:1.0.0-beta-6")
     compileOnly("ink.ptms:Sandalphon:1.2.7")
     compileOnly("ink.ptms.core:v11600:11600-minimize")
+    compileOnly("ink.ptms.core:v11200:11200")
     compileOnly(kotlin("stdlib"))
     compileOnly(fileTree("libs"))
     dokkaHtmlPlugin("org.jetbrains.dokka:kotlin-as-java-plugin:1.5.30")

@@ -1,21 +1,20 @@
 package ink.ptms.zaphkiel.item.kether.internal
 
-import io.lumine.xikage.mythicmobs.MythicMobs
+import ink.ptms.um.Mythic
 import org.bukkit.entity.Player
-import taboolib.library.kether.ArgTypes
-import taboolib.library.kether.ParsedAction
 import taboolib.module.kether.*
 import java.util.concurrent.CompletableFuture
 
 class ActionMythic {
 
-    class CastSkill(val skill: ParsedAction<*>) : ScriptAction<Void>() {
+    class CastSkill(skill: String) : ScriptAction<Void>() {
+
+        val skillMachine = Mythic.API.getSkillMechanic(skill)
+        val skillTrigger = Mythic.API.getSkillTrigger("API")
 
         override fun run(frame: ScriptFrame): CompletableFuture<Void> {
-            frame.newFrame(skill).run<String>().thenApply { skill ->
-                val caster = frame.script().sender?.castSafely<Player>() ?: error("No player selected.")
-                MythicMobs.inst().apiHelper.castSkill(caster, skill)
-            }
+            val caster = frame.script().sender?.castSafely<Player>() ?: error("No player selected.")
+            skillMachine?.execute(skillTrigger, caster, caster)
             return CompletableFuture.completedFuture(null)
         }
     }
@@ -25,7 +24,7 @@ class ActionMythic {
         @KetherParser(["mm"], namespace = "zaphkiel", shared = true)
         fun parser() = scriptParser {
             it.switch {
-                case("castskill") { CastSkill(it.next(ArgTypes.ACTION)) }
+                case("castskill") { CastSkill(it.nextToken()) }
             }
         }
     }
