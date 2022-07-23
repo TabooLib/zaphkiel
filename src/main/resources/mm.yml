@@ -1,7 +1,0 @@
-mm:
-  type: zombie
-  zaphkiel:
-    drops:
-      - item_intensify_sword 1-2 1
-    equipments:
-      chestplate: item_leather_armor

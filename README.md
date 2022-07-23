@@ -1,14 +1,19 @@
-# Zaphkiel
-Zaphkiel 是免费的，但我们不提供 jar 文件，你可以通过以下步骤自行构建插件。
+# Building
 
-**Windows 平台**
-```shell
+* [Gradle](https://gradle.org/) - Dependency Management
+
+The GradleWrapper in included in this project.
+
+**Windows:**
+
+```
 gradlew.bat clean build
 ```
 
-**macOS/Linux 平台**
-```shell
+**macOS/Linux:**
+
+```
 ./gradlew clean build
 ```
 
-**JavaDoc**：https://jd.ptms.ink/zaphkiel
+Build artifacts should be found in `./build/libs` folder.
