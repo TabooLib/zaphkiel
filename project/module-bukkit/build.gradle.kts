@@ -10,7 +10,7 @@ taboolib {
     }
     install("common", "platform-bukkit", "module-chat", "module-nms-util")
     install("expansion-command-helper")
-    options("skip-minimize", "keep-kotlin-module")
+    options("skip-minimize", "keep-kotlin-module", "skip-taboolib-relocate")
     classifier = null
     version = taboolib_version
 }

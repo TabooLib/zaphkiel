@@ -10,7 +10,7 @@ taboolib {
     install("platform-bukkit")
     install("module-database")
     install("expansion-player-database")
-    options("skip-minimize", "keep-kotlin-module", "skip-plugin-file")
+    options("skip-minimize", "keep-kotlin-module", "skip-plugin-file", "skip-taboolib-relocate")
     classifier = null
     version = taboolib_version
 }
@@ -23,5 +23,5 @@ dependencies {
     compileOnly("public:AttributePlus:3.2.6")
     compileOnly("public:HeadDatabase:1.3.0")
     compileOnly("public:Tiphareth:1.0.0")
-    taboo("ink.ptms:um:1.0.0-beta-7")
+    taboo("ink.ptms:um:1.0.0-beta-8")
 }
