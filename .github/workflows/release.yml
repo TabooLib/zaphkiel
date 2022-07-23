@@ -1,4 +1,4 @@
-name: Zaphkiel Release
+name: Project Release
 on:
   release:
     types: [ published ]
@@ -8,13 +8,6 @@ jobs:
     steps:
       - name: checkout repository
         uses: actions/checkout@v2
-      - name: cache gradle packages
-        uses: actions/cache@v2
-        with:
-          key: ${{ runner.os }}-build-${{ env.cache-name }}
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
       - name: validate gradle wrapper
         uses: gradle/wrapper-validation-action@v1
       - name: setup jdk 8.0
@@ -24,8 +17,6 @@ jobs:
           java-version: 8.0
       - name: make gradle wrapper executable
         run: chmod +x ./gradlew
-      - name: build
-        run: ./gradlew publish
       - name: build
         env:
           NEXUS_USERNAME: ${{ secrets.NEXUS_USERNAME }}
