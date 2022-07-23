@@ -40,7 +40,7 @@ dependencies {
     compileOnly("public:AttributePlus:3.2.6")
     compileOnly("public:HeadDatabase:1.3.0")
     compileOnly("public:Tiphareth:1.0.0")
-    taboo("ink.ptms:um:1.0.0-beta-6")
+    taboo("ink.ptms:um:1.0.0-beta-7")
     compileOnly("ink.ptms:Sandalphon:1.2.7")
     compileOnly("ink.ptms.core:v11600:11600-minimize")
     compileOnly("ink.ptms.core:v11200:11200")
