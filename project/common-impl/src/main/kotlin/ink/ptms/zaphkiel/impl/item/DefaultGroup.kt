@@ -24,7 +24,7 @@ class DefaultGroup(
     override val config: ConfigurationSection,
     override val display: ItemStack = XItemStack.deserialize(config),
     override val priority: Int = 0
-) : Group {
+) : Group() {
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

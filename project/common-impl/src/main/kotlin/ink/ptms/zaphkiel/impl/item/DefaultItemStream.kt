@@ -19,7 +19,7 @@ import taboolib.module.nms.*
  * @author 坏黑
  * @since 2022/7/23 17:02
  */
-open class DefaultItemStream(override val sourceItem: ItemStack, override val sourceCompound: ItemTag = sourceItem.getItemTag()) : ItemStream {
+open class DefaultItemStream(override val sourceItem: ItemStack, override val sourceCompound: ItemTag = sourceItem.getItemTag()) : ItemStream() {
 
     override val signal = hashSetOf<ItemSignal>()
 

@@ -12,30 +12,30 @@ import java.io.File
  */
 @Equal
 @Printable
-interface Group {
+abstract class Group {
 
     /**
      * 名称
      */
-    val name: String
+    abstract val name: String
 
     /**
      * 所在文件
      */
-    val file: File
+    abstract val file: File
 
     /**
      * 配置文件节点
      */
-    val config: ConfigurationSection
+    abstract val config: ConfigurationSection
 
     /**
      * 展示物品
      */
-    val display: ItemStack
+    abstract val display: ItemStack
 
     /**
      * 优先级（用于页面排序）
      */
-    val priority: Int
+    abstract val priority: Int
 }
