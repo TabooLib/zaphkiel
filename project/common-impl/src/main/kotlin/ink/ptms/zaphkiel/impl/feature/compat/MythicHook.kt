@@ -1,8 +1,8 @@
-package ink.ptms.zaphkiel.item.compat
+package ink.ptms.zaphkiel.impl.feature.compat
 
 import ink.ptms.um.event.MobDeathEvent
 import ink.ptms.um.event.MobSpawnEvent
-import ink.ptms.zaphkiel.ZaphkielAPI
+import ink.ptms.zaphkiel.Zaphkiel
 import org.bukkit.Material
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.entity.LivingEntity
@@ -12,6 +12,7 @@ import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common.platform.function.submit
 import taboolib.common.util.random
 import taboolib.common5.Coerce
+import taboolib.type.BukkitEquipment
 
 /**
  * Zaphkiel
@@ -37,7 +38,7 @@ internal object MythicHook {
             if (args.size == 3 && !random(Coerce.toDouble(args[2]))) {
                 return@forEach
             }
-            val item = ZaphkielAPI.getItemStack(args[0], e.killer as? Player) ?: return@forEach
+            val item = Zaphkiel.api().getItemManager().generateItemStack(args[0], e.killer as? Player) ?: return@forEach
             val amount = args.getOrElse(1) { "1" }.split("-").map { a -> Coerce.toInteger(a) }
             item.amount = random(amount[0], amount.getOrElse(1) { amount[0] })
             e.drop.add(item)
@@ -51,9 +52,9 @@ internal object MythicHook {
                 val itemStack = if (item.toString() == "air") {
                     ItemStack(Material.AIR)
                 } else {
-                    ZaphkielAPI.getItemStack(item.toString()) ?: ItemStack(Material.AIR)
+                    Zaphkiel.api().getItemManager().generateItemStack(item.toString()) ?: ItemStack(Material.AIR)
                 }
-                val equipments = ZaphkielAPI.asEquipmentSlot(slot)
+                val equipments = BukkitEquipment.fromString(slot)
                 if (equipments != null) {
                     equipments.setItem(entity, itemStack)
                     equipments.setItemDropChance(entity, 0f)

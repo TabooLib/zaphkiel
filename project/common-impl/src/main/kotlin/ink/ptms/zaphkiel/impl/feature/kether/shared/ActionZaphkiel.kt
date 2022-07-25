@@ -1,6 +1,6 @@
-package ink.ptms.zaphkiel.item.kether.shared
+package ink.ptms.zaphkiel.impl.feature.kether.shared
 
-import ink.ptms.zaphkiel.ZaphkielAPI
+import ink.ptms.zaphkiel.Zaphkiel
 import org.bukkit.entity.Player
 import taboolib.common5.Coerce
 import taboolib.library.kether.ParsedAction
@@ -14,7 +14,7 @@ class ActionZaphkiel {
         override fun run(frame: ScriptFrame): CompletableFuture<Boolean> {
             val viewer = frame.script().sender?.castSafely<Player>() ?: error("No player selected.")
             return frame.newFrame(idAction).run<Any>().thenApply {
-                val item = ZaphkielAPI.registeredItem[it.toString()] ?: error("Illegal buff id: $it.toString()")
+                val item = Zaphkiel.api().getItemManager().getItem(it.toString()) ?: error("Illegal buff id: $it.toString()")
                 frame.newFrame(amountAction).run<Any>().thenApply { am ->
                     val amount = Coerce.toInteger(am)
                     if (amount <= 0) error("Illegal amount: $am")
@@ -29,7 +29,7 @@ class ActionZaphkiel {
         override fun run(frame: ScriptFrame): CompletableFuture<Boolean> {
             val viewer = frame.script().sender?.castSafely<Player>() ?: error("No player selected.")
             return frame.newFrame(idAction).run<Any>().thenApply {
-                val item = ZaphkielAPI.registeredItem[it.toString()] ?: error("Illegal buff id: $it.toString()")
+                val item = Zaphkiel.api().getItemManager().getItem(it.toString()) ?: error("Illegal buff id: $it.toString()")
                 frame.newFrame(amountAction).run<Any>().thenApply { am ->
                     val amount = Coerce.toInteger(am)
                     if (amount <= 0) error("Illegal amount: $am")

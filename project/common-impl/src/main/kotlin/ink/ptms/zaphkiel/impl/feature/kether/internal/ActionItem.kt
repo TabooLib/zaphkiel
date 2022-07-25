@@ -1,10 +1,10 @@
-package ink.ptms.zaphkiel.item.kether.internal
+package ink.ptms.zaphkiel.impl.feature.kether.internal
 
 import ink.ptms.zaphkiel.api.ItemSignal
-import ink.ptms.zaphkiel.item.damageItem
-import ink.ptms.zaphkiel.item.getCurrentDurability
+import ink.ptms.zaphkiel.impl.feature.damageItem
+import ink.ptms.zaphkiel.impl.feature.getCurrentDurability
+import ink.ptms.zaphkiel.impl.feature.repairItem
 import ink.ptms.zaphkiel.item.kether.itemStream
-import ink.ptms.zaphkiel.item.repairItem
 import org.bukkit.entity.Player
 import taboolib.common5.Coerce
 import taboolib.library.kether.ArgTypes

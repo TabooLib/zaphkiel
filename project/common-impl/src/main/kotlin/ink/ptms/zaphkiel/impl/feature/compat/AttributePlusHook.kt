@@ -1,6 +1,6 @@
-package ink.ptms.zaphkiel.item.compat
+package ink.ptms.zaphkiel.impl.feature.compat
 
-import ink.ptms.zaphkiel.ZaphkielAPI
+import ink.ptms.zaphkiel.toItemStream
 import org.bukkit.entity.Player
 import org.serverct.ersha.api.AttributeAPI
 import org.serverct.ersha.attribute.data.AttributeData
@@ -9,7 +9,6 @@ import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common.reflect.Reflex.Companion.getProperty
 import taboolib.common5.Coerce
 import taboolib.platform.util.isAir
-import taboolib.platform.util.isNotAir
 import taboolib.type.BukkitEquipment
 
 internal object AttributePlusHook {
@@ -26,7 +25,7 @@ internal object AttributePlusHook {
                 if (item.isAir()) {
                     return
                 }
-                val itemStream = ZaphkielAPI.read(item)
+                val itemStream = item.toItemStream()
                 if (itemStream.isVanilla()) {
                     return
                 }

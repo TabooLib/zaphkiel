@@ -1,9 +1,9 @@
-package ink.ptms.zaphkiel.item.kether.internal
+package ink.ptms.zaphkiel.impl.feature.kether.internal
 
-import ink.ptms.zaphkiel.item.getItemInCooldown
-import ink.ptms.zaphkiel.item.isItemInCooldown
+import ink.ptms.zaphkiel.impl.feature.getItemInCooldown
+import ink.ptms.zaphkiel.impl.feature.isItemInCooldown
+import ink.ptms.zaphkiel.impl.feature.setItemInCooldown
 import ink.ptms.zaphkiel.item.kether.itemStream
-import ink.ptms.zaphkiel.item.setItemInCooldown
 import org.bukkit.entity.Player
 import taboolib.common5.Coerce
 import taboolib.library.kether.ArgTypes
