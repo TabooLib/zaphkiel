@@ -11,6 +11,7 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import taboolib.common.util.unsafeLazy
 import taboolib.module.nms.*
+import taboolib.platform.util.isNotAir
 
 /**
  * Zaphkiel
@@ -70,13 +71,15 @@ open class DefaultItemStream(override val sourceItem: ItemStack, override val so
     }
 
     override fun toItemStack(player: Player?): ItemStack {
-        val itemMeta = sourceItem.setItemTag(sourceCompound).itemMeta
-        if (itemMeta != null) {
-            val event = ItemReleaseEvent(sourceItem.type, sourceItem.durability.toInt(), itemMeta, this, player)
-            event.call()
-            sourceItem.type = event.icon
-            sourceItem.itemMeta = event.itemMeta
-            sourceItem.durability = event.data.toShort()
+        if (sourceItem.isNotAir()) {
+            val itemMeta = sourceItem.setItemTag(sourceCompound).itemMeta
+            if (itemMeta != null) {
+                val event = ItemReleaseEvent(sourceItem.type, sourceItem.durability.toInt(), itemMeta, this, player)
+                event.call()
+                sourceItem.type = event.icon
+                sourceItem.itemMeta = event.itemMeta
+                sourceItem.durability = event.data.toShort()
+            }
         }
         val final = ItemReleaseEvent.Final(sourceItem, this, player)
         final.call()
