@@ -36,7 +36,7 @@ class DefaultItemSerializer : ItemSerializer {
 
     override fun serialize(itemStream: ItemStream): SerializedItem {
         return if (itemStream.isVanilla()) {
-            DefaultSerializedItem("minecraft:${XMaterial.matchXMaterial(itemStream.sourceItem).name.lowercase()}", 1, null, null)
+            DefaultSerializedItem("minecraft:${XMaterial.matchXMaterial(itemStream.sourceItem).name.lowercase()}", itemStream.sourceItem.amount, null, null)
         } else {
             DefaultSerializedItem(
                 itemStream.getZaphkielName(),
