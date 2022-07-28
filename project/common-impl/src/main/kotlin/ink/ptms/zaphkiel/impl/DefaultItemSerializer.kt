@@ -80,11 +80,11 @@ class DefaultItemSerializer : ItemSerializer {
             val itemStream = Zaphkiel.api().getItemManager().generateItem(item.id) ?: error("item not found: ${item.id}")
             val data = item.data
             if (data != null) {
-                itemStream.sourceCompound[ItemKey.DATA.key] = ItemTagSerializer.deserializeData(data)
+                itemStream.getZaphkielData()[ItemKey.DATA.key] = ItemTagSerializer.deserializeData(data)
             }
             val unique = item.uniqueData
             if (unique != null) {
-                itemStream.sourceCompound[ItemKey.UNIQUE.key] = ItemTag().also {
+                itemStream.getZaphkielData()[ItemKey.UNIQUE.key] = ItemTag().also {
                     it["player"] = ItemTagData(unique.player)
                     it["date"] = ItemTagData(unique.date)
                     it["date-formatted"] = ItemTagData(DateFormatUtils.format(unique.date, MetaUnique.FORMAT))
