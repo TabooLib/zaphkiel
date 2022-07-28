@@ -12,6 +12,7 @@ import ink.ptms.zaphkiel.impl.item.DefaultSerializedItem
 import ink.ptms.zaphkiel.impl.meta.MetaUnique
 import org.apache.commons.lang3.time.DateFormatUtils
 import org.bukkit.inventory.ItemStack
+import taboolib.library.xseries.XMaterial
 import taboolib.library.xseries.parseToItemStack
 import taboolib.module.nms.ItemTag
 import taboolib.module.nms.ItemTagData
@@ -35,7 +36,7 @@ class DefaultItemSerializer : ItemSerializer {
 
     override fun serialize(itemStream: ItemStream): SerializedItem {
         return if (itemStream.isVanilla()) {
-            DefaultSerializedItem("minecraft:${itemStream.sourceItem.type.name.lowercase()}", 1, null, null)
+            DefaultSerializedItem("minecraft:${XMaterial.matchXMaterial(itemStream.sourceItem).name.lowercase()}", 1, null, null)
         } else {
             DefaultSerializedItem(
                 itemStream.getZaphkielName(),
