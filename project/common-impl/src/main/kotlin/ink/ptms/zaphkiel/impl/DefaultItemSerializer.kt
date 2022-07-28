@@ -59,7 +59,7 @@ class DefaultItemSerializer : ItemSerializer {
         }
         val id = json["id"]!!.asString
         return if (id.startsWith("minecraft:")) {
-            DefaultItemStream(id.substring("minecraft:".length).parseToItemStack())
+            DefaultItemStream(id.substring("minecraft:".length).parseToItemStack().also { it.amount = json["amount"]?.asInt ?: 1 })
         } else {
             deserialize(
                 DefaultSerializedItem(
@@ -76,7 +76,7 @@ class DefaultItemSerializer : ItemSerializer {
 
     override fun deserialize(item: SerializedItem): ItemStream {
         return if (item.id.startsWith("minecraft:")) {
-            DefaultItemStream(item.id.substring("minecraft:".length).parseToItemStack())
+            DefaultItemStream(item.id.substring("minecraft:".length).parseToItemStack().also { it.amount = item.amount })
         } else {
             val itemStream = Zaphkiel.api().getItemManager().generateItem(item.id) ?: error("item not found: ${item.id}")
             val data = item.data
