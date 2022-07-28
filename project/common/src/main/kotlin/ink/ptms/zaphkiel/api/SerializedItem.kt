@@ -21,6 +21,11 @@ interface SerializedItem : JsonContainer {
     val id: String
 
     /**
+     * 关键字段「物品数量」
+     */
+    val amount: Int
+
+    /**
      * 关键字段「物品数据」
      */
     val data: JsonObject?

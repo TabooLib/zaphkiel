@@ -27,7 +27,7 @@ import taboolib.platform.util.isAir
  */
 class DefaultItemSerializer : ItemSerializer {
 
-    val air = DefaultSerializedItem("minecraft:air", null, null)
+    val air = DefaultSerializedItem("minecraft:air", 1, null, null)
 
     override fun serialize(itemStack: ItemStack): SerializedItem {
         return if (itemStack.isAir()) air else serialize(Zaphkiel.api().getItemHandler().read(itemStack))
@@ -35,10 +35,11 @@ class DefaultItemSerializer : ItemSerializer {
 
     override fun serialize(itemStream: ItemStream): SerializedItem {
         return if (itemStream.isVanilla()) {
-            DefaultSerializedItem("minecraft:${itemStream.sourceItem.type.name.lowercase()}", null, null)
+            DefaultSerializedItem("minecraft:${itemStream.sourceItem.type.name.lowercase()}", 1, null, null)
         } else {
             DefaultSerializedItem(
                 itemStream.getZaphkielName(),
+                itemStream.sourceItem.amount,
                 itemStream.getZaphkielData().takeIf { it.isNotEmpty() }?.let { ItemTagSerializer.serializeData(it).asJsonObject },
                 itemStream.getZaphkielUniqueData()?.let {
                     DefaultSerializedItem.UniqueData(it["player"]?.asString(), it["date"]!!.asLong(), it["uuid"]!!.asString())
@@ -59,9 +60,16 @@ class DefaultItemSerializer : ItemSerializer {
         return if (id.startsWith("minecraft:")) {
             DefaultItemStream(id.substring("minecraft:".length).parseToItemStack())
         } else {
-            deserialize(DefaultSerializedItem(json["id"]!!.asString, json["data"]?.asJsonObject, json["unique"]?.asJsonObject?.let {
-                DefaultSerializedItem.UniqueData(it["player"]?.asString, it["date"]!!.asLong, it["uuid"]!!.asString)
-            }))
+            deserialize(
+                DefaultSerializedItem(
+                    json["id"]!!.asString,
+                    json["amount"]?.asInt ?: 1,
+                    json["data"]?.asJsonObject,
+                    json["unique"]?.asJsonObject?.let {
+                        DefaultSerializedItem.UniqueData(it["player"]?.asString, it["date"]!!.asLong, it["uuid"]!!.asString)
+                    }
+                )
+            )
         }
     }
 
@@ -83,6 +91,7 @@ class DefaultItemSerializer : ItemSerializer {
                     it["uuid"] = ItemTagData(unique.uuid)
                 }
             }
+            itemStream.sourceItem.amount = item.amount
             itemStream
         }
     }
