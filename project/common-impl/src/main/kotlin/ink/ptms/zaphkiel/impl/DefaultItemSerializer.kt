@@ -16,6 +16,7 @@ import taboolib.library.xseries.parseToItemStack
 import taboolib.module.nms.ItemTag
 import taboolib.module.nms.ItemTagData
 import taboolib.module.nms.ItemTagSerializer
+import taboolib.platform.util.isAir
 
 /**
  * Zaphkiel
@@ -26,8 +27,10 @@ import taboolib.module.nms.ItemTagSerializer
  */
 class DefaultItemSerializer : ItemSerializer {
 
+    val air = DefaultSerializedItem("minecraft:air", null, null)
+
     override fun serialize(itemStack: ItemStack): SerializedItem {
-        return serialize(Zaphkiel.api().getItemHandler().read(itemStack))
+        return if (itemStack.isAir()) air else serialize(Zaphkiel.api().getItemHandler().read(itemStack))
     }
 
     override fun serialize(itemStream: ItemStream): SerializedItem {
