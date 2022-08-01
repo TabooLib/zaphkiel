@@ -1,4 +1,4 @@
-package ink.ptms.zaphkiel.impl.feature.kether.internal
+package ink.ptms.zaphkiel.impl.feature.kether
 
 import ink.ptms.um.Mythic
 import org.bukkit.entity.Player

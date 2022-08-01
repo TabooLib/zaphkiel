@@ -1,4 +1,4 @@
-package ink.ptms.zaphkiel.impl.feature.kether.shared
+package ink.ptms.zaphkiel.impl.feature.kether
 
 import ink.ptms.zaphkiel.Zaphkiel
 import org.bukkit.entity.Player

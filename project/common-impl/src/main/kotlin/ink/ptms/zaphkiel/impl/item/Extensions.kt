@@ -2,8 +2,10 @@
 
 package ink.ptms.zaphkiel.impl.item
 
+import ink.ptms.zaphkiel.Zaphkiel
 import ink.ptms.zaphkiel.api.Item
 import ink.ptms.zaphkiel.api.ItemEvent
+import ink.ptms.zaphkiel.api.ItemStream
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 import taboolib.common.util.asList
@@ -12,12 +14,16 @@ import taboolib.library.xseries.parseToXMaterial
 import taboolib.module.chat.colored
 import java.util.ArrayList
 
-fun parseIcon(config: ConfigurationSection): ItemStack {
+fun ItemStack.toItemStream(): ItemStream {
+    return Zaphkiel.api().getItemHandler().read(this)
+}
+
+internal fun parseIcon(config: ConfigurationSection): ItemStack {
     val node = if (config.contains("icon!!")) "icon!!" else "icon"
     return config.getString(node, "STONE")!!.parseToXMaterial().parseItem() ?: ItemStack(Material.STONE)
 }
 
-fun parseName(config: ConfigurationSection): MutableMap<String, String> {
+internal fun parseName(config: ConfigurationSection): MutableMap<String, String> {
     val map = HashMap<String, String>()
     val node = if (config.contains("name!!")) "name!!" else "name"
     val name = config.getConfigurationSection(node) ?: return HashMap()
@@ -27,7 +33,7 @@ fun parseName(config: ConfigurationSection): MutableMap<String, String> {
     return map
 }
 
-fun parseLore(config: ConfigurationSection): MutableMap<String, MutableList<String>> {
+internal fun parseLore(config: ConfigurationSection): MutableMap<String, MutableList<String>> {
     val map = HashMap<String, MutableList<String>>()
     val node = if (config.contains("lore!!")) "lore!!" else "lore"
     val lore = config.getConfigurationSection(node) ?: return HashMap()
@@ -44,7 +50,7 @@ fun parseLore(config: ConfigurationSection): MutableMap<String, MutableList<Stri
     return map
 }
 
-fun parseEvent(item: Item, config: ConfigurationSection): MutableMap<String, ItemEvent> {
+internal fun parseEvent(item: Item, config: ConfigurationSection): MutableMap<String, ItemEvent> {
     val map = HashMap<String, ItemEvent>()
     val event = config.getConfigurationSection("event") ?: return HashMap()
     event.getKeys(false).forEach { key ->
@@ -58,7 +64,7 @@ fun parseEvent(item: Item, config: ConfigurationSection): MutableMap<String, Ite
     return map
 }
 
-fun List<String>.split(size: Int) = colored().flatMap { line ->
+internal fun List<String>.split(size: Int) = colored().flatMap { line ->
     if (line.length > size) {
         val arr = ArrayList<String>()
         var s = line

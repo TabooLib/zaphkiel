@@ -1,6 +1,6 @@
 package ink.ptms.zaphkiel.impl.feature.compat
 
-import ink.ptms.zaphkiel.toItemStream
+import ink.ptms.zaphkiel.impl.item.toItemStream
 import org.bukkit.entity.Player
 import org.serverct.ersha.api.AttributeAPI
 import org.serverct.ersha.attribute.data.AttributeData

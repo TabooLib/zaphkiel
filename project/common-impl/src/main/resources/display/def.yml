@@ -3,11 +3,3 @@ DISPLAY_ITEM:
   lore:
     - '&9<TYPE>'
     - '&f<LORE...>'
-
-DISPLAY_CONSUMEABLE:
-  name: '&7<NAME> <DURABILITY>'
-  lore:
-    - '&9<TYPE>'
-    - '&f<LORE...>'
-  meta:
-    shiny: true

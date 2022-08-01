@@ -1,4 +1,4 @@
-package ink.ptms.zaphkiel.impl.feature.kether.internal
+package ink.ptms.zaphkiel.impl.feature.kether
 
 import org.bukkit.entity.Player
 import org.bukkit.potion.PotionEffect

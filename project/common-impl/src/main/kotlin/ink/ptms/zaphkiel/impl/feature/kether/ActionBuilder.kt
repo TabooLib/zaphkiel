@@ -1,7 +1,8 @@
-package ink.ptms.zaphkiel.item.kether
+package ink.ptms.zaphkiel.impl.feature.kether
 
 import ink.ptms.zaphkiel.api.event.ItemBuildEvent
 import ink.ptms.zaphkiel.api.event.ItemReleaseEvent
+import ink.ptms.zaphkiel.impl.feature.kether.itemEvent
 import org.bukkit.event.Cancellable
 import org.bukkit.event.Event
 import taboolib.common5.Coerce
@@ -11,7 +12,7 @@ import taboolib.module.kether.*
 
 /**
  * Zaphkiel
- * ink.ptms.zaphkiel.item.kether.ActionBuilder
+ * ink.ptms.zaphkiel.impl.feature.kether.ActionBuilder
  *
  * @author sky
  * @since 2021/10/20 10:42 下午
