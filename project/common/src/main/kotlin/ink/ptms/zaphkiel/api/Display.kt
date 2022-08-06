@@ -14,45 +14,45 @@ import taboolib.library.configuration.ConfigurationSection
  */
 @Equal
 @Printable
-interface Display {
+abstract class Display {
 
     /**
      * 配置文件节点
      */
-    val config: ConfigurationSection
+    abstract val config: ConfigurationSection
 
     /**
      * 序号
      */
-    val id: String
+    abstract val id: String
 
     /**
      * 展示名称
      */
-    val name: String?
+    abstract val name: String?
 
     /**
      * 展示描述
      */
-    val lore: List<String>
+    abstract val lore: List<String>
 
     /**
      * 展示名称结构
      */
-    val structureName: StructureSingle?
+    abstract val structureName: StructureSingle?
 
     /**
      * 结构名称描述
      */
-    val structureLore: StructureList
+    abstract val structureLore: StructureList
 
     /**
      * 元数据
      */
-    val meta: List<Meta>
+    abstract val meta: List<Meta>
 
     /**
      * 构建展示方案
      */
-    fun build(name: Map<String, String>, lore: Map<String, List<String>>, trim: Boolean = true): DisplayProduct
+    abstract fun build(name: Map<String, String>, lore: Map<String, List<String>>, trim: Boolean = true): DisplayProduct
 }

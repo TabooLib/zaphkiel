@@ -16,14 +16,14 @@ import taboolib.module.configuration.Type
  * @author sky
  * @since 2019-12-26 9:53
  */
-object ItemBuilder {
+internal object ItemBuildHandler {
 
     val dropMeta by unsafeLazy {
         Zaphkiel.api().getItemManager().getMetaMap().map { it.value.invokeConstructor(Configuration.empty(Type.YAML)) }.associateBy { it.id }
     }
 
     @SubscribeEvent
-    fun e(e: ItemBuildEvent.Post) {
+    fun onBuildPost(e: ItemBuildEvent.Post) {
         e.itemStream.dropMeta.forEach {
             dropMeta[it]?.drop(e.player, e.itemStream.sourceCompound)
         }
@@ -36,7 +36,7 @@ object ItemBuilder {
     }
 
     @SubscribeEvent
-    fun e(e: ItemReleaseEvent) {
+    fun onRelease(e: ItemReleaseEvent) {
         val itemStream = e.itemStream
         itemStream.dropMeta.forEach {
             val meta = dropMeta[it]

@@ -12,7 +12,7 @@ import taboolib.library.configuration.ConfigurationSection
  * @author 坏黑
  * @since 2022/7/23 16:58
  */
-class DefaultDisplay(override val config: ConfigurationSection) : Display {
+class DefaultDisplay(override val config: ConfigurationSection) : Display() {
 
     override val id = config.name
 

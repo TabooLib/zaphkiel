@@ -4,7 +4,7 @@ import ink.ptms.zaphkiel.api.ItemStream
 import ink.ptms.zaphkiel.api.event.ItemBuildEvent
 import ink.ptms.zaphkiel.api.event.ItemEvent
 import ink.ptms.zaphkiel.api.event.ItemReleaseEvent
-import ink.ptms.zaphkiel.toItemStream
+import ink.ptms.zaphkiel.impl.item.toItemStream
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
@@ -28,7 +28,7 @@ import taboolib.platform.util.isNotAir
 internal object ItemListener {
 
     @Schedule(period = 100, async = true)
-    fun e() {
+    fun onAsyncTick() {
         Bukkit.getOnlinePlayers().forEach {
             it.inventory.filter { item -> item.isNotAir() }.forEach { item ->
                 val event = ItemEvent.AsyncTick(item.toItemStream(), it)
@@ -41,22 +41,22 @@ internal object ItemListener {
     }
 
     @SubscribeEvent
-    fun e(e: ItemBuildEvent.Pre) {
+    fun onBuildPre(e: ItemBuildEvent.Pre) {
         e.itemStream.getZaphkielItem().invokeScript("onBuild", e.player, e, e.itemStream, "zaphkiel-build")
     }
 
     @SubscribeEvent
-    fun e(e: ItemReleaseEvent) {
+    fun onRelease(e: ItemReleaseEvent) {
         e.itemStream.getZaphkielItem().invokeScript("onRelease", e.player, e, e.itemStream, "zaphkiel-build")
     }
 
     @SubscribeEvent
-    fun e(e: ItemReleaseEvent.Display) {
+    fun onReleaseDisplay(e: ItemReleaseEvent.Display) {
         e.itemStream.getZaphkielItem().invokeScript("onReleaseDisplay", e.player, e, e.itemStream, "zaphkiel-build")
     }
 
     @SubscribeEvent
-    fun e(e: EntityDamageByEntityEvent) {
+    fun onAttack(e: EntityDamageByEntityEvent) {
         val attacker = e.attacker
         if (attacker is Player && attacker.itemInHand.isNotAir()) {
             val itemStream = attacker.itemInHand.toItemStream()
@@ -67,12 +67,12 @@ internal object ItemListener {
     }
 
     @SubscribeEvent
-    fun e(e: PlayerJoinEvent) {
+    fun onJoin(e: PlayerJoinEvent) {
         e.player.onSelect()
     }
 
     @SubscribeEvent(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    fun e(e: PlayerChangedWorldEvent) {
+    fun onChangeWorld(e: PlayerChangedWorldEvent) {
         e.player.onSelect()
     }
 
@@ -81,7 +81,7 @@ internal object ItemListener {
      * 触发事件
      */
     @SubscribeEvent(ignoreCancelled = true)
-    fun e(e: PlayerItemBreakEvent) {
+    fun onBreak(e: PlayerItemBreakEvent) {
         val itemStream = e.brokenItem.toItemStream()
         if (itemStream.isExtension()) {
             itemStream.getZaphkielItem().invokeScript("onItemBreak", e, itemStream)
@@ -93,7 +93,7 @@ internal object ItemListener {
      * 触发事件及脚本
      */
     @SubscribeEvent(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    fun e(e: PlayerItemConsumeEvent) {
+    fun onConsume(e: PlayerItemConsumeEvent) {
         val itemStack = e.item
         if (itemStack.isAir()) {
             return
@@ -118,7 +118,7 @@ internal object ItemListener {
      * 触发事件及脚本
      */
     @SubscribeEvent
-    fun e(e: PlayerInteractEvent) {
+    fun onInteract(e: PlayerInteractEvent) {
         if (e.item.isAir()) {
             return
         }
@@ -151,7 +151,7 @@ internal object ItemListener {
      * 触发事件及脚本
      */
     @SubscribeEvent
-    fun e(e: PlayerInteractEntityEvent) {
+    fun onInteractAtEntity(e: PlayerInteractEntityEvent) {
         if (e.player.inventory.itemInMainHand.isNotAir() && e.hand == EquipmentSlot.HAND) {
             val itemStream = e.player.inventory.itemInMainHand.toItemStream()
             if (itemStream.isVanilla()) {
@@ -172,7 +172,7 @@ internal object ItemListener {
      * 触发脚本
      */
     @SubscribeEvent(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    fun e(e: PlayerSwapHandItemsEvent) {
+    fun onSwap(e: PlayerSwapHandItemsEvent) {
         if (e.offHandItem.isNotAir()) {
             val itemStream = e.offHandItem!!.toItemStream()
             if (itemStream.isExtension()) {
@@ -192,7 +192,7 @@ internal object ItemListener {
      * 触发脚本
      */
     @SubscribeEvent(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    fun e(e: BlockBreakEvent) {
+    fun onBreak(e: BlockBreakEvent) {
         if (e.player.inventory.itemInMainHand.isAir()) {
             return
         }
@@ -207,7 +207,7 @@ internal object ItemListener {
      * 触发事件及脚本
      */
     @SubscribeEvent(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    fun e(e: PlayerDropItemEvent) {
+    fun onDrop(e: PlayerDropItemEvent) {
         if (e.itemDrop.itemStack.isNotAir()) {
             val itemStream = e.itemDrop.itemStack.toItemStream()
             if (itemStream.isVanilla()) {
@@ -232,7 +232,7 @@ internal object ItemListener {
      * 触发事件及脚本
      */
     @SubscribeEvent(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    fun e(e: PlayerPickupItemEvent) {
+    fun onPickup(e: PlayerPickupItemEvent) {
         if (e.item.itemStack.isNotAir()) {
             val itemStream = e.item.itemStack.toItemStream()
             if (itemStream.isVanilla()) {
@@ -257,7 +257,7 @@ internal object ItemListener {
      * 触发事件
      */
     @SubscribeEvent(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    fun e(e: InventoryClickEvent) {
+    fun onClick(e: InventoryClickEvent) {
         val itemStreamCurrent = if (e.currentItem.isNotAir()) e.currentItem!!.toItemStream() else null
         var itemStreamButton: ItemStream? = null
         if (e.click == ClickType.NUMBER_KEY) {

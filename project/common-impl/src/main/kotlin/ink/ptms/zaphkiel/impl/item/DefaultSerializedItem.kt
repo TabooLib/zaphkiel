@@ -10,7 +10,12 @@ import ink.ptms.zaphkiel.api.SerializedItem
  * @author 坏黑
  * @since 2022/7/23 17:36
  */
-data class DefaultSerializedItem(override val id: String, override val data: JsonObject?, override val uniqueData: SerializedItem.UniqueData?) : SerializedItem {
+data class DefaultSerializedItem(
+    override val id: String,
+    override val amount: Int,
+    override val data: JsonObject?,
+    override val uniqueData: SerializedItem.UniqueData?,
+) : SerializedItem {
 
     override fun toJson(): String {
         return toJsonObject().toString()
@@ -19,6 +24,7 @@ data class DefaultSerializedItem(override val id: String, override val data: Jso
     override fun toJsonObject(): JsonObject {
         val json = JsonObject()
         json.addProperty("id", id)
+        json.addProperty("amount", amount)
         if (data != null && data.size() > 0) {
             json.add("data", data)
         }

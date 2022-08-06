@@ -31,7 +31,7 @@ import java.util.function.Consumer
  * @author 坏黑
  * @since 2022/7/23 16:51
  */
-class DefaultItem(override val config: ConfigurationSection, override val group: Group?) : Item {
+class DefaultItem(override val config: ConfigurationSection, override val group: Group?) : Item() {
 
     override val id = config.name
 

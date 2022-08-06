@@ -18,6 +18,7 @@ tasks {
         exclude("META-INF/tf/**")
         exclude("module-info.java")
         relocate("ink.ptms.um", "ink.ptms.zaphkiel.um")
+        relocate("taboolib", "ink.ptms.zaphkiel.taboolib")
     }
     build {
         dependsOn(shadowJar)

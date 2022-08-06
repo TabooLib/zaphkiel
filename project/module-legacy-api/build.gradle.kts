@@ -9,7 +9,7 @@ taboolib {
         name(rootProject.name)
     }
     install("common", "platform-bukkit", "module-nms", "module-nms-util", "module-configuration")
-    options("skip-minimize", "keep-kotlin-module")
+    options("skip-minimize", "keep-kotlin-module", "skip-taboolib-relocate")
     classifier = null
     version = taboolib_version
 }
