@@ -2,7 +2,7 @@ plugins {
     id("org.gradle.java")
     id("org.gradle.maven-publish")
     id("org.jetbrains.kotlin.jvm") version "1.5.10" apply false
-    id("org.jetbrains.dokka") version "1.7.10"
+    id("org.jetbrains.dokka") version "1.7.10" apply false
 }
 
 subprojects {
@@ -48,6 +48,6 @@ publishing {
     }
 }
 
-//gradle.buildFinished {
-//    buildDir.deleteRecursively()
-//}
+gradle.buildFinished {
+    buildDir.deleteRecursively()
+}
