@@ -1,7 +1,6 @@
 package ink.ptms.zaphkiel.impl.meta
 
 import ink.ptms.zaphkiel.item.meta.Meta
-import ink.ptms.zaphkiel.item.meta.MetaKey
 import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.meta.ItemMeta
 import taboolib.library.configuration.ConfigurationSection
@@ -13,6 +12,9 @@ class MetaItemFlag(root: ConfigurationSection) : Meta(root) {
         .mapNotNull { kotlin.runCatching { ItemFlag.valueOf(it.uppercase()) }.getOrNull() }
         .toSet()
         .toTypedArray()
+
+    override val id: String
+        get() = "itemflag"
 
     override fun build(itemMeta: ItemMeta) {
         itemMeta.addItemFlags(*itemflag)

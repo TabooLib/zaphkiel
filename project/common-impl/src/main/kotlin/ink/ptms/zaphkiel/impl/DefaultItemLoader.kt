@@ -9,8 +9,8 @@ import ink.ptms.zaphkiel.item.meta.Meta
 import taboolib.common.platform.function.getDataFolder
 import taboolib.common.platform.function.info
 import taboolib.common.platform.function.releaseResourceFile
-import taboolib.common.reflect.Reflex.Companion.invokeConstructor
 import taboolib.library.configuration.ConfigurationSection
+import taboolib.library.reflex.Reflex.Companion.invokeConstructor
 import taboolib.module.configuration.Configuration
 import taboolib.module.configuration.Type
 import java.io.File
@@ -130,7 +130,7 @@ class DefaultItemLoader : ItemLoader {
                 locked = false
                 itemManager.registeredMeta[id]
             } ?: return@mapNotNull null
-            val meta = metaClass.invokeConstructor(copy) as Meta
+            val meta: Meta = metaClass.invokeConstructor(copy)
             meta.locked = locked
             meta
         }?.toMutableList() ?: ArrayList()
