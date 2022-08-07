@@ -12,41 +12,39 @@ object Translator {
     val regexShort = Pattern.compile("\\d+s")!!
 
     fun toNBTBase(obj: Any?): ItemTagData? {
-        when (obj) {
-            is String -> return if (regexShort.matcher(obj.toString()).matches()) {
+        return when (obj) {
+            is String -> if (regexShort.matcher(obj.toString()).matches()) {
                 toNBTBase(java.lang.Short.valueOf(obj.toString().substring(0, obj.toString().length - 1)))
             } else {
                 ItemTagData(obj as String?)
             }
-            is Int -> return ItemTagData(obj)
-            is Double -> return ItemTagData(obj)
-            is Float -> return ItemTagData(obj)
-            is Short -> return ItemTagData(obj)
-            is Long -> return ItemTagData(obj)
-            is Byte -> return ItemTagData(obj)
-            is List<*> -> return toNBTList(ItemTagList(), (obj as List<*>?)!!)
+            is Int -> ItemTagData(obj)
+            is Double -> ItemTagData(obj)
+            is Float -> ItemTagData(obj)
+            is Short -> ItemTagData(obj)
+            is Long -> ItemTagData(obj)
+            is Byte -> ItemTagData(obj)
+            is List<*> -> toNBTList(ItemTagList(), (obj as List<*>?)!!)
             is Map<*, *> -> {
                 val nbtCompound = ItemTag()
                 obj.forEach { (key, value) -> nbtCompound[key.toString()] = toNBTBase(value) }
-                return nbtCompound
+                nbtCompound
             }
             is ConfigurationSection -> {
                 val nbtCompound = ItemTag()
                 obj.getValues(false).forEach { (key, value) -> nbtCompound[key] = toNBTBase(value) }
-                return nbtCompound
+                nbtCompound
             }
-            else -> {
-                return ItemTagData("Error: " + obj!!)
-            }
+            else -> ItemTagData("Error: " + obj!!)
         }
     }
 
     fun toNBTList(nbtList: ItemTagList, list: List<*>): ItemTagList {
-        for (obj in list) {
+        list.forEach { obj ->
             val base = toNBTBase(obj)
             if (base == null) {
                 warning("Invalid Type: " + obj + " [" + obj!!.javaClass.simpleName + "]")
-                continue
+                return@forEach
             }
             nbtList.add(base)
         }
@@ -54,7 +52,7 @@ object Translator {
     }
 
     fun toNBTCompound(nbt: ItemTag, section: ConfigurationSection): ItemTag {
-        for (key in section.getKeys(false)) {
+        section.getKeys(false).forEach { key ->
             val obj = section[key]
             val base: ItemTagData?
             if (obj is ConfigurationSection) {
@@ -63,7 +61,7 @@ object Translator {
                 base = toNBTBase(obj)
                 if (base == null) {
                     warning("Invalid Type: " + obj + " [" + obj!!.javaClass.simpleName + "]")
-                    continue
+                    return@forEach
                 }
             }
             if (key.endsWith("!!")) {

@@ -1,7 +1,6 @@
 package ink.ptms.zaphkiel.impl.meta
 
 import ink.ptms.zaphkiel.item.meta.Meta
-import ink.ptms.zaphkiel.item.meta.MetaKey
 import org.bukkit.attribute.AttributeModifier
 import org.bukkit.entity.Player
 import org.bukkit.inventory.EquipmentSlot
@@ -74,6 +73,9 @@ class MetaAttribute(root: ConfigurationSection) : Meta(root) {
             }
         }
     }
+
+    override val id: String
+        get() = "attribute"
 
     override fun build(player: Player?, compound: ItemTag) {
         if (MinecraftVersion.majorLegacy < 11600) {

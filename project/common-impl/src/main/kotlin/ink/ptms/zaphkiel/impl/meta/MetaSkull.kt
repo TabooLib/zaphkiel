@@ -3,7 +3,6 @@ package ink.ptms.zaphkiel.impl.meta
 import com.mojang.authlib.GameProfile
 import com.mojang.authlib.properties.Property
 import ink.ptms.zaphkiel.item.meta.Meta
-import ink.ptms.zaphkiel.item.meta.MetaKey
 import me.arcaniax.hdb.api.HeadDatabaseAPI
 import org.bukkit.inventory.meta.ItemMeta
 import org.bukkit.inventory.meta.SkullMeta
@@ -28,6 +27,9 @@ class MetaSkull(root: ConfigurationSection) : Meta(root) {
     } else null
 
     val skullHeadDatabase = root.getString("meta.skull.head-database")
+
+    override val id: String
+        get() = "skull"
 
     override fun build(itemMeta: ItemMeta) {
         if (itemMeta is SkullMeta) {

@@ -12,7 +12,7 @@ abstract class Meta(val root: ConfigurationSection) {
     /**
      * 元数据序号
      */
-    val id = if (javaClass.isAssignableFrom(MetaKey::class.java)) javaClass.getAnnotation(MetaKey::class.java).value else javaClass.name.toString()
+    abstract val id: String
 
     /**
      * 元数据是否上锁

@@ -1,7 +1,6 @@
 package ink.ptms.zaphkiel.impl.meta
 
 import ink.ptms.zaphkiel.item.meta.Meta
-import ink.ptms.zaphkiel.item.meta.MetaKey
 import org.bukkit.Color
 import org.bukkit.inventory.meta.ItemMeta
 import org.bukkit.inventory.meta.LeatherArmorMeta
@@ -15,6 +14,9 @@ class MetaColor(root: ConfigurationSection) : Meta(root) {
     val color = root.getString("meta.color")?.split("-")?.run {
         Color.fromRGB(Coerce.toInteger(getOrElse(0) { 0 }), Coerce.toInteger(getOrElse(1) { 0 }), Coerce.toInteger(getOrElse(2) { 0 }))
     }
+
+    override val id: String
+        get() = "color"
 
     override fun build(itemMeta: ItemMeta) {
         if (itemMeta is PotionMeta) {

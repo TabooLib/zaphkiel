@@ -3,7 +3,6 @@ package ink.ptms.zaphkiel.impl.meta
 import ink.ptms.tiphareth.TipharethAPI
 import ink.ptms.zaphkiel.api.event.ItemReleaseEvent
 import ink.ptms.zaphkiel.item.meta.Meta
-import ink.ptms.zaphkiel.item.meta.MetaKey
 import taboolib.library.configuration.ConfigurationSection
 
 @Suppress("SpellCheckingInspection")
@@ -11,6 +10,9 @@ import taboolib.library.configuration.ConfigurationSection
 class MetaTiphareth(root: ConfigurationSection) : Meta(root) {
 
     val tiphareth = root.getString("meta.tiphareth")?.run { TipharethAPI.LOADER.getByName(this)?.buildItem() }
+
+    override val id: String
+        get() = "tiphareth"
 
     override fun build(itemReleaseEvent: ItemReleaseEvent) {
         if (tiphareth != null) {

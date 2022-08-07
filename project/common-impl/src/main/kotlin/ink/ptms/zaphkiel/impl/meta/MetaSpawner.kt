@@ -1,7 +1,6 @@
 package ink.ptms.zaphkiel.impl.meta
 
 import ink.ptms.zaphkiel.item.meta.Meta
-import ink.ptms.zaphkiel.item.meta.MetaKey
 import org.bukkit.entity.EntityType
 import org.bukkit.inventory.meta.ItemMeta
 import org.bukkit.inventory.meta.SpawnEggMeta
@@ -15,6 +14,9 @@ import taboolib.library.configuration.ConfigurationSection
 class MetaSpawner(root: ConfigurationSection) : Meta(root) {
 
     val type = root.getString("meta.spawner").toString()
+
+    override val id: String
+        get() = "spawner"
 
     override fun build(itemMeta: ItemMeta) {
         if (itemMeta is SpawnEggMeta) {

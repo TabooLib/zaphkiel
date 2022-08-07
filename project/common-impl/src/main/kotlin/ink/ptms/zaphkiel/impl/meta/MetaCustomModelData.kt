@@ -1,7 +1,6 @@
 package ink.ptms.zaphkiel.impl.meta
 
 import ink.ptms.zaphkiel.item.meta.Meta
-import ink.ptms.zaphkiel.item.meta.MetaKey
 import org.bukkit.inventory.meta.ItemMeta
 import taboolib.library.configuration.ConfigurationSection
 
@@ -9,6 +8,9 @@ import taboolib.library.configuration.ConfigurationSection
 class MetaCustomModelData(root: ConfigurationSection) : Meta(root) {
 
     val data = root.getInt("meta.custom-model-data")
+
+    override val id: String
+        get() = "custom-model-data"
 
     override fun build(itemMeta: ItemMeta) {
         itemMeta.setCustomModelData(data)

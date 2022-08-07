@@ -1,7 +1,6 @@
 package ink.ptms.zaphkiel.impl.meta
 
 import ink.ptms.zaphkiel.item.meta.Meta
-import ink.ptms.zaphkiel.item.meta.MetaKey
 import org.bukkit.entity.Player
 import taboolib.library.configuration.ConfigurationSection
 import taboolib.module.nms.ItemTag
@@ -17,6 +16,9 @@ class MetaNative(root: ConfigurationSection) : Meta(root) {
             }
         }
     }
+
+    override val id: String
+        get() = "native"
 
     override fun build(player: Player?, compound: ItemTag) {
         nativeNBT.forEach { t, u ->

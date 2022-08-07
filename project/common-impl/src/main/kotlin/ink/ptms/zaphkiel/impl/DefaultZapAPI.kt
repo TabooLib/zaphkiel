@@ -16,6 +16,7 @@ import taboolib.common.util.unsafeLazy
 import taboolib.expansion.releaseDataContainer
 import taboolib.expansion.setupDataContainer
 import taboolib.expansion.setupPlayerDatabase
+import taboolib.module.configuration.Config
 import taboolib.module.configuration.Configuration
 
 /**
@@ -63,7 +64,9 @@ class DefaultZapAPI : ZapAPI {
 
     companion object {
 
-        val config by unsafeLazy { Configuration.loadFromFile(releaseResourceFile("config.yml")) }
+        @Config
+        lateinit var config: Configuration
+            private set
 
         val instance by unsafeLazy { DefaultZapAPI() }
 
