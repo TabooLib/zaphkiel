@@ -1,4 +1,4 @@
-package ink.ptms.zaphkiel.impl.feature
+package ink.ptms.zaphkiel.impl.internal
 
 import ink.ptms.zaphkiel.Zaphkiel
 import ink.ptms.zaphkiel.api.ItemSignal
@@ -16,7 +16,7 @@ import taboolib.module.configuration.Type
  * @author sky
  * @since 2019-12-26 9:53
  */
-internal object ItemBuildHandler {
+internal object ItemBuilder {
 
     val dropMeta by unsafeLazy {
         Zaphkiel.api().getItemManager().getMetaMap().map { it.value.invokeConstructor(Configuration.empty(Type.YAML)) }.associateBy { it.id }

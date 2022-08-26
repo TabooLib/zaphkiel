@@ -3,6 +3,7 @@ package ink.ptms.zaphkiel.api
 import ink.ptms.zaphkiel.annotation.Equal
 import ink.ptms.zaphkiel.annotation.Printable
 import org.bukkit.inventory.ItemStack
+import org.bukkit.metadata.Metadatable
 import taboolib.library.configuration.ConfigurationSection
 import java.io.File
 
@@ -12,7 +13,7 @@ import java.io.File
  */
 @Equal
 @Printable
-abstract class Group {
+abstract class Group : Metadatable {
 
     /**
      * 名称

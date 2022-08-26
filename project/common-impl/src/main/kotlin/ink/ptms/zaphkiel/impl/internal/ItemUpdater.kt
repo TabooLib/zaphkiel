@@ -1,4 +1,4 @@
-package ink.ptms.zaphkiel.impl.feature
+package ink.ptms.zaphkiel.impl.internal
 
 import ink.ptms.zaphkiel.Zaphkiel
 import ink.ptms.zaphkiel.api.ItemSignal

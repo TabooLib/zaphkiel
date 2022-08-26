@@ -3,7 +3,10 @@ package ink.ptms.zaphkiel.impl.item
 import ink.ptms.zaphkiel.Zaphkiel
 import ink.ptms.zaphkiel.api.Display
 import ink.ptms.zaphkiel.api.DisplayProduct
+import org.bukkit.metadata.MetadataValue
+import org.bukkit.plugin.Plugin
 import taboolib.library.configuration.ConfigurationSection
+import java.util.concurrent.ConcurrentHashMap
 
 /**
  * Zaphkiel
@@ -26,8 +29,26 @@ class DefaultDisplay(override val config: ConfigurationSection) : Display() {
 
     override val meta = Zaphkiel.api().getItemLoader().loadMetaFromSection(config)
 
+    val metadataList = ConcurrentHashMap<String, MutableMap<String, MetadataValue>>()
+
     override fun build(name: Map<String, String>, lore: Map<String, List<String>>, trim: Boolean): DisplayProduct {
         return DisplayProduct(structureName?.build(name, trim), structureLore.build(lore.mapValues { it.value.toMutableList() }, trim))
+    }
+
+    override fun setMetadata(p0: String, p1: MetadataValue) {
+        metadataList.computeIfAbsent(p0) { ConcurrentHashMap() }[p1.owningPlugin?.name ?: "null"] = p1
+    }
+
+    override fun getMetadata(p0: String): MutableList<MetadataValue> {
+        return metadataList[p0]?.values?.toMutableList() ?: mutableListOf()
+    }
+
+    override fun hasMetadata(p0: String): Boolean {
+        return metadataList.containsKey(p0)
+    }
+
+    override fun removeMetadata(p0: String, p1: Plugin) {
+        metadataList[p0]?.remove(p1.name)
     }
 
     override fun equals(other: Any?): Boolean {

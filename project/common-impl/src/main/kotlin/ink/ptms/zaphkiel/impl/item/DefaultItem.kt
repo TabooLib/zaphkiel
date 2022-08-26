@@ -9,6 +9,8 @@ import org.bukkit.event.Cancellable
 import org.bukkit.event.Event
 import org.bukkit.event.player.PlayerEvent
 import org.bukkit.inventory.ItemStack
+import org.bukkit.metadata.MetadataValue
+import org.bukkit.plugin.Plugin
 import taboolib.common.io.digest
 import taboolib.common.platform.function.severe
 import taboolib.common.util.unsafeLazy
@@ -22,6 +24,7 @@ import taboolib.platform.util.hasItem
 import taboolib.platform.util.isAir
 import taboolib.platform.util.takeItem
 import java.util.concurrent.CompletableFuture
+import java.util.concurrent.ConcurrentHashMap
 import java.util.function.Consumer
 
 /**
@@ -88,6 +91,8 @@ class DefaultItem(override val config: ConfigurationSection, override val group:
         }
         saveToString().digest("sha-1")
     }
+
+    val metadataList = ConcurrentHashMap<String, MutableMap<String, MetadataValue>>()
 
     override fun buildItemStack(player: Player?): ItemStack {
         return build(player).toItemStack(player)
@@ -175,6 +180,22 @@ class DefaultItem(override val config: ConfigurationSection, override val group:
             }
         }
         return map
+    }
+
+    override fun setMetadata(p0: String, p1: MetadataValue) {
+        metadataList.computeIfAbsent(p0) { ConcurrentHashMap() }[p1.owningPlugin?.name ?: "null"] = p1
+    }
+
+    override fun getMetadata(p0: String): MutableList<MetadataValue> {
+        return metadataList[p0]?.values?.toMutableList() ?: mutableListOf()
+    }
+
+    override fun hasMetadata(p0: String): Boolean {
+        return metadataList.containsKey(p0)
+    }
+
+    override fun removeMetadata(p0: String, p1: Plugin) {
+        metadataList[p0]?.remove(p1.name)
     }
 
     override fun equals(other: Any?): Boolean {

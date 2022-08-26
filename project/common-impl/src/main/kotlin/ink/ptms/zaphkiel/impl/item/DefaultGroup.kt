@@ -2,6 +2,8 @@ package ink.ptms.zaphkiel.impl.item
 
 import ink.ptms.zaphkiel.api.Group
 import org.bukkit.inventory.ItemStack
+import org.bukkit.metadata.MetadataValue
+import org.bukkit.plugin.Plugin
 import taboolib.common.platform.function.getDataFolder
 import taboolib.library.configuration.ConfigurationSection
 import taboolib.library.xseries.XItemStack
@@ -10,6 +12,7 @@ import taboolib.module.configuration.Configuration
 import taboolib.module.configuration.Type
 import taboolib.platform.util.buildItem
 import java.io.File
+import java.util.concurrent.ConcurrentHashMap
 
 /**
  * Zaphkiel
@@ -25,6 +28,24 @@ class DefaultGroup(
     override val display: ItemStack = XItemStack.deserialize(config),
     override val priority: Int = 0
 ) : Group() {
+
+    val metadataList = ConcurrentHashMap<String, MutableMap<String, MetadataValue>>()
+
+    override fun setMetadata(p0: String, p1: MetadataValue) {
+        metadataList.computeIfAbsent(p0) { ConcurrentHashMap() }[p1.owningPlugin?.name ?: "null"] = p1
+    }
+
+    override fun getMetadata(p0: String): MutableList<MetadataValue> {
+        return metadataList[p0]?.values?.toMutableList() ?: mutableListOf()
+    }
+
+    override fun hasMetadata(p0: String): Boolean {
+        return metadataList.containsKey(p0)
+    }
+
+    override fun removeMetadata(p0: String, p1: Plugin) {
+        metadataList[p0]?.remove(p1.name)
+    }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

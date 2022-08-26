@@ -8,6 +8,8 @@ import org.bukkit.entity.Player
 import org.bukkit.event.Event
 import org.bukkit.event.player.PlayerEvent
 import org.bukkit.inventory.ItemStack
+import org.bukkit.metadata.MetadataValue
+import org.bukkit.metadata.Metadatable
 import taboolib.library.configuration.ConfigurationSection
 import taboolib.module.nms.ItemTagData
 import java.util.concurrent.CompletableFuture
@@ -22,7 +24,7 @@ import java.util.function.Consumer
  */
 @Equal
 @Printable
-abstract class Item {
+abstract class Item : Metadatable {
 
     /**
      * 配置文件节点

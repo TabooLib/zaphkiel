@@ -1,4 +1,4 @@
-package ink.ptms.zaphkiel.impl.feature.compat
+package ink.ptms.zaphkiel.impl.feature.hook
 
 import ink.ptms.um.event.MobDeathEvent
 import ink.ptms.um.event.MobSpawnEvent

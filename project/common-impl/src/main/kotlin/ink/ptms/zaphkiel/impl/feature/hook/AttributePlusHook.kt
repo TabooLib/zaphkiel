@@ -1,4 +1,4 @@
-package ink.ptms.zaphkiel.impl.feature.compat
+package ink.ptms.zaphkiel.impl.feature.hook
 
 import ink.ptms.zaphkiel.impl.item.toItemStream
 import org.bukkit.entity.Player

@@ -3,6 +3,7 @@ package ink.ptms.zaphkiel.api
 import ink.ptms.zaphkiel.annotation.Equal
 import ink.ptms.zaphkiel.annotation.Printable
 import ink.ptms.zaphkiel.item.meta.Meta
+import org.bukkit.metadata.Metadatable
 import taboolib.library.configuration.ConfigurationSection
 
 /**
@@ -14,7 +15,7 @@ import taboolib.library.configuration.ConfigurationSection
  */
 @Equal
 @Printable
-abstract class Display {
+abstract class Display : Metadatable {
 
     /**
      * 配置文件节点
