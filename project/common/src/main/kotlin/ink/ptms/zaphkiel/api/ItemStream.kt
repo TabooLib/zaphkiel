@@ -5,6 +5,7 @@ import ink.ptms.zaphkiel.annotation.Printable
 import ink.ptms.zaphkiel.annotation.UseWarning
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
+import org.bukkit.metadata.Metadatable
 import taboolib.module.nms.ItemTag
 
 /**
@@ -16,7 +17,7 @@ import taboolib.module.nms.ItemTag
  */
 @Equal
 @Printable
-abstract class ItemStream {
+abstract class ItemStream : Metadatable {
 
     abstract val sourceItem: ItemStack
 

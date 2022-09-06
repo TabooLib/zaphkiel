@@ -9,9 +9,12 @@ import ink.ptms.zaphkiel.api.ItemStream
 import ink.ptms.zaphkiel.api.event.ItemReleaseEvent
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
+import org.bukkit.metadata.MetadataValue
+import org.bukkit.plugin.Plugin
 import taboolib.common.util.unsafeLazy
 import taboolib.module.nms.*
 import taboolib.platform.util.isNotAir
+import java.util.concurrent.ConcurrentHashMap
 
 /**
  * Zaphkiel
@@ -21,6 +24,8 @@ import taboolib.platform.util.isNotAir
  * @since 2022/7/23 17:02
  */
 open class DefaultItemStream(override val sourceItem: ItemStack, override val sourceCompound: ItemTag = sourceItem.getItemTag()) : ItemStream() {
+
+    val metadataList = ConcurrentHashMap<String, MutableMap<String, MetadataValue>>()
 
     override val signal = hashSetOf<ItemSignal>()
 
@@ -62,6 +67,8 @@ open class DefaultItemStream(override val sourceItem: ItemStack, override val so
     override fun rebuild(player: Player?): ItemStream {
         val item = getZaphkielItem()
         val itemStreamGenerated = DefaultItemStreamGenerated(sourceItem, item.name.toMutableMap(), item.lore.toMutableMap(), sourceCompound)
+        // 继承 Metadata 列表
+        itemStreamGenerated.metadataList += metadataList
         return item.build(player, itemStreamGenerated)
     }
 
@@ -93,6 +100,7 @@ open class DefaultItemStream(override val sourceItem: ItemStack, override val so
         return Zaphkiel.api().getItemManager().getItem(getZaphkielName())!!
     }
 
+    @Deprecated("命名歧义", replaceWith = ReplaceWith("getZaphkielId"))
     override fun getZaphkielName(): String {
         if (isVanilla()) {
             error("This item is not an extension item.")
@@ -100,6 +108,7 @@ open class DefaultItemStream(override val sourceItem: ItemStack, override val so
         return getZaphkielCompound()!![ItemKey.ID.key]!!.asString()
     }
 
+    @Deprecated("命名歧义", replaceWith = ReplaceWith("getZaphkielHash"))
     @LegacyName("getZaphkielHash")
     override fun getZaphkielVersion(): String {
         if (isVanilla()) {
@@ -138,6 +147,22 @@ open class DefaultItemStream(override val sourceItem: ItemStack, override val so
 
     override fun getZaphkielCompound(): ItemTag? {
         return sourceCompound[ItemKey.ROOT.key]?.asCompound()
+    }
+
+    override fun setMetadata(p0: String, p1: MetadataValue) {
+        metadataList.computeIfAbsent(p0) { ConcurrentHashMap() }[p1.owningPlugin?.name ?: "null"] = p1
+    }
+
+    override fun getMetadata(p0: String): MutableList<MetadataValue> {
+        return metadataList[p0]?.values?.toMutableList() ?: mutableListOf()
+    }
+
+    override fun hasMetadata(p0: String): Boolean {
+        return metadataList.containsKey(p0)
+    }
+
+    override fun removeMetadata(p0: String, p1: Plugin) {
+        metadataList[p0]?.remove(p1.name)
     }
 
     override fun equals(other: Any?): Boolean {

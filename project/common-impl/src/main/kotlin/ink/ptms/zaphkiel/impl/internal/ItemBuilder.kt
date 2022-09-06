@@ -52,8 +52,11 @@ internal object ItemBuilder {
             }
         }
         if (itemStream is DefaultItemStreamGenerated) {
-            val display = Zaphkiel.api().getItemManager().getDisplay(e.item.display)
+            var display = Zaphkiel.api().getItemManager().getDisplay(e.item.display)
             if (display != null) {
+                // 展示方案替换事件
+                display = ItemReleaseEvent.SelectDisplay(e.itemStream, display, e.player).also { it.call() }.display
+                // 描述替换事件
                 val event = ItemReleaseEvent.Display(itemStream, itemStream.name, itemStream.lore, e.player)
                 event.call()
                 val product = display.build(event.name, event.lore)
@@ -69,8 +72,9 @@ internal object ItemBuilder {
                 e.data = e.item.icon.durability.toInt()
             }
             if (e.item.nameLocked || e.item.loreLocked) {
-                val display = Zaphkiel.api().getItemManager().getDisplay(e.item.display)
+                var display = Zaphkiel.api().getItemManager().getDisplay(e.item.display)
                 if (display != null) {
+                    display = ItemReleaseEvent.SelectDisplay(e.itemStream, display, e.player).also { it.call() }.display
                     val event = ItemReleaseEvent.Display(itemStream, e.item.name.toMutableMap(), e.item.lore.toMutableMap(), e.player)
                     event.call()
                     val product = display.build(event.name, event.lore)

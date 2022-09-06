@@ -115,9 +115,11 @@ class DefaultItem(override val config: ConfigurationSection, override val group:
         if (!pre.call()) {
             return itemStream
         }
+        // 设置数据
         lockedData.forEach { (k, v) -> itemStream.getZaphkielData().putDeep(k, v) }
+        // 设置版本
         pre.itemStream.sourceCompound["zaphkiel"]!!.asCompound()[ItemKey.VERSION.key] = ItemTagData(version)
-        // 使用papi替换变量
+        // 替换变量
         val placeholderReplaced = if (player != null) {
             val map = HashMap<String, MutableList<String>>()
             pre.lore.forEach { (key, lore) ->

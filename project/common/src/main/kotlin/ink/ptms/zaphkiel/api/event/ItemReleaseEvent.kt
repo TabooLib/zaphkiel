@@ -1,8 +1,10 @@
 package ink.ptms.zaphkiel.api.event
 
+import ink.ptms.zaphkiel.api.Display
 import ink.ptms.zaphkiel.api.ItemStream
 import org.bukkit.Material
 import org.bukkit.entity.Player
+import org.bukkit.event.EventPriority
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.ItemMeta
 import taboolib.platform.type.BukkitProxyEvent
@@ -62,5 +64,15 @@ class ItemReleaseEvent(var icon: Material, var data: Int, var itemMeta: ItemMeta
         fun addLore(key: String, value: List<Any>) {
             value.forEach { addLore(key, it) }
         }
+    }
+
+    /**
+     * 当物品释放时选择展示方案时
+     * 可以在该事件下修改即将使用的展示方案
+     */
+    class SelectDisplay(val itemStream: ItemStream, var display: ink.ptms.zaphkiel.api.Display, val player: Player? = null): BukkitProxyEvent() {
+
+        override val allowCancelled: Boolean
+            get() = false
     }
 }
