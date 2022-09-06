@@ -1,13 +1,13 @@
 package ink.ptms.zaphkiel.impl
 
 import ink.ptms.zaphkiel.api.*
+import ink.ptms.zaphkiel.api.event.ItemGiveEvent
 import ink.ptms.zaphkiel.impl.meta.MetaKey
 import ink.ptms.zaphkiel.item.meta.Meta
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import taboolib.common.io.runningClasses
-import taboolib.library.reflex.ClassAnnotation
-import taboolib.library.reflex.ReflexClass
+import taboolib.platform.util.giveItem
 import java.util.HashMap
 
 /**
@@ -41,6 +41,19 @@ class DefaultItemManager : ItemManager {
 
     fun clearDisplay() {
         registeredDisplay.clear()
+    }
+
+    override fun giveItem(player: Player, item: Item, amount: Int): Boolean {
+        val event = ItemGiveEvent(player, item.build(player), amount).also { it.call() }
+        if (!event.isCancelled) {
+            player.giveItem(event.itemStream.rebuildToItemStack(player), event.amount)
+            return true
+        }
+        return false
+    }
+
+    override fun giveItem(player: Player, name: String, amount: Int): Boolean {
+        return giveItem(player, getItem(name) ?: return false, amount)
     }
 
     override fun getItem(name: String): Item? {

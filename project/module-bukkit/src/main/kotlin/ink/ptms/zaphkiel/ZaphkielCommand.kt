@@ -78,7 +78,7 @@ object ZaphkielCommand {
                 Zaphkiel.api().getItemManager().getItemMap().keys.toList()
             }
             execute<Player> { sender, _, argument ->
-                sender.giveItem(Zaphkiel.api().getItemManager().generateItemStack(argument, sender)!!)
+                Zaphkiel.api().getItemManager().giveItem(sender, argument)
             }
             dynamic(optional = true, commit = "player") {
                 suggestion<CommandSender> { _, _ ->
@@ -86,13 +86,13 @@ object ZaphkielCommand {
                 }
                 execute<CommandSender> { _, context, argument ->
                     val player = Bukkit.getPlayerExact(argument)!!
-                    player.giveItem(Zaphkiel.api().getItemManager().generateItemStack(context.argument(-1), player)!!)
+                    Zaphkiel.api().getItemManager().giveItem(player, context.argument(-1))
                 }
                 dynamic(optional = true, commit = "amount") {
                     execute<CommandSender> { _, context, argument ->
                         val player = Bukkit.getPlayerExact(context.argument(-1))!!
                         val amount = argument.toIntOrNull() ?: 1
-                        player.giveItem(Zaphkiel.api().getItemManager().generateItemStack(context.argument(-2), player)!!, amount)
+                        Zaphkiel.api().getItemManager().giveItem(player, context.argument(-2), amount)
                     }
                 }
             }

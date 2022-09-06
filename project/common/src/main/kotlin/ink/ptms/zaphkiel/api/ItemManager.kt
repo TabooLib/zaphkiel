@@ -14,6 +14,16 @@ import org.bukkit.inventory.ItemStack
 interface ItemManager {
 
     /**
+     * 发放物品
+     */
+    fun giveItem(player: Player, item: Item, amount: Int = 1): Boolean
+
+    /**
+     * 发放物品
+     */
+    fun giveItem(player: Player, name: String, amount: Int = 1): Boolean
+
+    /**
      * 获取物品
      */
     fun getItem(name: String): Item?
