@@ -40,7 +40,7 @@ class DefaultStructureList(source: List<String>) : StructureList {
                             skip = true
                         }
                     } else {
-                        builder.append(newVars[variable.text]?.removeAt(0) ?: "")
+                        builder.append(newVars[variable.text]?.firstOrNull() ?: "")
                     }
                 } else {
                     builder.append(variable.text)
