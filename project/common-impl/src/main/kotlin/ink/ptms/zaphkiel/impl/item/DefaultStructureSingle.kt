@@ -15,13 +15,7 @@ class DefaultStructureSingle(source: String) : StructureSingle {
     val cache = VariableReader("<", ">").readToFlatten(source)
 
     override fun build(vars: Map<String, String>, trim: Boolean): String {
-        val value = cache.joinToString("") {
-            if (it.isVariable) {
-                vars[it.text] ?: ""
-            } else {
-                it.text
-            }
-        }
+        val value = cache.joinToString("") { if (it.isVariable) vars[it.text] ?: "" else it.text }
         return if (trim) value.trim() else value
     }
 }
