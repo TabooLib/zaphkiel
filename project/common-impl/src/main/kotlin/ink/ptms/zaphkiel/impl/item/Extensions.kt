@@ -12,7 +12,16 @@ import taboolib.common.util.asList
 import taboolib.library.configuration.ConfigurationSection
 import taboolib.library.xseries.parseToXMaterial
 import taboolib.module.chat.colored
+import taboolib.platform.util.isAir
 import java.util.ArrayList
+
+fun ItemStack?.toExtensionStreamOrNull(): ItemStream? {
+    return toItemStreamOrNull()?.takeIf { it.isExtension() }
+}
+
+fun ItemStack?.toItemStreamOrNull(): ItemStream? {
+    return if (isAir) null else this!!.toItemStream()
+}
 
 fun ItemStack.toItemStream(): ItemStream {
     return Zaphkiel.api().getItemHandler().read(this)
