@@ -38,7 +38,7 @@ object ZaphkielCommand {
         }
     }
 
-    @CommandBody
+    // @CommandBody
     val test1 = subCommand {
         execute<Player> { sender, _, _ ->
             try {
@@ -55,7 +55,7 @@ object ZaphkielCommand {
         }
     }
 
-    @CommandBody
+    // @CommandBody
     val test2 = subCommand {
         execute<Player> { sender, _, _ ->
             try {
@@ -73,14 +73,14 @@ object ZaphkielCommand {
 
     @CommandBody
     val give = subCommand {
-        dynamic(commit = "item") {
+        dynamic(comment = "item") {
             suggestion<CommandSender> { _, _ ->
                 Zaphkiel.api().getItemManager().getItemMap().keys.toList()
             }
             execute<Player> { sender, _, argument ->
                 Zaphkiel.api().getItemManager().giveItem(sender, argument)
             }
-            dynamic(optional = true, commit = "player") {
+            dynamic(optional = true, comment = "player") {
                 suggestion<CommandSender> { _, _ ->
                     Bukkit.getOnlinePlayers().map { it.name }
                 }
@@ -88,7 +88,7 @@ object ZaphkielCommand {
                     val player = Bukkit.getPlayerExact(argument)!!
                     Zaphkiel.api().getItemManager().giveItem(player, context.argument(-1))
                 }
-                dynamic(optional = true, commit = "amount") {
+                dynamic(optional = true, comment = "amount") {
                     execute<CommandSender> { _, context, argument ->
                         val player = Bukkit.getPlayerExact(context.argument(-1))!!
                         val amount = argument.toIntOrNull() ?: 1
