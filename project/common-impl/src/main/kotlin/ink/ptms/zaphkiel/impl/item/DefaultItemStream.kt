@@ -97,7 +97,7 @@ open class DefaultItemStream(override val sourceItem: ItemStack, override val so
         if (isVanilla()) {
             error("This item is not an extension item.")
         }
-        return Zaphkiel.api().getItemManager().getItem(getZaphkielName())!!
+        return Zaphkiel.api().getItemManager().getItem(getZaphkielId())!!
     }
 
     @Deprecated("命名歧义", replaceWith = ReplaceWith("getZaphkielId"))
