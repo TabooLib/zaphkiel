@@ -25,7 +25,7 @@ internal object MythicHook {
 
     @SubscribeEvent
     fun onSpawn(e: MobSpawnEvent) {
-        val section = e.mob.config.getConfigurationSection(e.mob.id + ".Zaphkiel.equipments") ?: return
+        val section = e.mob.config.getConfigurationSection("Zaphkiel.equipments") ?: return
         submit(delay = 5) {
             MythicUtil.equipment(section, e.mob.entity as? LivingEntity ?: return@submit)
         }
