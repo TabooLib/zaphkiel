@@ -2,19 +2,20 @@ plugins {
     id("org.gradle.java")
     id("org.gradle.maven-publish")
     id("org.jetbrains.kotlin.jvm") version "1.5.31" apply false
-    // id("org.jetbrains.dokka") version "1.7.10" apply false
 }
 
 subprojects {
     apply<JavaPlugin>()
     apply(plugin = "org.jetbrains.kotlin.jvm")
-    // apply(plugin = "org.jetbrains.dokka")
 
     repositories {
         mavenCentral()
     }
     dependencies {
-        compileOnly("ink.ptms.core:v11600:11600-minimize")
+        compileOnly("org.apache.commons:commons-lang3:3.12.0")
+        compileOnly("com.google.guava:guava:30.1.1-jre")
+        compileOnly("com.google.code.gson:gson:2.8.8")
+        compileOnly("ink.ptms.core:v11903:11903:mapped")
         compileOnly("ink.ptms.core:v11200:11200")
         compileOnly(kotlin("stdlib"))
     }

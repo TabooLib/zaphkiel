@@ -48,7 +48,7 @@ class DefaultItemLoader : ItemLoader {
             }
             items.forEach { itemManager.registerItem(it) }
         }
-        info("[Zaphkiel] Loaded ${itemManager.registeredItem.size} items (${itemManager.registeredModel.size} models)")
+        info("Loaded ${itemManager.registeredItem.size} items (${itemManager.registeredModel.size} models)")
         PluginReloadEvent.Item().call()
     }
 
@@ -57,7 +57,7 @@ class DefaultItemLoader : ItemLoader {
         itemManager.clearDisplay()
         loadDisplayFromFile(folderDisplay).forEach { itemManager.registerDisplay(it) }
         loadDisplayFromFile(folderItem, fromItemFile = true).forEach { itemManager.registerDisplay(it) }
-        info("[Zaphkiel] Loaded ${itemManager.registeredDisplay.size} display plans")
+        info("Loaded ${itemManager.registeredDisplay.size} display plans")
         PluginReloadEvent.Display().call()
     }
 
