@@ -16,6 +16,7 @@ import org.bukkit.event.player.*
 import org.bukkit.inventory.EquipmentSlot
 import taboolib.common.platform.Schedule
 import taboolib.common.platform.event.EventPriority
+import taboolib.common.platform.event.OptionalEvent
 import taboolib.common.platform.event.SubscribeEvent
 import taboolib.platform.util.attacker
 import taboolib.platform.util.isAir
@@ -193,6 +194,21 @@ internal object ItemListener {
      */
     @SubscribeEvent(priority = EventPriority.MONITOR, ignoreCancelled = true)
     fun onBreak(e: BlockBreakEvent) {
+        if (e.player.inventory.itemInMainHand.isAir()) {
+            return
+        }
+        val itemStream = e.player.inventory.itemInMainHand.toItemStream()
+        if (itemStream.isExtension()) {
+            itemStream.getZaphkielItem().invokeScript("onBlockBreak", e.player, e, itemStream)
+        }
+    }
+
+    /**
+     * 当玩家破坏方块时（Sandalphon）
+     * 触发脚本
+     */
+    @SubscribeEvent(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    fun onBreak(e: ink.ptms.sandalphon.module.impl.blockmine.event.BlockBreakEvent) {
         if (e.player.inventory.itemInMainHand.isAir()) {
             return
         }
