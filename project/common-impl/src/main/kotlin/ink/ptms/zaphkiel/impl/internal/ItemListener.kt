@@ -4,8 +4,10 @@ import ink.ptms.zaphkiel.api.ItemStream
 import ink.ptms.zaphkiel.api.event.ItemBuildEvent
 import ink.ptms.zaphkiel.api.event.ItemEvent
 import ink.ptms.zaphkiel.api.event.ItemReleaseEvent
+import ink.ptms.zaphkiel.impl.internal.ItemListener.onSelect
 import ink.ptms.zaphkiel.impl.item.toItemStream
 import org.bukkit.Bukkit
+import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
 import org.bukkit.event.block.BlockBreakEvent
@@ -14,10 +16,13 @@ import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.player.*
 import org.bukkit.inventory.EquipmentSlot
+import org.bukkit.inventory.ItemStack
 import taboolib.common.platform.Schedule
 import taboolib.common.platform.event.EventPriority
 import taboolib.common.platform.event.OptionalEvent
 import taboolib.common.platform.event.SubscribeEvent
+import taboolib.common.platform.function.console
+import taboolib.module.nms.getItemTag
 import taboolib.platform.util.attacker
 import taboolib.platform.util.isAir
 import taboolib.platform.util.isNotAir
@@ -62,6 +67,7 @@ internal object ItemListener {
         if (attacker is Player && attacker.itemInHand.isNotAir()) {
             val itemStream = attacker.itemInHand.toItemStream()
             if (itemStream.isExtension()) {
+                itemStream.checkExpiry(attacker)
                 itemStream.getZaphkielItem().invokeScript("onAttack", attacker, e, itemStream)
             }
         }
@@ -85,6 +91,7 @@ internal object ItemListener {
     fun onBreak(e: PlayerItemBreakEvent) {
         val itemStream = e.brokenItem.toItemStream()
         if (itemStream.isExtension()) {
+            itemStream.checkExpiry(e.player)
             itemStream.getZaphkielItem().invokeScript("onItemBreak", e, itemStream)
         }
     }
@@ -101,6 +108,7 @@ internal object ItemListener {
         }
         val itemStream = itemStack.toItemStream()
         if (itemStream.isExtension()) {
+            itemStream.checkExpiry(e.player)
             // 触发事件
             ItemEvent.Consume(itemStream, e).also { it.call() }
             // 执行脚本
@@ -127,6 +135,7 @@ internal object ItemListener {
         if (itemStream.isVanilla()) {
             return
         }
+        itemStream.checkExpiry(e.player)
         // 触发事件
         val event = ItemEvent.Interact(itemStream, e)
         if (event.call()) {
@@ -158,6 +167,8 @@ internal object ItemListener {
             if (itemStream.isVanilla()) {
                 return
             }
+            itemStream.checkExpiry(e.player)
+            itemStream.getZaphkielUniqueData()
             val event = ItemEvent.InteractEntity(itemStream, e)
             if (event.call()) {
                 if (event.save) {
@@ -177,12 +188,16 @@ internal object ItemListener {
         if (e.offHandItem.isNotAir()) {
             val itemStream = e.offHandItem!!.toItemStream()
             if (itemStream.isExtension()) {
+                // 检查过期
+                itemStream.checkExpiry(e.player)
                 itemStream.getZaphkielItem().invokeScript("onSwapToOffhand", e, itemStream)
             }
         }
         if (e.mainHandItem.isNotAir()) {
             val itemStream = e.mainHandItem!!.toItemStream()
             if (itemStream.isExtension()) {
+                // 检查过期
+                itemStream.checkExpiry(e.player)
                 itemStream.getZaphkielItem().invokeScript("onSwapToMainHand", e, itemStream)
             }
         }
@@ -199,6 +214,10 @@ internal object ItemListener {
         }
         val itemStream = e.player.inventory.itemInMainHand.toItemStream()
         if (itemStream.isExtension()) {
+
+            // 检查过期
+            itemStream.checkExpiry(e.player)
+
             itemStream.getZaphkielItem().invokeScript("onBlockBreak", e.player, e, itemStream)
         }
     }
@@ -214,6 +233,9 @@ internal object ItemListener {
         }
         val itemStream = e.player.inventory.itemInMainHand.toItemStream()
         if (itemStream.isExtension()) {
+            // 检查过期物品
+            itemStream.checkExpiry(e.player)
+
             itemStream.getZaphkielItem().invokeScript("onBlockBreak", e.player, e, itemStream)
         }
     }
@@ -229,6 +251,9 @@ internal object ItemListener {
             if (itemStream.isVanilla()) {
                 return
             }
+            // 检查过期
+            itemStream.checkExpiry(e.player)
+
             val event = ItemEvent.Drop(itemStream, e)
             event.call()
             if (event.save) {
@@ -254,6 +279,9 @@ internal object ItemListener {
             if (itemStream.isVanilla()) {
                 return
             }
+            // 检查过期
+            itemStream.checkExpiry(e.player)
+
             val event = ItemEvent.Pick(itemStream, e)
             event.call()
             if (event.save) {
@@ -262,7 +290,7 @@ internal object ItemListener {
             // 若脚本修改物品则写回事件
             itemStream.getZaphkielItem().invokeScript("onPick", e.player, e, itemStream)?.thenAccept {
                 if (it != null) {
-                    e.item.setItemStack(it.itemStack)
+                    e.item.itemStack = it.itemStack
                 }
             }
         }
@@ -302,6 +330,38 @@ internal object ItemListener {
             event.call()
             if (event.save) {
                 event.itemStream.rebuildToItemStack(this@onSelect)
+            }
+        }
+    }
+    private fun ItemStream.checkExpiry(player: Player) {
+        if (isExtension()) {
+            getZaphkielCompound()?.let {
+                val b = it["time"].toString().replace("L","").toLong()
+                if (System.currentTimeMillis() >= b) {
+                    player.inventory.remove(this.sourceItem)
+                }
+            }
+        }
+    }
+    private fun ItemStack.checkExpiry() {
+        if (isNotAir()) {
+            getItemTag()["zaphkiel"]?.let { a ->
+                val b = a.asCompound()["time"].toString().replace("L","").toLong()
+                if (System.currentTimeMillis() >= b) {
+                    type = Material.AIR
+                }
+            }
+        }
+    }
+    fun Player.checkExpiry() {
+        inventory.forEachIndexed { index, item ->
+            if (item.isNotAir()) {
+                item.getItemTag()["zaphkiel"]?.let { a ->
+                    val b = a.asCompound()["time"].toString().replace("L","").toLong()
+                    if (System.currentTimeMillis() >= b) {
+                        this.inventory.setItem(index, null)
+                    }
+                }
             }
         }
     }

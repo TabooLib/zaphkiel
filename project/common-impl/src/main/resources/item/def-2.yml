@@ -1,0 +1,23 @@
+item_wooden_sword:
+  display: DISPLAY_ITEM
+  icon: WOODEN_SWORD
+  name:
+    NAME: '&7Wooden Sword'
+  lore:
+    TYPE: '&9Sword'
+    LORE:
+      - '&fCan be bought everywhere.'
+      - '&e到期时间: {time}'
+  data:
+    durability: 10
+  meta:
+    expiry: 30h
+    durability:
+      remains: minecraft:stick
+    attribute:
+      mainhand:
+        damage: +7
+        attackspeed: +10%
+  event:
+    onDamage!!: |-
+      item damage 1

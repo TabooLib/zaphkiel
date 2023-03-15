@@ -123,7 +123,9 @@ class DefaultItem(override val config: ConfigurationSection, override val group:
         val placeholderReplaced = if (player != null) {
             val map = HashMap<String, MutableList<String>>()
             pre.lore.forEach { (key, lore) ->
-                lore.forEachIndexed { index, line -> lore[index] = line.replacePlaceholder(player) }
+                lore.forEachIndexed { index, line ->
+                    lore[index] = line.replacePlaceholder(player)
+                }
                 map[key] = lore
             }
             map

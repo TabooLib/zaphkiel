@@ -5,12 +5,16 @@ import ink.ptms.zaphkiel.api.ItemSignal
 import ink.ptms.zaphkiel.api.event.ItemBuildEvent
 import ink.ptms.zaphkiel.api.event.ItemReleaseEvent
 import ink.ptms.zaphkiel.impl.item.DefaultItemStreamGenerated
+import ink.ptms.zaphkiel.impl.uitls.ExpIryBuilder
+import org.bukkit.Material
 import taboolib.common.platform.event.SubscribeEvent
+import taboolib.common.platform.function.console
 import taboolib.common.reflect.Reflex.Companion.invokeConstructor
 import taboolib.common.util.unsafeLazy
 import taboolib.module.chat.colored
 import taboolib.module.configuration.Configuration
 import taboolib.module.configuration.Type
+import taboolib.module.nms.getItemTag
 
 /**
  * @author sky
@@ -61,7 +65,21 @@ internal object ItemBuilder {
                 event.call()
                 val product = display.build(event.name, event.lore)
                 e.itemMeta.setDisplayName(product.name?.colored() ?: "")
-                e.itemMeta.lore = product.lore.colored()
+
+                // 更新过期时间
+                e.itemStream.getZaphkielCompound()?.get("time")?.let { a ->
+                    val c = mutableListOf<String>()
+                    product.lore.forEach {
+                        if (it.contains("{time}")) {
+                            val s = ExpIryBuilder.getFormat((a.toString().replace("L","").toLong()))
+                            c.add(it.replace("{time}", s).colored())
+                        } else c.add(it.colored())
+                    }
+                    e.itemMeta.lore = c
+                } ?: run {
+                    e.itemMeta.lore = product.lore.colored()
+                }
+
             } else {
                 e.itemMeta.setDisplayName("§c${e.item.id}")
                 e.itemMeta.lore = listOf("", "§4- NO DISPLAY PLAN -")
