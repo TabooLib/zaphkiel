@@ -1,8 +1,5 @@
 package ink.ptms.zaphkiel.api
 
-import ink.ptms.zaphkiel.annotation.Equal
-import ink.ptms.zaphkiel.annotation.Printable
-
 /**
  * Zaphkiel
  * ink.ptms.zaphkiel.api.DisplayProduct

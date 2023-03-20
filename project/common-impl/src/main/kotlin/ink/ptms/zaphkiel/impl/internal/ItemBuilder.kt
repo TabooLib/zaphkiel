@@ -64,7 +64,7 @@ internal object ItemBuilder {
                 e.itemMeta.lore = product.lore.colored()
             } else {
                 e.itemMeta.setDisplayName("§c${e.item.id}")
-                e.itemMeta.lore = listOf("", "§4- NO DISPLAY PLAN -")
+                e.itemMeta.lore = listOf("", "§4NO DISPLAY PLAN")
             }
         } else {
             if (e.item.iconLocked) {

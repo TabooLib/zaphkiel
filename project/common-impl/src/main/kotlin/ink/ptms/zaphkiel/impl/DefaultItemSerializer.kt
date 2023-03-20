@@ -39,7 +39,7 @@ class DefaultItemSerializer : ItemSerializer {
             DefaultSerializedItem("minecraft:${XMaterial.matchXMaterial(itemStream.sourceItem).name.lowercase()}", itemStream.sourceItem.amount, null, null)
         } else {
             DefaultSerializedItem(
-                itemStream.getZaphkielName(),
+                itemStream.getZaphkielId(),
                 itemStream.sourceItem.amount,
                 itemStream.getZaphkielData().takeIf { it.isNotEmpty() }?.let { ItemTagSerializer.serializeData(it).asJsonObject },
                 itemStream.getZaphkielUniqueData()?.let {

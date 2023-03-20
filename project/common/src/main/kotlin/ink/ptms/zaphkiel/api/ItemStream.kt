@@ -94,7 +94,7 @@ abstract class ItemStream : Metadatable {
     /**
      * 获取内部物品名称
      */
-    @Deprecated("命名歧义", ReplaceWith("getZaphkielId"))
+    @Deprecated("命名歧义", ReplaceWith("getZaphkielId()"))
     @UseWarning("原版物品将产生异常")
     abstract fun getZaphkielName(): String
 
@@ -109,7 +109,7 @@ abstract class ItemStream : Metadatable {
     /**
      * 获取物品版本签名
      */
-    @Deprecated("命名歧义", ReplaceWith("getZaphkielHash"))
+    @Deprecated("命名歧义", ReplaceWith("getZaphkielHash()"))
     @UseWarning("原版物品将产生异常")
     abstract fun getZaphkielVersion(): String
 

@@ -1,11 +1,11 @@
-item_wooden_sword:
-  display: DISPLAY_ITEM
-  icon: WOODEN_SWORD
+example_sword:
+  display: default_display
+  icon: wooden_sword
   name:
-    NAME: '&7Wooden Sword'
+    item_name: '&7Wooden Sword'
   lore:
-    TYPE: '&9Sword'
-    LORE:
+    item_type: '&9Sword'
+    item_description:
       - '&fCan be bought everywhere.'
   data:
     durability: 10
@@ -15,7 +15,6 @@ item_wooden_sword:
     attribute:
       mainhand:
         damage: +7
-        attackspeed: +10%
+        attack_speed: +10%
   event:
-    onDamage!!: |-
-      item damage 1
+    on_damage: item damage 1

@@ -31,20 +31,20 @@ class DefaultGroup(
 
     val metadataList = ConcurrentHashMap<String, MutableMap<String, MetadataValue>>()
 
-    override fun setMetadata(p0: String, p1: MetadataValue) {
-        metadataList.computeIfAbsent(p0) { ConcurrentHashMap() }[p1.owningPlugin?.name ?: "null"] = p1
+    override fun setMetadata(key: String, value: MetadataValue) {
+        metadataList.computeIfAbsent(key) { ConcurrentHashMap() }[value.owningPlugin?.name ?: "null"] = value
     }
 
-    override fun getMetadata(p0: String): MutableList<MetadataValue> {
-        return metadataList[p0]?.values?.toMutableList() ?: mutableListOf()
+    override fun getMetadata(key: String): MutableList<MetadataValue> {
+        return metadataList[key]?.values?.toMutableList() ?: mutableListOf()
     }
 
-    override fun hasMetadata(p0: String): Boolean {
-        return metadataList.containsKey(p0)
+    override fun hasMetadata(key: String): Boolean {
+        return metadataList.containsKey(key)
     }
 
-    override fun removeMetadata(p0: String, p1: Plugin) {
-        metadataList[p0]?.remove(p1.name)
+    override fun removeMetadata(key: String, plugin: Plugin) {
+        metadataList[key]?.remove(plugin.name)
     }
 
     override fun equals(other: Any?): Boolean {
@@ -65,8 +65,8 @@ class DefaultGroup(
     companion object {
 
         val NO_GROUP by lazy {
-            DefaultGroup("#", File(getDataFolder(), "config.yml"), Configuration.empty(Type.YAML), buildItem(XMaterial.BARRIER) {
-                name = "&7[NO GROUP]"
+            DefaultGroup("#", File(getDataFolder(), "config.yml"), Configuration.empty(Type.YAML), buildItem(XMaterial.APPLE) {
+                name = "&7[Isolated]"
                 colored()
             }, -1)
         }

@@ -29,7 +29,7 @@ class DefaultItemHandler : ItemHandler {
     }
 
     override fun getItemId(item: ItemStack): String? {
-        return read(item).takeIf { it.isExtension() }?.getZaphkielName()
+        return read(item).takeIf { it.isExtension() }?.getZaphkielId()
     }
 
     override fun getItemData(item: ItemStack): ItemTag? {

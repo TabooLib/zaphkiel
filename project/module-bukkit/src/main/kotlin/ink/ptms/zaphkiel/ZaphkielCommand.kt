@@ -11,13 +11,8 @@ import taboolib.common.platform.command.CommandBody
 import taboolib.common.platform.command.CommandHeader
 import taboolib.common.platform.command.mainCommand
 import taboolib.common.platform.command.subCommand
-import taboolib.common.platform.function.adaptPlayer
 import taboolib.expansion.createHelper
-import taboolib.module.chat.TellrawJson
 import taboolib.module.chat.colored
-import taboolib.module.nms.getName
-import taboolib.platform.util.giveItem
-import taboolib.platform.util.hoverItem
 import taboolib.platform.util.isAir
 
 /**

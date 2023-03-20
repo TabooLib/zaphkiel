@@ -1,14 +1,13 @@
 package ink.ptms.zaphkiel.api
 
-import ink.ptms.zaphkiel.annotation.LegacyName
 import ink.ptms.zaphkiel.annotation.Equal
+import ink.ptms.zaphkiel.annotation.LegacyName
 import ink.ptms.zaphkiel.annotation.Printable
 import ink.ptms.zaphkiel.item.meta.Meta
 import org.bukkit.entity.Player
 import org.bukkit.event.Event
 import org.bukkit.event.player.PlayerEvent
 import org.bukkit.inventory.ItemStack
-import org.bukkit.metadata.MetadataValue
 import org.bukkit.metadata.Metadatable
 import taboolib.library.configuration.ConfigurationSection
 import taboolib.module.nms.ItemTagData
@@ -163,7 +162,7 @@ abstract class Item : Metadatable {
      * 执行脚本
      */
     abstract fun invokeScript(
-        key: String,
+        key: List<String>,
         event: PlayerEvent,
         itemStream: ItemStream,
         namespace: String = "zaphkiel-internal",
@@ -173,7 +172,7 @@ abstract class Item : Metadatable {
      * 基于事件执行脚本
      */
     abstract fun invokeScript(
-        key: String,
+        key: List<String>,
         player: Player?,
         event: Event,
         itemStream: ItemStream,

@@ -19,9 +19,10 @@ import taboolib.common.LifeCycle
 import taboolib.common.platform.Awake
 import taboolib.common.platform.event.EventPriority
 import taboolib.common.platform.event.SubscribeEvent
-import taboolib.common.platform.function.submit
+import taboolib.common.platform.function.submitAsync
 import taboolib.common.util.random
 import taboolib.common5.Coerce
+import taboolib.common5.util.createBar
 import taboolib.library.xseries.parseToMaterial
 import taboolib.module.nms.ItemTagData
 import taboolib.module.nms.getItemTag
@@ -42,12 +43,9 @@ object ItemDurability {
                 if (current >= i) "§f${symbol.getOrElse(0) { "" }}" else "§7${symbol.getOrElse(1) { "" }}"
             })
         } else {
-            display.replace("%symbol%", taboolib.common5.util.createBar(
-                "§7${symbol.getOrElse(1) { "" }}",
-                "§f${symbol.getOrElse(0) { "" }}",
-                scale,
-                current / max.toDouble()
-            ))
+            val empty = "§7${symbol.getOrElse(1) { "" }}"
+            val full = "§f${symbol.getOrElse(0) { "" }}"
+            display.replace("%symbol%", createBar(empty, full, scale, current / max.toDouble()))
         }.replace("%current%", current.toString()).replace("%max%", max.toString()).replace("%percent%", percent)
     }
 
@@ -55,8 +53,8 @@ object ItemDurability {
     private fun onRelease(e: ItemReleaseEvent) {
         val max = e.itemStream.getZaphkielData()["durability"] ?: return
         val current = e.itemStream.getZaphkielData()["durability_current"] ?: return
-        val mapping = e.itemStream.getZaphkielItem().config.getBoolean("meta.durability.damage-mapping", true)
-        if (mapping) {
+        val sync = e.itemStream.getZaphkielItem().config.getBoolean("meta.durability.synchronous", true)
+        if (sync) {
             val percent = current.asDouble() / max.asDouble()
             val durability = e.itemStream.sourceItem.type.maxDurability
             e.data = (durability - (durability * percent)).toInt()
@@ -66,19 +64,23 @@ object ItemDurability {
     @SubscribeEvent
     private fun onReleaseDisplay(e: ItemReleaseEvent.Display) {
         val max = e.itemStream.getZaphkielData()["durability"] ?: return
-        val current = e.itemStream.getZaphkielData()["durability_current"] ?: ItemTagData(max.asInt())
-        val config = e.itemStream.getZaphkielItem().config.getConfigurationSection("meta.durability")
-        val display = config?.getString("display") ?: durability ?: return
-        if (display == "none") {
+        val cur = e.itemStream.getZaphkielData()["durability_current"] ?: ItemTagData(max.asInt())
+        val root = e.itemStream.getZaphkielItem().config.getConfigurationSection("meta.durability")
+        // 获取耐久表示格式
+        val displayFormat = root?.getString("display") ?: durability ?: return
+        if (displayFormat == "none") {
             return
         }
-        val displaySymbol = if (config?.contains("display-symbol") == true) {
-            listOf(config.getString("display-symbol.0")!!, config.getString("display-symbol.1")!!)
+        // 获取耐久表示符号
+        val displaySymbol = if (root?.contains("display-symbol") == true) {
+            listOf(root.getString("display-symbol.0")!!, root.getString("display-symbol.1")!!)
         } else {
             durabilitySymbol!!
         }
-        val bar = createBar(current.asInt(), max.asInt(), display, displaySymbol, config?.getInt("scale", -1) ?: -1)
+        val bar = createBar(cur.asInt(), max.asInt(), displayFormat, displaySymbol, root?.getInt("scale", -1) ?: -1)
+        e.addName("durability", bar)
         e.addName("DURABILITY", bar)
+        e.addLore("durability", bar)
         e.addLore("DURABILITY", bar)
     }
 
@@ -91,17 +93,22 @@ object ItemDurability {
     private fun onDamage(e: PlayerItemDamageEvent) {
         val itemStream = DefaultItemStream(e.item)
         if (itemStream.isExtension()) {
+            // 如果物品有自定义耐久度，则取消原版耐久度
             if (itemStream.getZaphkielData().containsKey("durability")) {
                 e.isCancelled = true
             }
-            itemStream.getZaphkielItem().invokeScript("onDamage", e, itemStream)
+            // 执行脚本
+            itemStream.getZaphkielItem().invokeScript(listOf("on_damage", "onDamage"), e, itemStream)
         }
     }
 
     @Awake(LifeCycle.ACTIVE)
     fun reload() {
         durability = DefaultZapAPI.config.getString("Durability.display")!!
-        durabilitySymbol = arrayListOf(DefaultZapAPI.config.getString("Durability.display-symbol.0")!!, DefaultZapAPI.config.getString("Durability.display-symbol.1")!!)
+        durabilitySymbol = arrayListOf(
+            DefaultZapAPI.config.getString("Durability.display-symbol.0")!!,
+            DefaultZapAPI.config.getString("Durability.display-symbol.1")!!
+        )
     }
 }
 
@@ -123,54 +130,60 @@ fun ItemStream.getCurrentDurability(): Int {
 /**
  * 扣除耐久度
  */
-fun ItemStream.damageItem(value: Int, player: Player? = null): Boolean {
-    return repairItem(-value, player)
+fun ItemStream.damageItem(value: Int, player: Player? = null, broken: Boolean = true): Boolean {
+    return repairItem(-value, player, broken)
 }
 
 /**
  * 恢复耐久度
  */
-fun ItemStream.repairItem(value: Int, player: Player? = null): Boolean {
+fun ItemStream.repairItem(value: Int, player: Player? = null, broken: Boolean = true): Boolean {
     val data = getZaphkielData()
     val max = data["durability"] ?: return true
     val current = data["durability_current"] ?: ItemTagData(max.asInt())
     val currentLatest = (current.asInt() + value).coerceIn(0..max.asInt())
-    // 当耐久度大于 0
-    return if (currentLatest > 0) {
-        signal += ItemSignal.DURABILITY_UPDATE
-        data["durability_current"] = ItemTagData(currentLatest)
-        true
-    } else {
-        signal += ItemSignal.DURABILITY_DESTROY
-        // 残骸
-        val remains = getZaphkielItem().config.getString("meta.durability.remains")
-        if (remains != null) {
-            val replace = remains.split("~")
-            // 获取替换后的物品
-            val replaceItem = if (replace[0].startsWith("minecraft:")) {
-                ItemStack(replace[0].substring("minecraft:".length).parseToMaterial())
-            } else {
-                Zaphkiel.api().getItemManager().generateItemStack(replace[0], player) ?: ItemStack(Material.STONE)
-            }
-            sourceItem.type = replaceItem.type
-            sourceItem.itemMeta = replaceItem.itemMeta
-            sourceItem.durability = Coerce.toShort(replace.getOrNull(1) ?: "0")
-            sourceCompound.clear()
-            sourceCompound.putAll(replaceItem.getItemTag())
-        } else {
-            val itemStack = sourceItem.clone()
-            if (player != null) {
-                Bukkit.getPluginManager().callEvent(PlayerItemBreakEvent(player, sourceItem))
-                // 播放特效
-                submit(async = true, delay = 1) {
-                    if (itemStack.type.maxDurability > 0) {
-                        player.playSound(player.location, Sound.ENTITY_ITEM_BREAK, 1f, random(0.5, 1.5).toFloat())
-                    }
-                    player.world.spawnParticle(Particle.ITEM_CRACK, player.location.add(0.0, 1.0, 0.0), 15, 0.0, 0.0, 0.0, 0.1, itemStack)
-                }
-            }
-            sourceItem.amount = 0
+    return when {
+        // 耐久度大于 0
+        currentLatest > 0 -> {
+            signal += ItemSignal.DURABILITY_CHANGED
+            data["durability_current"] = ItemTagData(currentLatest)
+            true
         }
-        false
+        // 允许被破坏
+        broken -> {
+            signal += ItemSignal.DURABILITY_DESTROYED
+            // 残骸
+            val remains = getZaphkielItem().config.getString("meta.durability.remains")
+            if (remains != null) {
+                val replace = remains.split("~")
+                // 获取替换后的物品
+                val replaceItem = if (replace[0].startsWith("minecraft:")) {
+                    ItemStack(replace[0].substring("minecraft:".length).parseToMaterial())
+                } else {
+                    Zaphkiel.api().getItemManager().generateItemStack(replace[0], player) ?: ItemStack(Material.STONE)
+                }
+                sourceItem.type = replaceItem.type
+                sourceItem.itemMeta = replaceItem.itemMeta
+                sourceItem.durability = Coerce.toShort(replace.getOrNull(1) ?: "0")
+                sourceCompound.clear()
+                sourceCompound.putAll(replaceItem.getItemTag())
+            } else {
+                val itemStack = sourceItem.clone()
+                if (player != null) {
+                    Bukkit.getPluginManager().callEvent(PlayerItemBreakEvent(player, sourceItem))
+                    // 播放特效
+                    submitAsync(delay = 1) {
+                        // 如果物品有耐久度，则播放破碎声音
+                        if (itemStack.type.maxDurability > 0) {
+                            player.playSound(player.location, Sound.ENTITY_ITEM_BREAK, 1f, random(0.5, 1.5).toFloat())
+                        }
+                        player.world.spawnParticle(Particle.ITEM_CRACK, player.location.add(0.0, 1.0, 0.0), 15, 0.0, 0.0, 0.0, 0.1, itemStack)
+                    }
+                }
+                sourceItem.amount = 0
+            }
+            false
+        }
+        else -> false
     }
 }

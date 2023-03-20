@@ -102,7 +102,7 @@ class DefaultItem(override val config: ConfigurationSection, override val group:
         val itemStream = DefaultItemStreamGenerated(icon.clone(), name.toMutableMap(), lore.toMutableMap())
         val compound = itemStream.sourceCompound.computeIfAbsent("zaphkiel") { ItemTag() }.asCompound()
         compound[ItemKey.ID.key] = ItemTagData(id)
-        compound[ItemKey.DATA.key] = Translator.toNBTCompound(ItemTag(), data)
+        compound[ItemKey.DATA.key] = Translator.toItemTag(ItemTag(), data)
         return build(player, itemStream)
     }
 
@@ -112,25 +112,22 @@ class DefaultItem(override val config: ConfigurationSection, override val group:
         } else {
             ItemBuildEvent.Pre(player, itemStream, name.toMutableMap(), lore.toMutableMap())
         }
-        if (!pre.call()) {
-            return itemStream
+        if (pre.call()) {
+            // 设置数据
+            lockedData.forEach { (k, v) -> itemStream.getZaphkielData().putDeep(k, v) }
+            // 设置版本
+            pre.itemStream.sourceCompound["zaphkiel"]!!.asCompound()[ItemKey.VERSION.key] = ItemTagData(version)
+            // 替换变量
+            val placeholderReplaced = if (player != null) {
+                val map = HashMap<String, MutableList<String>>()
+                pre.lore.forEach { (key, lore) -> map[key] = lore.replacePlaceholder(player).toMutableList() }
+                map
+            } else null
+            val post = ItemBuildEvent.Post(player, pre.itemStream, pre.name, placeholderReplaced ?: pre.lore)
+            post.call()
+            return post.itemStream
         }
-        // 设置数据
-        lockedData.forEach { (k, v) -> itemStream.getZaphkielData().putDeep(k, v) }
-        // 设置版本
-        pre.itemStream.sourceCompound["zaphkiel"]!!.asCompound()[ItemKey.VERSION.key] = ItemTagData(version)
-        // 替换变量
-        val placeholderReplaced = if (player != null) {
-            val map = HashMap<String, MutableList<String>>()
-            pre.lore.forEach { (key, lore) ->
-                lore.forEachIndexed { index, line -> lore[index] = line.replacePlaceholder(player) }
-                map[key] = lore
-            }
-            map
-        } else null
-        val post = ItemBuildEvent.Post(player, pre.itemStream, pre.name, placeholderReplaced ?: pre.lore)
-        post.call()
-        return post.itemStream
+        return itemStream
     }
 
     override fun isSimilar(itemStack: ItemStack): Boolean {
@@ -157,16 +154,16 @@ class DefaultItem(override val config: ConfigurationSection, override val group:
         giveItem(player, amount) { it.forEach { item -> player.world.dropItem(player.location, item) } }
     }
 
-    override fun invokeScript(key: String, event: PlayerEvent, itemStream: ItemStream, namespace: String): CompletableFuture<ItemEvent.ItemResult?>? {
-        val itemEvent = eventMap[key] ?: return null
+    override fun invokeScript(key: List<String>, event: PlayerEvent, itemStream: ItemStream, namespace: String): CompletableFuture<ItemEvent.ItemResult?>? {
+        val itemEvent = eventMap.entries.firstOrNull { it.key in key }?.value ?: return null
         if (itemEvent.isCancelled && event is Cancellable) {
             event.isCancelled = true
         }
         return itemEvent.invoke(event.player, event, itemStream, eventVars, namespace)
     }
 
-    override fun invokeScript(key: String, player: Player?, event: Event, itemStream: ItemStream, namespace: String): CompletableFuture<ItemEvent.ItemResult?>? {
-        val itemEvent = eventMap[key] ?: return null
+    override fun invokeScript(key: List<String>, player: Player?, event: Event, itemStream: ItemStream, namespace: String): CompletableFuture<ItemEvent.ItemResult?>? {
+        val itemEvent = eventMap.entries.firstOrNull { it.key in key }?.value ?: return null
         if (itemEvent.isCancelled && event is Cancellable) {
             event.isCancelled = true
         }
@@ -176,7 +173,7 @@ class DefaultItem(override val config: ConfigurationSection, override val group:
     fun getLockedData(map: MutableMap<String, ItemTagData?>, section: ConfigurationSection, path: String = ""): MutableMap<String, ItemTagData?> {
         section.getKeys(false).forEach { key ->
             if (key.endsWith("!!")) {
-                map[path + key.substring(0, key.length - 2)] = Translator.toNBTBase(config["data.$path$key"])
+                map[path + key.substring(0, key.length - 2)] = Translator.toItemTag(config["data.$path$key"])
             } else if (section.isConfigurationSection(key)) {
                 getLockedData(map, section.getConfigurationSection(key)!!, "$path$key.")
             }
@@ -184,20 +181,20 @@ class DefaultItem(override val config: ConfigurationSection, override val group:
         return map
     }
 
-    override fun setMetadata(p0: String, p1: MetadataValue) {
-        metadataList.computeIfAbsent(p0) { ConcurrentHashMap() }[p1.owningPlugin?.name ?: "null"] = p1
+    override fun setMetadata(key: String, value: MetadataValue) {
+        metadataList.computeIfAbsent(key) { ConcurrentHashMap() }[value.owningPlugin?.name ?: "null"] = value
     }
 
-    override fun getMetadata(p0: String): MutableList<MetadataValue> {
-        return metadataList[p0]?.values?.toMutableList() ?: mutableListOf()
+    override fun getMetadata(key: String): MutableList<MetadataValue> {
+        return metadataList[key]?.values?.toMutableList() ?: mutableListOf()
     }
 
-    override fun hasMetadata(p0: String): Boolean {
-        return metadataList.containsKey(p0)
+    override fun hasMetadata(key: String): Boolean {
+        return metadataList.containsKey(key)
     }
 
-    override fun removeMetadata(p0: String, p1: Plugin) {
-        metadataList[p0]?.remove(p1.name)
+    override fun removeMetadata(key: String, plugin: Plugin) {
+        metadataList[key]?.remove(plugin.name)
     }
 
     override fun equals(other: Any?): Boolean {

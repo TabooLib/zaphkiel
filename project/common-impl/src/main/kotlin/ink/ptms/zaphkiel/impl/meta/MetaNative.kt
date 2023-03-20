@@ -9,7 +9,7 @@ import taboolib.module.nms.ItemTagData
 @MetaKey("native")
 class MetaNative(root: ConfigurationSection) : Meta(root) {
 
-    val nativeNBT = ItemTag().also { nbt ->
+    val nativeTag = ItemTag().also { nbt ->
         root.getConfigurationSection("meta.native")?.run {
             getValues(false).forEach {
                 nbt[it.key] = ItemTagData.toNBT(it.value)
@@ -21,12 +21,10 @@ class MetaNative(root: ConfigurationSection) : Meta(root) {
         get() = "native"
 
     override fun build(player: Player?, compound: ItemTag) {
-        nativeNBT.forEach { t, u ->
-            compound[t] = u
-        }
+        nativeTag.forEach { t, u -> compound[t] = u }
     }
 
     override fun toString(): String {
-        return "MetaNative(nativeNBT=$nativeNBT)"
+        return "MetaNative(nativeNBT=$nativeTag)"
     }
 }

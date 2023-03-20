@@ -16,7 +16,6 @@ import org.bukkit.event.player.*
 import org.bukkit.inventory.EquipmentSlot
 import taboolib.common.platform.Schedule
 import taboolib.common.platform.event.EventPriority
-import taboolib.common.platform.event.OptionalEvent
 import taboolib.common.platform.event.SubscribeEvent
 import taboolib.platform.util.attacker
 import taboolib.platform.util.isAir
@@ -43,17 +42,17 @@ internal object ItemListener {
 
     @SubscribeEvent
     fun onBuildPre(e: ItemBuildEvent.Pre) {
-        e.itemStream.getZaphkielItem().invokeScript("onBuild", e.player, e, e.itemStream, "zaphkiel-build")
+        e.itemStream.getZaphkielItem().invokeScript(listOf("on_build", "onBuild"), e.player, e, e.itemStream, "zaphkiel-build")
     }
 
     @SubscribeEvent
     fun onRelease(e: ItemReleaseEvent) {
-        e.itemStream.getZaphkielItem().invokeScript("onRelease", e.player, e, e.itemStream, "zaphkiel-build")
+        e.itemStream.getZaphkielItem().invokeScript(listOf("on_release", "onRelease"), e.player, e, e.itemStream, "zaphkiel-build")
     }
 
     @SubscribeEvent
     fun onReleaseDisplay(e: ItemReleaseEvent.Display) {
-        e.itemStream.getZaphkielItem().invokeScript("onReleaseDisplay", e.player, e, e.itemStream, "zaphkiel-build")
+        e.itemStream.getZaphkielItem().invokeScript(listOf("on_release_display", "onReleaseDisplay"), e.player, e, e.itemStream, "zaphkiel-build")
     }
 
     @SubscribeEvent
@@ -62,7 +61,7 @@ internal object ItemListener {
         if (attacker is Player && attacker.itemInHand.isNotAir()) {
             val itemStream = attacker.itemInHand.toItemStream()
             if (itemStream.isExtension()) {
-                itemStream.getZaphkielItem().invokeScript("onAttack", attacker, e, itemStream)
+                itemStream.getZaphkielItem().invokeScript(listOf("on_attack", "onAttack"), attacker, e, itemStream)
             }
         }
     }
@@ -85,7 +84,7 @@ internal object ItemListener {
     fun onBreak(e: PlayerItemBreakEvent) {
         val itemStream = e.brokenItem.toItemStream()
         if (itemStream.isExtension()) {
-            itemStream.getZaphkielItem().invokeScript("onItemBreak", e, itemStream)
+            itemStream.getZaphkielItem().invokeScript(listOf("on_item_break", "onItemBreak"), e, itemStream)
         }
     }
 
@@ -104,7 +103,7 @@ internal object ItemListener {
             // 触发事件
             ItemEvent.Consume(itemStream, e).also { it.call() }
             // 执行脚本
-            itemStream.getZaphkielItem().invokeScript("onConsume", e, itemStream)
+            itemStream.getZaphkielItem().invokeScript(listOf("on_consume", "onConsume"), e, itemStream)
             // 更新物品
             if (e.item == e.player.inventory.itemInMainHand) {
                 e.player.inventory.setItemInMainHand(itemStack)
@@ -135,14 +134,16 @@ internal object ItemListener {
             }
             // 执行脚本
             when (e.action) {
+                // 左键
                 Action.LEFT_CLICK_AIR, Action.LEFT_CLICK_BLOCK -> {
-                    itemStream.getZaphkielItem().invokeScript("onLeftClick", e, itemStream)
+                    itemStream.getZaphkielItem().invokeScript(listOf("on_left_click", "onLeftClick"), e, itemStream)
                 }
+                // 右键
                 Action.RIGHT_CLICK_AIR, Action.RIGHT_CLICK_BLOCK -> {
-                    itemStream.getZaphkielItem().invokeScript("onRightClick", e, itemStream)
+                    itemStream.getZaphkielItem().invokeScript(listOf("on_right_click", "onRightClick"), e, itemStream)
                 }
-                else -> {
-                }
+                // 其他
+                else -> {}
             }
         }
     }
@@ -163,7 +164,7 @@ internal object ItemListener {
                 if (event.save) {
                     event.itemStream.rebuildToItemStack(e.player)
                 }
-                itemStream.getZaphkielItem().invokeScript("onRightClickEntity", e, itemStream)
+                itemStream.getZaphkielItem().invokeScript(listOf("on_right_click_entity", "onRightClickEntity"), e, itemStream)
             }
         }
     }
@@ -177,13 +178,13 @@ internal object ItemListener {
         if (e.offHandItem.isNotAir()) {
             val itemStream = e.offHandItem!!.toItemStream()
             if (itemStream.isExtension()) {
-                itemStream.getZaphkielItem().invokeScript("onSwapToOffhand", e, itemStream)
+                itemStream.getZaphkielItem().invokeScript(listOf("on_swap_to_offhand", "onSwapToOffhand"), e, itemStream)
             }
         }
         if (e.mainHandItem.isNotAir()) {
             val itemStream = e.mainHandItem!!.toItemStream()
             if (itemStream.isExtension()) {
-                itemStream.getZaphkielItem().invokeScript("onSwapToMainHand", e, itemStream)
+                itemStream.getZaphkielItem().invokeScript(listOf("on_swap_to_mainhand", "onSwapToMainHand"), e, itemStream)
             }
         }
     }
@@ -199,7 +200,7 @@ internal object ItemListener {
         }
         val itemStream = e.player.inventory.itemInMainHand.toItemStream()
         if (itemStream.isExtension()) {
-            itemStream.getZaphkielItem().invokeScript("onBlockBreak", e.player, e, itemStream)
+            itemStream.getZaphkielItem().invokeScript(listOf("on_block_break", "onBlockBreak"), e.player, e, itemStream)
         }
     }
 
@@ -214,7 +215,7 @@ internal object ItemListener {
         }
         val itemStream = e.player.inventory.itemInMainHand.toItemStream()
         if (itemStream.isExtension()) {
-            itemStream.getZaphkielItem().invokeScript("onBlockBreak", e.player, e, itemStream)
+            itemStream.getZaphkielItem().invokeScript(listOf("on_block_break", "onBlockBreak"), e.player, e, itemStream)
         }
     }
 
@@ -232,12 +233,12 @@ internal object ItemListener {
             val event = ItemEvent.Drop(itemStream, e)
             event.call()
             if (event.save) {
-                e.itemDrop.setItemStack(event.itemStream.rebuildToItemStack(e.player))
+                e.itemDrop.itemStack = event.itemStream.rebuildToItemStack(e.player)
             }
             // 若脚本修改物品则写回事件
-            itemStream.getZaphkielItem().invokeScript("onDrop", e.player, e, itemStream)?.thenAccept {
+            itemStream.getZaphkielItem().invokeScript(listOf("on_drop", "onDrop"), e.player, e, itemStream)?.thenAccept {
                 if (it != null) {
-                    e.itemDrop.setItemStack(it.itemStack)
+                    e.itemDrop.itemStack = it.itemStack
                 }
             }
         }
@@ -257,12 +258,12 @@ internal object ItemListener {
             val event = ItemEvent.Pick(itemStream, e)
             event.call()
             if (event.save) {
-                e.item.setItemStack(event.itemStream.rebuildToItemStack(e.player))
+                e.item.itemStack = event.itemStream.rebuildToItemStack(e.player)
             }
             // 若脚本修改物品则写回事件
-            itemStream.getZaphkielItem().invokeScript("onPick", e.player, e, itemStream)?.thenAccept {
+            itemStream.getZaphkielItem().invokeScript(listOf("on_pick", "on_pickup", "onPick", "onPickUp"), e.player, e, itemStream)?.thenAccept {
                 if (it != null) {
-                    e.item.setItemStack(it.itemStack)
+                    e.item.itemStack = it.itemStack
                 }
             }
         }
@@ -279,7 +280,7 @@ internal object ItemListener {
         if (e.click == ClickType.NUMBER_KEY) {
             val hotbarButton = e.whoClicked.inventory.getItem(e.hotbarButton)
             if (hotbarButton.isNotAir()) {
-                itemStreamButton = hotbarButton!!.toItemStream()
+                itemStreamButton = hotbarButton.toItemStream()
             }
         }
         if (itemStreamCurrent == null && itemStreamButton == null) {

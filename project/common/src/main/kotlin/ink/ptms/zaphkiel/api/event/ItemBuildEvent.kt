@@ -13,21 +13,33 @@ class ItemBuildEvent {
     /**
      * 构建之前
      * 可被取消
+     *
+     * 该事件在物品发送到玩家背包时通常会触发两次：
+     * - 第一次是在产生 ItemStack 时进行初次构建
+     * - 第二次是在 ItemGiveEvent 事件后重构
      */
-    class Pre(val player: Player?, val itemStream: ItemStream, val name: MutableMap<String, String>, val lore: MutableMap<String, MutableList<String>>) : BukkitProxyEvent() {
+    class Pre(
+        val player: Player?,
+        val itemStream: ItemStream,
+        val name: MutableMap<String, String>,
+        val lore: MutableMap<String, MutableList<String>>
+    ) : BukkitProxyEvent(), Editable {
 
         val item = itemStream.getZaphkielItem()
 
-        fun addName(key: String, value: Any) {
+        override fun addName(key: String, value: Any) {
             name[key] = value.toString()
         }
 
-        fun addLore(key: String, value: Any) {
-            val list = lore.computeIfAbsent(key) { ArrayList() } as ArrayList
-            list.add(value.toString())
+        override fun addLore(key: String, value: Any) {
+            val list = lore.computeIfAbsent(key) { arrayListOf() }
+            when (value) {
+                is List<*> -> list.addAll(value.map { it.toString() })
+                else -> list.add(value.toString())
+            }
         }
 
-        fun addLore(key: String, value: List<Any>) {
+        override fun addLore(key: String, value: List<Any>) {
             value.forEach { addLore(key, it) }
         }
     }

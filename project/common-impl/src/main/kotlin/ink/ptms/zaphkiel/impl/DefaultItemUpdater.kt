@@ -25,7 +25,7 @@ class DefaultItemUpdater : ItemUpdater {
             if (item.isAir()) {
                 return@forEach
             }
-            val rebuild = checkUpdate(player, item!!)
+            val rebuild = checkUpdate(player, item)
             if (ItemSignal.UPDATE_CHECKED in rebuild.signal) {
                 rebuild.toItemStack(player)
             }

@@ -11,16 +11,16 @@ import org.bukkit.entity.Player
 import taboolib.library.xseries.XMaterial
 import taboolib.module.ui.openMenu
 import taboolib.module.ui.type.Linked
+import taboolib.platform.util.Slots
 import taboolib.platform.util.buildItem
 import taboolib.platform.util.giveItem
-import taboolib.platform.util.inventoryCenterSlots
 import taboolib.platform.util.modifyLore
 
 fun Player.openGroupMenu() {
     playSound(location, Sound.UI_BUTTON_CLICK, 1f, 2f)
-    openMenu<Linked<Group>>("Zaphkiel [Pg.%p]") {
+    openMenu<Linked<Group>>("Zaphkiel Items [%p]") {
         rows(6)
-        slots(inventoryCenterSlots)
+        slots(Slots.CENTER)
         elements {
             Zaphkiel.api().getItemManager().getItemMap().values.groupBy { it.group ?: DefaultGroup.NO_GROUP }.map { it.key }.sortedByDescending { it.priority }
         }
@@ -49,9 +49,9 @@ fun Player.openGroupMenu() {
 
 fun Player.openItemMenu(group: Group) {
     playSound(location, Sound.UI_BUTTON_CLICK, 1f, 2f)
-    openMenu<Linked<Item>>("Zaphkiel - ${group.name} [Pg.%p]") {
+    openMenu<Linked<Item>>("Zaphkiel Items : ${group.name} [%p]") {
         rows(6)
-        slots(inventoryCenterSlots)
+        slots(Slots.CENTER)
         elements {
             Zaphkiel.api().getItemManager().getItemMap().values.filter { (it.group ?: DefaultGroup.NO_GROUP) == group }
         }

@@ -8,7 +8,6 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import taboolib.common.io.runningClasses
 import taboolib.platform.util.giveItem
-import java.util.HashMap
 
 /**
  * Zaphkiel

@@ -1,5 +1,7 @@
 package ink.ptms.zaphkiel.api
 
+import ink.ptms.zaphkiel.annotation.LegacyName
+
 /**
  * Zaphkiel
  * ink.ptms.zaphkiel.api.ItemSignal
@@ -17,10 +19,12 @@ enum class ItemSignal {
     /**
      * 物品是否被 itemDamage/itemRepair 方法下更新
      */
-    DURABILITY_UPDATE,
+    @LegacyName("DURABILITY_UPDATE")
+    DURABILITY_CHANGED,
 
     /**
      * 物品是否被 itemDamage/itemRepair 方法下损坏
      */
-    DURABILITY_DESTROY
+    @LegacyName("DURABILITY_DESTROY")
+    DURABILITY_DESTROYED
 }

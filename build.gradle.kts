@@ -15,7 +15,7 @@ subprojects {
         compileOnly("org.apache.commons:commons-lang3:3.12.0")
         compileOnly("com.google.guava:guava:30.1.1-jre")
         compileOnly("com.google.code.gson:gson:2.8.8")
-        compileOnly("ink.ptms.core:v11903:11903:mapped")
+        compileOnly("ink.ptms.core:v11904:11904:mapped")
         compileOnly("ink.ptms.core:v11200:11200")
         compileOnly(kotlin("stdlib"))
     }

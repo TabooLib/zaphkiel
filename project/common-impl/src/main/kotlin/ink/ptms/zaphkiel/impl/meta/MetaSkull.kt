@@ -22,6 +22,7 @@ import java.util.*
 class MetaSkull(root: ConfigurationSection) : Meta(root) {
 
     val skullOwner = root.getString("meta.skull.owner")
+
     val skullTexture = if (root.contains("meta.skull.textures")) {
         SkullTexture(root.getString("meta.skull.textures.value").toString(), root.getString("meta.skull.textures.id"))
     } else null

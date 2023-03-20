@@ -1,92 +1,57 @@
 package ink.ptms.zaphkiel.impl.feature.kether
 
-import ink.ptms.zaphkiel.api.event.ItemBuildEvent
+import ink.ptms.zaphkiel.api.event.Editable
 import ink.ptms.zaphkiel.api.event.ItemReleaseEvent
-import ink.ptms.zaphkiel.impl.feature.kether.itemEvent
 import org.bukkit.event.Cancellable
 import org.bukkit.event.Event
-import taboolib.common5.Coerce
-import taboolib.library.kether.ArgTypes
+import taboolib.common5.cint
 import taboolib.library.xseries.parseToMaterial
-import taboolib.module.kether.*
+import taboolib.module.kether.KetherParser
+import taboolib.module.kether.actionNow
+import taboolib.module.kether.combinationParser
+import taboolib.module.kether.scriptParser
 
-/**
- * Zaphkiel
- * ink.ptms.zaphkiel.impl.feature.kether.ActionBuilder
- *
- * @author sky
- * @since 2021/10/20 10:42 下午
- */
-object ActionBuilder {
-
-    @KetherParser(["cancel"], namespace = "zaphkiel")
-    fun cancel() = scriptParser {
-        actionNow {
-            val e = itemEvent<Event>()
-            if (e is Cancellable) {
-                e.isCancelled = true
-            }
+@KetherParser(["cancel"], namespace = "zaphkiel")
+private fun parserCancel() = scriptParser {
+    actionNow {
+        val e = itemEvent<Event>()
+        if (e is Cancellable) {
+            e.isCancelled = true
         }
     }
+}
 
-    /**
-     * build name *123 to *123
-     * build lore *123 to *123
-     * build icon *stone
-     * build data *1
-     */
-    @KetherParser(["build"], namespace = "zaphkiel-build")
-    fun build() = scriptParser {
-        it.switch {
-            case("icon") {
-                val value = it.next(ArgTypes.ACTION)
-                actionNow {
-                    newFrame(value).run<Any>().thenAccept { value ->
-                        itemEvent<ItemReleaseEvent>().icon = value.toString().parseToMaterial()
-                    }
-                }
-            }
-            case("data") {
-                val value = it.next(ArgTypes.ACTION)
-                actionNow {
-                    newFrame(value).run<Any>().thenAccept { value ->
-                        itemEvent<ItemReleaseEvent>().data = Coerce.toInteger(value.toString())
-                    }
-                }
-            }
-            case("name") {
-                val key = it.next(ArgTypes.ACTION)
-                it.expects("to")
-                val value = it.next(ArgTypes.ACTION)
-                actionNow {
+@KetherParser(["preset", "build"], namespace = "zaphkiel-build")
+private fun parserPreset() = combinationParser {
+    it.group(symbol(), text(), command("to", then = text()).option()).apply(it) { action, a1, a2 ->
+        now {
+            when (action) {
+                // 名称
+                "name" -> {
+                    a2 ?: error("missing value for preset name $a1")
                     val itemEvent = itemEvent<Event>()
-                    newFrame(key).run<Any>().thenApply { key ->
-                        newFrame(value).run<Any>().thenApply { value ->
-                            when (itemEvent) {
-                                is ItemBuildEvent.Pre -> itemEvent.addName(key.toString(), value)
-                                is ItemReleaseEvent.Display -> itemEvent.addName(key.toString(), value)
-                                else -> error("not a build or release event")
-                            }
-                        }
+                    if (itemEvent is Editable) {
+                        itemEvent.addName(a1, a2)
+                    } else {
+                        error("It cannot be modified in this event")
                     }
                 }
-            }
-            case("lore") {
-                val key = it.next(ArgTypes.ACTION)
-                it.expects("to")
-                val value = it.next(ArgTypes.ACTION)
-                actionNow {
+                // 描述
+                "lore" -> {
+                    a2 ?: error("missing value for preset name $a1")
                     val itemEvent = itemEvent<Event>()
-                    newFrame(key).run<Any>().thenApply { key ->
-                        newFrame(value).run<Any>().thenApply { value ->
-                            when (itemEvent) {
-                                is ItemBuildEvent.Pre -> itemEvent.addLore(key.toString(), value)
-                                is ItemReleaseEvent.Display -> itemEvent.addLore(key.toString(), value)
-                                else -> error("not a build or release event")
-                            }
-                        }
+                    if (itemEvent is Editable) {
+                        itemEvent.addLore(a1, a2)
+                    } else {
+                        error("It cannot be modified in this event")
                     }
                 }
+                // 图标（材质）
+                "icon", "material" -> itemEvent<ItemReleaseEvent>().icon = a1.parseToMaterial()
+                // 附加值
+                "data", "damage" -> itemEvent<ItemReleaseEvent>().data = a1.cint
+                // 其他
+                else -> error("unknown preset action $action")
             }
         }
     }

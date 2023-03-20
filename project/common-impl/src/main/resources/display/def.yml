@@ -1,5 +1,5 @@
-DISPLAY_ITEM:
-  name: '&7<NAME>'
+default_display:
+  name: '&7<item_name>'
   lore:
-    - '&9<TYPE>'
-    - '&f<LORE...>'
+    - '&9<item_type>'
+    - '&f<item_description...>'

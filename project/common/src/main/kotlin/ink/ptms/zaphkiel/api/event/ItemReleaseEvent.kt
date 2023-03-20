@@ -1,10 +1,8 @@
 package ink.ptms.zaphkiel.api.event
 
-import ink.ptms.zaphkiel.api.Display
 import ink.ptms.zaphkiel.api.ItemStream
 import org.bukkit.Material
 import org.bukkit.entity.Player
-import org.bukkit.event.EventPriority
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.ItemMeta
 import taboolib.platform.type.BukkitProxyEvent
@@ -44,24 +42,24 @@ class ItemReleaseEvent(var icon: Material, var data: Int, var itemMeta: ItemMeta
         val name: MutableMap<String, String>,
         val lore: MutableMap<String, MutableList<String>>,
         val player: Player? = null,
-    ) : BukkitProxyEvent() {
+    ) : BukkitProxyEvent(), Editable {
 
         override val allowCancelled: Boolean
             get() = false
 
-        fun addName(key: String, value: Any) {
+        override fun addName(key: String, value: Any) {
             name[key] = value.toString()
         }
 
-        fun addLore(key: String, value: Any) {
-            val list = lore.computeIfAbsent(key) { ArrayList() } as ArrayList
+        override fun addLore(key: String, value: Any) {
+            val list = lore.computeIfAbsent(key) { arrayListOf() }
             when (value) {
                 is List<*> -> list.addAll(value.map { it.toString() })
                 else -> list.add(value.toString())
             }
         }
 
-        fun addLore(key: String, value: List<Any>) {
+        override fun addLore(key: String, value: List<Any>) {
             value.forEach { addLore(key, it) }
         }
     }

@@ -11,7 +11,6 @@ import taboolib.common.io.newFile
 import taboolib.common.platform.Awake
 import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common.platform.function.getDataFolder
-import taboolib.common.platform.function.releaseResourceFile
 import taboolib.common.util.unsafeLazy
 import taboolib.expansion.releaseDataContainer
 import taboolib.expansion.setupDataContainer
