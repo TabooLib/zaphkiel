@@ -40,7 +40,7 @@ class DefaultGroup(
     }
 
     override fun hasMetadata(key: String): Boolean {
-        return metadataList.containsKey(key)
+        return metadataList.containsKey(key) && metadataList[key]?.isNotEmpty() == true
     }
 
     override fun removeMetadata(key: String, plugin: Plugin) {

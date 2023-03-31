@@ -158,7 +158,7 @@ open class DefaultItemStream(override val sourceItem: ItemStack, override val so
     }
 
     override fun hasMetadata(key: String): Boolean {
-        return metadataList.containsKey(key)
+        return metadataList.containsKey(key) && metadataList[key]?.isNotEmpty() == true
     }
 
     override fun removeMetadata(key: String, plugin: Plugin) {
