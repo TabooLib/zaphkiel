@@ -4,7 +4,6 @@ import ink.ptms.um.event.MobDeathEvent
 import ink.ptms.um.event.MobSpawnEvent
 import ink.ptms.zaphkiel.Zaphkiel
 import org.bukkit.Material
-import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
@@ -12,6 +11,7 @@ import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common.platform.function.submit
 import taboolib.common.util.random
 import taboolib.common5.Coerce
+import taboolib.library.configuration.ConfigurationSection
 import taboolib.type.BukkitEquipment
 
 /**
@@ -25,9 +25,10 @@ internal object MythicHook {
 
     @SubscribeEvent
     fun onSpawn(e: MobSpawnEvent) {
-        val section = e.mob.config.getConfigurationSection("Zaphkiel.equipments") ?: return
+        val mob = e.mob ?: return
+        val section = mob.config.getConfigurationSection("Zaphkiel.equipments") ?: return
         submit(delay = 5) {
-            MythicUtil.equipment(section, e.mob.entity as? LivingEntity ?: return@submit)
+            MythicUtil.equipment(section, mob.entity as? LivingEntity ?: return@submit)
         }
     }
 
