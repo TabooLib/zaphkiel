@@ -8,6 +8,9 @@ import org.bukkit.event.Event
 import taboolib.common.platform.function.adaptPlayer
 import taboolib.common.platform.function.warning
 import taboolib.module.kether.KetherShell
+import taboolib.module.kether.KetherShell.eval
+import taboolib.module.kether.ScriptContext
+import taboolib.module.kether.ScriptOptions
 import taboolib.module.kether.printKetherErrorMessage
 import java.util.concurrent.CompletableFuture
 
@@ -22,27 +25,23 @@ class DefaultItemEvent(item: Item, name: String, script: List<String>, isCancell
 
     override fun invoke(player: Player?, event: Event, itemStream: ItemStream, data: Map<String, Any?>, namespace: String): CompletableFuture<ItemResult?> {
         val future = CompletableFuture<ItemResult?>()
-        try {
-            KetherShell.eval(script, namespace = listOf("zaphkiel", namespace)) {
-                if (player != null) {
-                    sender = adaptPlayer(player)
-                }
-                rootFrame().variables().also { vars ->
-                    data.forEach { (k, v) -> vars.set(k, v) }
-                    vars.set("@ItemEvent", event)
-                    vars.set("@ItemStream", itemStream)
-                }
-            }.thenRun {
-                if (itemStream.signal.isNotEmpty()) {
-                    future.complete(ItemResult(itemStream.rebuildToItemStack(player)))
-                } else {
-                    future.complete(null)
-                }
+        val options = ScriptOptions.new {
+            if (player != null) {
+                sender(player)
             }
-        } catch (e: Throwable) {
-            future.complete(null)
-            warning("error item: ${item.id}")
-            e.printKetherErrorMessage()
+            namespace(listOf("zaphkiel", namespace))
+            vars(data)
+            set("@ItemEvent", event)
+            set("@ItemStream", itemStream)
+            sandbox()
+            detailError()
+        }
+        eval(script, options).thenRun {
+            if (itemStream.signal.isNotEmpty()) {
+                future.complete(ItemResult(itemStream.rebuildToItemStack(player)))
+            } else {
+                future.complete(null)
+            }
         }
         return future
     }

@@ -8,9 +8,8 @@ import ink.ptms.zaphkiel.impl.feature.getMaxDurability
 import ink.ptms.zaphkiel.impl.feature.repairItem
 import org.bukkit.entity.Player
 import taboolib.common5.cint
-import taboolib.module.kether.KetherParser
-import taboolib.module.kether.combinationParser
-import taboolib.module.kether.script
+import taboolib.library.kether.ParsedAction
+import taboolib.module.kether.*
 import taboolib.module.nms.ItemTagData
 
 /**
@@ -24,45 +23,63 @@ import taboolib.module.nms.ItemTagData
  * item data key to 1
  * item data key to ~
  */
-@KetherParser(["item"], namespace = "zaphkiel", shared = true)
-private fun parserItem() = combinationParser {
-    it.group(symbol(), text(), command("to", then = any()).option()).apply(it) { action, a1, a2 ->
-        now {
-            val itemStream = itemStream()
-            when (action) {
-                // 耐久度
-                "durability" -> itemStream.getCurrentDurability()
-                // 最大耐久度
-                "max-durability", "max_durability" -> itemStream.getMaxDurability()
-                // 损耗
-                "consume" -> itemStream.sourceItem.amount--
-                // 修复
-                "repair" -> itemStream.repairItem(a1.cint, script().sender?.castSafely<Player>())
-                // 损坏
-                "damage" -> itemStream.damageItem(a1.cint, script().sender?.castSafely<Player>())
-                // 更新
-                // 下次检查时更新，不是立即更新
-                "update" -> itemStream.signal.add(ItemSignal.UPDATE_CHECKED)
-                // 数据
-                "data" -> {
-                    when {
-                        // 获取
-                        a2 == null -> {
-                            val unsafeData = itemStream.getZaphkielData().getDeep(a1)?.unsafeData()
-                            if (unsafeData != null) Translator.fromItemTag(unsafeData) else null
-                        }
-                        // 设置
-                        a2 != "~" -> {
-                            itemStream.getZaphkielData().putDeep(a1, ItemTagData.toNBT(a2))
-                        }
-                        // 移除
-                        else -> {
-                            itemStream.getZaphkielData().removeDeep(a1)
-                        }
+@KetherParser(["item"])
+private fun parserItem() = scriptParser {
+    it.switch {
+        case("durability") {
+            actionNow { itemStream().getCurrentDurability() }
+        }
+        case("max-durability", "max_durability") {
+            actionNow { itemStream().getMaxDurability() }
+        }
+        case("consume") {
+            actionNow { itemStream().sourceItem.amount-- }
+        }
+        case("repair") {
+            val value = it.nextParsedAction()
+            actionTake {
+                run(value).int { value -> itemStream().repairItem(value, script().sender?.castSafely<Player>()) }
+            }
+        }
+        case("damage") {
+            val value = it.nextParsedAction()
+            actionTake {
+                run(value).int { value -> itemStream().damageItem(value, script().sender?.castSafely<Player>()) }
+            }
+        }
+        // 更新
+        // 下次检查时更新，不是立即更新
+        case("update") {
+            actionNow { itemStream().signal.add(ItemSignal.UPDATE_CHECKED) }
+        }
+        // 数据
+        case("data") {
+            val key = it.nextParsedAction()
+            val value = try {
+                it.mark()
+                expect("to")
+                it.nextParsedAction()
+            } catch (_: Throwable) {
+                it.reset()
+                null
+            }
+            actionFuture { f ->
+                run(key).str { key ->
+                    // 获取
+                    if (value == null) {
+                        val unsafeData = itemStream().getZaphkielData().getDeep(key)?.unsafeData()
+                        f.complete(if (unsafeData != null) Translator.fromItemTag(unsafeData) else null)
+                    }
+                    // 设置
+                    else if (key != "~") {
+                        run(value).str { value -> f.complete(itemStream().getZaphkielData().putDeep(key, ItemTagData.toNBT(value))) }
+                    }
+                    // 移除
+                    else {
+                        itemStream().getZaphkielData().removeDeep(key)
+                        f.complete(null)
                     }
                 }
-                // 其他
-                else -> error("unknown item action $action")
             }
         }
     }
