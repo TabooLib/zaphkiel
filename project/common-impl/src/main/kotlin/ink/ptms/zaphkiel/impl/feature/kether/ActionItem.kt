@@ -23,7 +23,7 @@ import taboolib.module.nms.ItemTagData
  * item data key to 1
  * item data key to ~
  */
-@KetherParser(["item"])
+@KetherParser(["item", "zitem"])
 private fun parserItem() = scriptParser {
     it.switch {
         case("durability") {
