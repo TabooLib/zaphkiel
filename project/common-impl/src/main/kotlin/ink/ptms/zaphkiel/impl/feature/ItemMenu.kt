@@ -62,7 +62,7 @@ fun Player.openItemMenu(group: Group) {
             }
         }
         onClick { _, element ->
-            giveItem(element.buildItemStack(this@openItemMenu))
+            element.giveItemOrDrop(this@openItemMenu, 1)
         }
         set(49, buildItem(XMaterial.BOOK) { name = "§7Groups" }) {
             openGroupMenu()
