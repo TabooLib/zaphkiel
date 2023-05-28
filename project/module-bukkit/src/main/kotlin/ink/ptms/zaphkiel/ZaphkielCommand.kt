@@ -34,39 +34,6 @@ object ZaphkielCommand {
         }
     }
 
-//    @CommandBody
-//    val test1 = subCommand {
-//        execute<Player> { sender, _, _ ->
-//            try {
-//                val json = Zaphkiel.api().getItemSerializer().serialize(sender.itemInHand)
-//                notify(sender, "序列化: $json")
-//                val item = Zaphkiel.api().getItemSerializer().deserialize(json).rebuildToItemStack(sender)
-//                TellrawJson().sendTo(adaptPlayer(sender)) {
-//                    append("§c[Zaphkiel] §7反序列化: ").append(item.getName()).hoverItem(item)
-//                }
-//                sender.giveItem(item)
-//            } catch (ex: Throwable) {
-//                notify(sender, "无效的物品: $ex")
-//            }
-//        }
-//    }
-
-//    @CommandBody
-//    val test2 = subCommand {
-//        execute<Player> { sender, _, _ ->
-//            try {
-//                sender.itemInHand.toItemStream()
-//                val time = System.currentTimeMillis()
-//                repeat(10000) {
-//                    sender. itemInHand.toItemStream()
-//                }
-//                notify(sender, "耗时: ${System.currentTimeMillis() - time}ms")
-//            } catch (ex: Throwable) {
-//                notify(sender, "无效的物品: $ex")
-//            }
-//        }
-//    }
-
     @CommandBody
     val give = subCommand {
         dynamic(comment = "item") {

@@ -3,6 +3,7 @@ package ink.ptms.zaphkiel.impl.item
 import ink.ptms.zaphkiel.Zaphkiel
 import ink.ptms.zaphkiel.api.*
 import ink.ptms.zaphkiel.api.event.ItemBuildEvent
+import ink.ptms.zaphkiel.api.event.ItemGiveEvent
 import ink.ptms.zaphkiel.impl.Translator
 import org.bukkit.entity.Player
 import org.bukkit.event.Cancellable
@@ -20,6 +21,7 @@ import taboolib.module.configuration.Type
 import taboolib.module.nms.ItemTag
 import taboolib.module.nms.ItemTagData
 import taboolib.platform.compat.replacePlaceholder
+import taboolib.platform.util.giveItem
 import taboolib.platform.util.hasItem
 import taboolib.platform.util.isAir
 import taboolib.platform.util.takeItem
@@ -145,9 +147,12 @@ class DefaultItem(override val config: ConfigurationSection, override val group:
     }
 
     override fun giveItem(player: Player, amount: Int, overflow: Consumer<List<ItemStack>>) {
-        val item = buildItemStack(player)
-        item.amount = amount
-        overflow.accept(player.inventory.addItem(item).values.toList())
+        val event = ItemGiveEvent(player, build(player), amount).also { it.call() }
+        if (!event.isCancelled) {
+            val item = event.itemStream.rebuildToItemStack(player)
+            item.amount = event.amount
+            overflow.accept(player.inventory.addItem(item).values.toList())
+        }
     }
 
     override fun giveItemOrDrop(player: Player, amount: Int) {

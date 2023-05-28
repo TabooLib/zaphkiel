@@ -1,0 +1,13 @@
+# 词条随机
+example_gen_0:
+  ==: text
+  content:
+    - id: 0
+      value: '普通'
+      priority: 100
+    - id: 1
+      value: '稀有'
+      priority: 20
+    - id: 2
+      value: '史诗'
+      priority: 5
