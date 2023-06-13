@@ -141,4 +141,15 @@ abstract class ItemStream : Metadatable {
      * 获取 Zaphkiel 下所有数据
      */
     abstract fun getZaphkielCompound(): ItemTag?
+
+    /**
+     * 锁定物品
+     * 任何对物品的修改都将产生异常（允许修改 Metadata）
+     */
+    abstract fun lock(value: Boolean)
+
+    /**
+     * 获取物品锁定状态
+     */
+    abstract fun isLocked(): Boolean
 }

@@ -81,6 +81,11 @@ abstract class Item : Metadatable {
     abstract val data: ConfigurationSection
 
     /**
+     * 物品数据映射
+     */
+    abstract val dataMapper: MutableMap<String, String>
+
+    /**
      * 物品模型
      */
     abstract val model: MutableList<String>

@@ -23,11 +23,36 @@ import java.util.concurrent.ConcurrentHashMap
  * @author 坏黑
  * @since 2022/7/23 17:02
  */
-open class DefaultItemStream(override val sourceItem: ItemStack, override val sourceCompound: ItemTag = sourceItem.getItemTag()) : ItemStream() {
+open class DefaultItemStream(sourceItem: ItemStack, sourceCompound: ItemTag = sourceItem.getItemTag()) : ItemStream() {
 
     val metadataList = ConcurrentHashMap<String, MutableMap<String, MetadataValue>>()
 
+    /** 是否锁定 */
+    private var isLocked = false
+
+    override val sourceItem = sourceItem
+        get() {
+            if (isLocked) {
+                return sourceItem.clone()
+            }
+            return field
+        }
+
+    override val sourceCompound = sourceCompound
+        get() {
+            if (isLocked) {
+                return sourceCompound.clone().asCompound()
+            }
+            return field
+        }
+
     override val signal = hashSetOf<ItemSignal>()
+        get() {
+            if (isLocked) {
+                return field.toHashSet()
+            }
+            return field
+        }
 
     override val dropMeta by unsafeLazy {
         val metaItem = getZaphkielItem().meta
@@ -51,15 +76,21 @@ open class DefaultItemStream(override val sourceItem: ItemStack, override val so
         if (isVanilla()) {
             error("This item is not an extension item.")
         }
-        return getZaphkielVersion() != getZaphkielItem().version
+        return getZaphkielHash() != getZaphkielItem().version
     }
 
     override fun setDisplayName(displayName: String) {
+        if (isLocked) {
+            error("This item is locked.")
+        }
         val display = sourceCompound.computeIfAbsent("display") { ItemTag() } as ItemTag
         display["Name"] = ItemTagData(displayName)
     }
 
     override fun setLore(lore: List<String>) {
+        if (isLocked) {
+            error("This item is locked.")
+        }
         val display = sourceCompound.computeIfAbsent("display") { ItemTag() } as ItemTag
         display["Lore"] = lore.map { ItemTagData(it) }.toCollection(ItemTagList())
     }
@@ -142,11 +173,14 @@ open class DefaultItemStream(override val sourceItem: ItemStack, override val so
         if (isVanilla()) {
             error("This item is not extension item.")
         }
+        if (isLocked) {
+            error("This item is locked.")
+        }
         getZaphkielCompound()!![ItemKey.META_HISTORY.key] = ItemTagList.of(*meta.map { ItemTagData(it) }.toTypedArray())
     }
 
     override fun getZaphkielCompound(): ItemTag? {
-        return sourceCompound[ItemKey.ROOT.key]?.asCompound()
+        return sourceCompound[ItemKey.ROOT.key]?.asCompound()?.let { if (isLocked) it.clone().asCompound() else it }
     }
 
     override fun setMetadata(key: String, value: MetadataValue) {
@@ -163,6 +197,14 @@ open class DefaultItemStream(override val sourceItem: ItemStack, override val so
 
     override fun removeMetadata(key: String, plugin: Plugin) {
         metadataList[key]?.remove(plugin.name)
+    }
+
+    override fun lock(value: Boolean) {
+        isLocked = value
+    }
+
+    override fun isLocked(): Boolean {
+        return isLocked
     }
 
     override fun equals(other: Any?): Boolean {

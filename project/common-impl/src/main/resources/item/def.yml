@@ -1,8 +1,8 @@
-example_sword:
-  display: default_display
+example_sword_1:
+  display: default_display_1
   icon: wooden_sword
   name:
-    item_name: '&7Wooden Sword'
+    item_name: '&7Wooden Sword 1'
   lore:
     item_type: '&9Sword'
     item_description:
@@ -18,3 +18,27 @@ example_sword:
         attack_speed: +10%
   event:
     on_damage: item damage 1
+
+example_sword_2:
+  display: default_display_2
+  icon: iron_sword
+  name:
+    item_name: '&7Wooden Sword 2'
+  lore:
+    item_type: '&9Sword'
+    item_description:
+      - '&fCan be bought everywhere.'
+  data:
+    # 展示用数据，无实际作用
+    damage: 10
+    attack-speed: 0.8
+  data-mapper:
+    damage: it
+    attack-speed: it
+    attack-speed-level: |-
+      case &attack-speed [
+        when < 1 -> FAST
+        when < 2 -> NORMAL
+        when < 3 -> SLOW
+        else -> VERY SLOW
+      ]

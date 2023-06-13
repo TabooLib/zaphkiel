@@ -14,10 +14,12 @@ import org.bukkit.metadata.MetadataValue
 import org.bukkit.plugin.Plugin
 import taboolib.common.io.digest
 import taboolib.common.platform.function.severe
+import taboolib.common.util.asList
 import taboolib.common.util.unsafeLazy
 import taboolib.library.configuration.ConfigurationSection
 import taboolib.module.configuration.Configuration
 import taboolib.module.configuration.Type
+import taboolib.module.configuration.util.getMap
 import taboolib.module.nms.ItemTag
 import taboolib.module.nms.ItemTagData
 import taboolib.platform.compat.replacePlaceholder
@@ -57,6 +59,8 @@ class DefaultItem(override val config: ConfigurationSection, override val group:
     override val loreLocked = config.contains("lore!!")
 
     override val data = config.getConfigurationSection("data") ?: config.createSection("data")
+
+    override val dataMapper = config.getMap<Any, Any>("data-mapper").map { it.key.toString() to it.value.asList().joinToString("\n") }.toMap(HashMap())
 
     override val model = config.getString("event.from")?.split(",")?.map { it.trim() }?.toMutableList() ?: arrayListOf()
 

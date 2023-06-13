@@ -12,6 +12,10 @@ import taboolib.common.util.asList
 import taboolib.library.configuration.ConfigurationSection
 import taboolib.library.xseries.parseToXMaterial
 import taboolib.module.chat.colored
+import taboolib.module.nms.ItemTag
+import taboolib.module.nms.ItemTagData
+import taboolib.module.nms.ItemTagList
+import taboolib.module.nms.ItemTagType
 import taboolib.platform.util.isAir
 
 fun ItemStack?.toExtensionStreamOrNull(): ItemStream? {

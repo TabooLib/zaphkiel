@@ -1,5 +1,6 @@
 package ink.ptms.zaphkiel.api.event
 
+import ink.ptms.zaphkiel.annotation.Locked
 import ink.ptms.zaphkiel.api.ItemStream
 import org.bukkit.entity.Player
 import taboolib.platform.type.BukkitProxyEvent
@@ -62,7 +63,7 @@ class ItemBuildEvent {
      * 可被取消
      * 递交至构建事件之前
      */
-    class CheckUpdate(val player: Player?, val itemStream: ItemStream, isOutdated: Boolean) : BukkitProxyEvent() {
+    class CheckUpdate(val player: Player?, @Locked val itemStream: ItemStream, isOutdated: Boolean) : BukkitProxyEvent() {
 
         val item = itemStream.getZaphkielItem()
 

@@ -14,7 +14,6 @@ import taboolib.platform.type.BukkitProxyEvent
  * @author sky
  * @since 2020-04-20 12:37
  */
-@Suppress("SpellCheckingInspection")
 class ItemEvent {
 
     class InventoryClick(val itemStreamCurrent: ItemStream?, val itemStreamButton: ItemStream?, val bukkitEvent: InventoryClickEvent) : BukkitProxyEvent() {
