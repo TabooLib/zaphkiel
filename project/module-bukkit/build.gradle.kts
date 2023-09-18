@@ -8,11 +8,22 @@ taboolib {
     description {
         name(rootProject.name)
     }
-    install("common", "platform-bukkit", "module-chat", "module-nms-util")
+    install("common")
+    install("common-5")
+    install("module-chat")
+    install("module-configuration")
+    install("module-database")
+    install("module-nms")
+    install("module-nms-util")
+    install("module-kether")
+    install("module-ui")
+    install("platform-bukkit")
     install("expansion-command-helper")
+    install("expansion-player-database")
     options("skip-minimize", "keep-kotlin-module", "skip-taboolib-relocate")
     classifier = null
     version = taboolib_version
+    exclude("taboolib/test")
 }
 
 dependencies {

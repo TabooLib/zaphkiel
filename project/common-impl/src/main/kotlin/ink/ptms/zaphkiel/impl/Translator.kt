@@ -59,7 +59,7 @@ object Translator {
             is String -> if (regex.matcher(obj.toString()).matches()) {
                 toItemTag(java.lang.Short.valueOf(obj.toString().substring(0, obj.toString().length - 1)))
             } else {
-                ItemTagData(obj as String?)
+                ItemTagData(obj.toString())
             }
             is Int -> ItemTagData(obj)
             is Double -> ItemTagData(obj)
@@ -70,12 +70,12 @@ object Translator {
             is List<*> -> toItemTag(ItemTagList(), (obj as List<*>?)!!)
             is Map<*, *> -> {
                 val nbtCompound = ItemTag()
-                obj.forEach { (key, value) -> nbtCompound[key.toString()] = toItemTag(value) }
+                obj.forEach { (key, value) -> nbtCompound.put(key.toString(), toItemTag(value)) }
                 nbtCompound
             }
             is ConfigurationSection -> {
                 val nbtCompound = ItemTag()
-                obj.getValues(false).forEach { (key, value) -> nbtCompound[key] = toItemTag(value) }
+                obj.getValues(false).forEach { (key, value) -> nbtCompound.put(key, toItemTag(value)) }
                 nbtCompound
             }
             else -> ItemTagData("Error: " + obj!!)

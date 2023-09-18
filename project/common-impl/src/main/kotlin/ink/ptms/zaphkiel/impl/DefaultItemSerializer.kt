@@ -86,7 +86,11 @@ class DefaultItemSerializer : ItemSerializer {
             val unique = item.uniqueData
             if (unique != null) {
                 itemStream.getZaphkielCompound()!![ItemKey.UNIQUE.key] = ItemTag().also {
-                    it["player"] = ItemTagData(unique.player)
+                    // 如果存在玩家信息，将会在物品签名中添加玩家信息
+                    if (unique.player != null) {
+                        it["player"] = ItemTagData(unique.player!!)
+                    }
+                    // 添加构建时间和格式化时间
                     it["date"] = ItemTagData(unique.date)
                     it["date-formatted"] = ItemTagData(DateFormatUtils.format(unique.date, MetaUnique.FORMAT))
                     it["uuid"] = ItemTagData(unique.uuid)

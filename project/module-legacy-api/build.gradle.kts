@@ -12,6 +12,7 @@ taboolib {
     options("skip-minimize", "keep-kotlin-module", "skip-taboolib-relocate")
     classifier = null
     version = taboolib_version
+    exclude("taboolib")
 }
 
 dependencies {
