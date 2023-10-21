@@ -154,6 +154,10 @@ class ItemEvent {
          * 保存交互物品
          */
         var save = false
+            set(_) {
+                field = false
+                error("PlayerPickupItemEvent#save is not supported, item modification is not safe in this event.")
+            }
 
         val item = bukkitEvent.item
 

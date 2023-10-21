@@ -255,16 +255,16 @@ internal object ItemListener {
             if (itemStream.isVanilla()) {
                 return
             }
-            val event = ItemEvent.Pick(itemStream, e)
-            event.call()
-            if (event.save) {
-                e.item.itemStack = event.itemStream.rebuildToItemStack(e.player)
-            }
+            val event = ItemEvent.Pick(itemStream, e).call()
+            // 2023/10/21 移除物品捡起事件中修改物品的功能
+            // if (event.save) {
+            //     e.item.itemStack = event.itemStream.rebuildToItemStack(e.player)
+            // }
             // 若脚本修改物品则写回事件
             itemStream.getZaphkielItem().invokeScript(listOf("on_pick", "on_pickup", "onPick", "onPickUp"), e.player, e, itemStream)?.thenAccept {
-                if (it != null) {
-                    e.item.itemStack = it.itemStack
-                }
+            //     if (it != null) {
+            //         e.item.itemStack = it.itemStack
+            //     }
             }
         }
     }
