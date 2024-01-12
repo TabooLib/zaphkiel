@@ -17,6 +17,19 @@ data class DefaultSerializedItem(
     override val uniqueData: SerializedItem.UniqueData?,
 ) : SerializedItem {
 
+    override fun toMap(): Map<String, Any> {
+        val map = hashMapOf<String, Any>()
+        map["id"] = id
+        map["amount"] = amount
+        if (data != null && data.size() > 0) {
+            map["data"] = jsonObjectToMap(data)
+        }
+        if (uniqueData != null) {
+            map["unique"] = uniqueData.toMap()
+        }
+        return map
+    }
+
     override fun toJson(): String {
         return toJsonObject().toString()
     }
@@ -36,6 +49,16 @@ data class DefaultSerializedItem(
 
     data class UniqueData(override val player: String?, override val date: Long, override val uuid: String) : SerializedItem.UniqueData {
 
+        override fun toMap(): Map<String, Any> {
+            val map = hashMapOf<String, Any>()
+            if (player != null) {
+                map["player"] = player
+            }
+            map["date"] = date
+            map["uuid"] = uuid
+            return map
+        }
+
         override fun toJson(): String {
             return toJsonObject().toString()
         }
@@ -48,6 +71,22 @@ data class DefaultSerializedItem(
             json.addProperty("date", date)
             json.addProperty("uuid", uuid)
             return json
+        }
+    }
+
+    companion object {
+
+        fun jsonObjectToMap(json: JsonObject): Map<String, Any> {
+            val map = hashMapOf<String, Any>()
+            json.entrySet().forEach { (k, v) ->
+                map[k] = when {
+                    v.isJsonPrimitive -> v.asString
+                    v.isJsonArray -> v.asJsonArray.map { it.asString }
+                    v.isJsonObject -> jsonObjectToMap(v.asJsonObject)
+                    else -> error("unsupported type: ${v::class.java}")
+                }
+            }
+            return map
         }
     }
 }

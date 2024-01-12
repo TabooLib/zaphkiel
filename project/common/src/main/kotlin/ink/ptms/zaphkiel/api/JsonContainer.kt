@@ -12,6 +12,11 @@ import com.google.gson.JsonObject
 interface JsonContainer {
 
     /**
+     * 转换为 Map 对象
+     */
+    fun toMap(): Map<String, Any>
+
+    /**
      * 转换为 Json 字符串
      */
     fun toJson(): String
