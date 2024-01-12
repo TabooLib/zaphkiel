@@ -8,28 +8,42 @@ import ink.ptms.zaphkiel.api.Item
 import ink.ptms.zaphkiel.impl.item.DefaultGroup
 import org.bukkit.Sound
 import org.bukkit.entity.Player
+import org.bukkit.inventory.ItemFlag
+import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.meta.ItemMeta
 import taboolib.library.xseries.XMaterial
 import taboolib.module.ui.openMenu
 import taboolib.module.ui.type.Linked
 import taboolib.platform.util.Slots
 import taboolib.platform.util.buildItem
-import taboolib.platform.util.giveItem
 import taboolib.platform.util.modifyLore
+import taboolib.platform.util.modifyMeta
 
-fun Player.openGroupMenu() {
+/**
+ * 打开组菜单
+ */
+fun Player.openGroupMenu(parent: Group? = null) {
+    // 播放音效
     playSound(location, Sound.UI_BUTTON_CLICK, 1f, 2f)
-    openMenu<Linked<Group>>("Zaphkiel Items [%p]") {
+    // 打开页面
+    openMenu<Linked<MenuItem>>("Zaphkiel Items (Page %p)") {
         rows(6)
         slots(Slots.CENTER)
         elements {
-            Zaphkiel.api().getItemManager().getItemMap().values.groupBy { it.group ?: DefaultGroup.NO_GROUP }.map { it.key }.sortedByDescending { it.priority }
+            val items = arrayListOf<MenuItem>()
+            // 获取当前层级下的所有组
+            items += Zaphkiel.api().getItemManager().getGroupMap().values.filter { it.parent == parent }.map { MenuItem.of(it) }
+            // 如果存在父组，则获取组内所有物品
+            if (parent != null) {
+                items += parent.getItems().map { MenuItem.of(it) }
+            }
+            items
         }
-        onGenerate { _, element, _, _ ->
-            buildItem(element.display) { hideAll() }
-        }
-        onClick { _, element ->
-            openItemMenu(element)
-        }
+        // 生成物品
+        onGenerate { _, element, _, _ -> element.icon() }
+        // 点击
+        onClick { event, element -> element.click(event.clicker) }
+        // 翻页
         setNextPage(51) { _, hasNextPage ->
             if (hasNextPage) {
                 buildItem(XMaterial.SPECTRAL_ARROW) { name = "§7Next" }
@@ -47,38 +61,41 @@ fun Player.openGroupMenu() {
     }
 }
 
-fun Player.openItemMenu(group: Group) {
-    playSound(location, Sound.UI_BUTTON_CLICK, 1f, 2f)
-    openMenu<Linked<Item>>("Zaphkiel Items : ${group.name} [%p]") {
-        rows(6)
-        slots(Slots.CENTER)
-        elements {
-            Zaphkiel.api().getItemManager().getItemMap().values.filter { (it.group ?: DefaultGroup.NO_GROUP) == group }
-        }
-        onGenerate { _, element, _, _ ->
-            element.buildItemStack(this@openItemMenu).modifyLore {
-                add("")
-                add("§7ID: ${element.id}")
+interface MenuItem {
+
+    fun icon(): ItemStack
+
+    fun click(player: Player)
+
+    companion object {
+
+        fun of(item: Item) = object : MenuItem {
+
+            override fun icon(): ItemStack {
+                return item.buildItemStack().modifyMeta<ItemMeta> {
+                    // 修改描述
+                    modifyLore {
+                        add("")
+                        add("§7ID: ${item.id}")
+                    }
+                    // 隐藏标签
+                    addItemFlags(*ItemFlag.values())
+                }
+            }
+
+            override fun click(player: Player) {
+                item.giveItemOrDrop(player)
             }
         }
-        onClick { _, element ->
-            element.giveItemOrDrop(this@openItemMenu, 1)
-        }
-        set(49, buildItem(XMaterial.BOOK) { name = "§7Groups" }) {
-            openGroupMenu()
-        }
-        setNextPage(51) { _, hasNextPage ->
-            if (hasNextPage) {
-                buildItem(XMaterial.SPECTRAL_ARROW) { name = "§7Next" }
-            } else {
-                buildItem(XMaterial.ARROW) { name = "§8Next" }
+
+        fun of(group: Group) = object : MenuItem {
+
+            override fun icon(): ItemStack {
+                return group.display
             }
-        }
-        setPreviousPage(47) { _, hasPreviousPage ->
-            if (hasPreviousPage) {
-                buildItem(XMaterial.SPECTRAL_ARROW) { name = "§7Previous" }
-            } else {
-                buildItem(XMaterial.ARROW) { name = "§8Previous" }
+
+            override fun click(player: Player) {
+                player.openGroupMenu(group)
             }
         }
     }

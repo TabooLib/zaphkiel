@@ -11,14 +11,18 @@ import java.io.File
  * @author sky
  * @since 2020-11-13 22:50
  */
-@Equal
-@Printable
+@Equal@Printable
 abstract class Group : Metadatable {
 
     /**
      * 名称
      */
     abstract val name: String
+
+    /**
+     * 路径
+     */
+    abstract val path: String
 
     /**
      * 所在文件
@@ -39,4 +43,19 @@ abstract class Group : Metadatable {
      * 优先级（用于页面排序）
      */
     abstract val priority: Int
+
+    /**
+     * 层级
+     */
+    abstract val level: Int
+
+    /**
+     * 父组
+     */
+    abstract val parent: Group?
+
+    /**
+     * 获取所有物品
+     */
+    abstract fun getItems(): List<Item>
 }

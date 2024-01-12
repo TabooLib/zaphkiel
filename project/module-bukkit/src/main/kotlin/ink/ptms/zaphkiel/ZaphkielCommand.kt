@@ -7,10 +7,7 @@ import org.bukkit.Sound
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import taboolib.common.io.zip
-import taboolib.common.platform.command.CommandBody
-import taboolib.common.platform.command.CommandHeader
-import taboolib.common.platform.command.mainCommand
-import taboolib.common.platform.command.subCommand
+import taboolib.common.platform.command.*
 import taboolib.expansion.createHelper
 import taboolib.module.chat.colored
 import taboolib.platform.util.isAir
@@ -29,9 +26,13 @@ object ZaphkielCommand {
 
     @CommandBody
     val list = subCommand {
-        execute<Player> { sender, _, _ ->
-            sender.openGroupMenu()
+        dynamic("group") {
+            suggest { Zaphkiel.api().getItemManager().getGroupMap().keys.toList() }
+            execute<Player> { sender, _, argument ->
+                sender.openGroupMenu(Zaphkiel.api().getItemManager().getGroup(argument)!!)
+            }
         }
+        execute<Player> { sender, _, _ -> sender.openGroupMenu() }
     }
 
     @CommandBody

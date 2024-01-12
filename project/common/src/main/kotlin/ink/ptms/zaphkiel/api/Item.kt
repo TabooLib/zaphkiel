@@ -126,7 +126,7 @@ abstract class Item : Metadatable {
     /**
      * 构建为 ItemStack 对象
      */
-    abstract fun buildItemStack(player: Player?): ItemStack
+    abstract fun buildItemStack(player: Player? = null): ItemStack
 
     /**
      * 构建为物品流
@@ -156,12 +156,12 @@ abstract class Item : Metadatable {
     /**
      * 添加物品（判断 ID）溢出物品将删除
      */
-    abstract fun giveItem(player: Player, amount: Int = 1, overflow: Consumer<List<ItemStack>>)
+    abstract fun giveItem(player: Player, amount: Int = 1, overflow: Consumer<List<ItemStack>> = Consumer {})
 
     /**
      * 添加物品（判断 ID）溢出物品将丢弃
      */
-    abstract fun giveItemOrDrop(player: Player, amount: Int)
+    abstract fun giveItemOrDrop(player: Player, amount: Int = 1)
 
     /**
      * 执行脚本

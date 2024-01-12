@@ -1,16 +1,19 @@
 package ink.ptms.zaphkiel.impl.item
 
+import ink.ptms.zaphkiel.Zaphkiel
 import ink.ptms.zaphkiel.api.Group
+import ink.ptms.zaphkiel.api.Item
+import org.bukkit.Material
+import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.meta.ItemMeta
 import org.bukkit.metadata.MetadataValue
 import org.bukkit.plugin.Plugin
 import taboolib.common.platform.function.getDataFolder
+import taboolib.common.util.unsafeLazy
 import taboolib.library.configuration.ConfigurationSection
-import taboolib.library.xseries.XItemStack
-import taboolib.library.xseries.XMaterial
 import taboolib.module.configuration.Configuration
-import taboolib.module.configuration.Type
-import taboolib.platform.util.buildItem
+import taboolib.platform.util.modifyMeta
 import java.io.File
 import java.util.concurrent.ConcurrentHashMap
 
@@ -21,15 +24,44 @@ import java.util.concurrent.ConcurrentHashMap
  * @author 坏黑
  * @since 2022/7/23 16:47
  */
-class DefaultGroup(
-    override val name: String,
+data class DefaultGroup(
+    override var name: String,
     override val file: File,
     override val config: ConfigurationSection,
-    override val display: ItemStack = XItemStack.deserialize(config),
-    override val priority: Int = 0
+    override val priority: Int = config.getInt("priority"),
+    override val level: Int = 0,
+    override val parent: Group? = null
 ) : Group() {
 
+    override val path: String
+        get() = (parent?.path ?: "") + "/" + name
+
+    override val display: ItemStack
+        get() {
+            val items = getItems()
+            return if (items.isNotEmpty()) {
+                items.random().buildItemStack()
+            } else {
+                ItemStack(Material.CHEST_MINECART)
+            }.modifyMeta<ItemMeta> {
+                // 设置名称
+                setDisplayName("§f$name")
+                // 移除描述
+                lore = if (items.isNotEmpty()) {
+                    listOf("", "§7${items.size} items")
+                } else {
+                    null
+                }
+                // 隐藏标签
+                addItemFlags(*ItemFlag.values())
+            }
+        }
+
     val metadataList = ConcurrentHashMap<String, MutableMap<String, MetadataValue>>()
+
+    override fun getItems(): List<Item> {
+        return Zaphkiel.api().getItemManager().getItemMap().values.filter { it.group == this }
+    }
 
     override fun setMetadata(key: String, value: MetadataValue) {
         metadataList.computeIfAbsent(key) { ConcurrentHashMap() }[value.owningPlugin?.name ?: "null"] = value
@@ -64,11 +96,6 @@ class DefaultGroup(
 
     companion object {
 
-        val NO_GROUP by lazy {
-            DefaultGroup("#", File(getDataFolder(), "config.yml"), Configuration.empty(Type.YAML), buildItem(XMaterial.APPLE) {
-                name = "&7[Isolated]"
-                colored()
-            }, -1)
-        }
+        val NO_GROUP by unsafeLazy { DefaultGroup("#", File(getDataFolder(), "config.yml"), Configuration.empty()) }
     }
 }
