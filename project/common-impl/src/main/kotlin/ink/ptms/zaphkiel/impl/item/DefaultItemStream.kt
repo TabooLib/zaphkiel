@@ -31,28 +31,13 @@ open class DefaultItemStream(sourceItem: ItemStack, sourceCompound: ItemTag = so
     private var isLocked = false
 
     override val sourceItem = sourceItem
-        get() {
-            if (isLocked) {
-                return sourceItem.clone()
-            }
-            return field
-        }
+        get() = if (isLocked) field.clone() else field
 
     override val sourceCompound = sourceCompound
-        get() {
-            if (isLocked) {
-                return sourceCompound.clone().asCompound()
-            }
-            return field
-        }
+        get() = if (isLocked) field.clone().asCompound() else field
 
     override val signal = hashSetOf<ItemSignal>()
-        get() {
-            if (isLocked) {
-                return field.toHashSet()
-            }
-            return field
-        }
+        get() = if (isLocked) field.toHashSet() else field
 
     override val dropMeta by unsafeLazy {
         val metaItem = getZaphkielItem().meta
@@ -119,7 +104,7 @@ open class DefaultItemStream(sourceItem: ItemStack, sourceCompound: ItemTag = so
                 sourceItem.durability = event.data.toShort()
             }
         }
-        val final = ItemReleaseEvent.Final(sourceItem, this, player)
+        val final = ItemReleaseEvent.Final(sourceItem.clone(), this, player)
         final.call()
         return final.itemStack
     }
