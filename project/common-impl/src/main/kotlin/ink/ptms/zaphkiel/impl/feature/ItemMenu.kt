@@ -5,7 +5,6 @@ package ink.ptms.zaphkiel.impl.feature
 import ink.ptms.zaphkiel.Zaphkiel
 import ink.ptms.zaphkiel.api.Group
 import ink.ptms.zaphkiel.api.Item
-import ink.ptms.zaphkiel.impl.item.DefaultGroup
 import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemFlag

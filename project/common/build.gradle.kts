@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 val taboolib_version: String by project
 
 plugins {
@@ -11,4 +13,10 @@ taboolib {
     classifier = null
     version = taboolib_version
     exclude("taboolib")
+}
+
+tasks.withType(KotlinCompile::class.java) {
+    kotlinOptions {
+        freeCompilerArgs = listOf("-module-name", "zap_common")
+    }
 }

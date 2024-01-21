@@ -23,7 +23,6 @@ import taboolib.module.configuration.util.getMap
 import taboolib.module.nms.ItemTag
 import taboolib.module.nms.ItemTagData
 import taboolib.platform.compat.replacePlaceholder
-import taboolib.platform.util.giveItem
 import taboolib.platform.util.hasItem
 import taboolib.platform.util.isAir
 import taboolib.platform.util.takeItem

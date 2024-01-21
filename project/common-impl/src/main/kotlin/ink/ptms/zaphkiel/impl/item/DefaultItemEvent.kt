@@ -5,13 +5,8 @@ import ink.ptms.zaphkiel.api.ItemEvent
 import ink.ptms.zaphkiel.api.ItemStream
 import org.bukkit.entity.Player
 import org.bukkit.event.Event
-import taboolib.common.platform.function.adaptPlayer
-import taboolib.common.platform.function.warning
-import taboolib.module.kether.KetherShell
 import taboolib.module.kether.KetherShell.eval
-import taboolib.module.kether.ScriptContext
 import taboolib.module.kether.ScriptOptions
-import taboolib.module.kether.printKetherErrorMessage
 import java.util.concurrent.CompletableFuture
 
 /**

@@ -2,33 +2,14 @@
 
 package ink.ptms.zaphkiel.impl.item
 
-import ink.ptms.zaphkiel.Zaphkiel
 import ink.ptms.zaphkiel.api.Item
 import ink.ptms.zaphkiel.api.ItemEvent
-import ink.ptms.zaphkiel.api.ItemStream
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 import taboolib.common.util.asList
 import taboolib.library.configuration.ConfigurationSection
 import taboolib.library.xseries.parseToXMaterial
 import taboolib.module.chat.colored
-import taboolib.module.nms.ItemTag
-import taboolib.module.nms.ItemTagData
-import taboolib.module.nms.ItemTagList
-import taboolib.module.nms.ItemTagType
-import taboolib.platform.util.isAir
-
-fun ItemStack?.toExtensionStreamOrNull(): ItemStream? {
-    return toItemStreamOrNull()?.takeIf { it.isExtension() }
-}
-
-fun ItemStack?.toItemStreamOrNull(): ItemStream? {
-    return if (isAir) null else this!!.toItemStream()
-}
-
-fun ItemStack.toItemStream(): ItemStream {
-    return Zaphkiel.api().getItemHandler().read(this)
-}
 
 internal fun parseIcon(config: ConfigurationSection): ItemStack {
     val node = if (config.contains("icon!!")) "icon!!" else "icon"

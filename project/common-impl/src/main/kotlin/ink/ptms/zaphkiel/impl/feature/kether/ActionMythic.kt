@@ -2,7 +2,9 @@ package ink.ptms.zaphkiel.impl.feature.kether
 
 import ink.ptms.um.Mythic
 import org.bukkit.entity.Player
-import taboolib.module.kether.*
+import taboolib.module.kether.KetherParser
+import taboolib.module.kether.combinationParser
+import taboolib.module.kether.script
 
 /**
  * mm cast-skill 'message{m="我是傻逼"}'
