@@ -1,6 +1,7 @@
-package ink.ptms.zaphkiel.api
+package ink.ptms.zaphkiel.impl.item
 
 import ink.ptms.zaphkiel.Zaphkiel
+import ink.ptms.zaphkiel.api.ItemStream
 import org.bukkit.inventory.ItemStack
 import taboolib.platform.util.isAir
 
