@@ -129,9 +129,14 @@ abstract class Item : Metadatable {
     abstract fun buildItemStack(player: Player? = null): ItemStack
 
     /**
-     * 构建为物品流
+     * 构建新的物品流
      */
     abstract fun build(player: Player?): ItemStream
+
+    /**
+     * 构建新的物品流
+     */
+    abstract fun build(player: Player?, prepareCallback: Consumer<ItemStream>): ItemStream
 
     /**
      * 基于已存在的 ItemSteam 构建物品流

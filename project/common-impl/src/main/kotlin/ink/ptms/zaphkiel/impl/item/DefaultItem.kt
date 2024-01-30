@@ -104,10 +104,15 @@ class DefaultItem(override val config: ConfigurationSection, override val group:
     }
 
     override fun build(player: Player?): ItemStream {
+        return build(player) {}
+    }
+
+    override fun build(player: Player?, prepareCallback: Consumer<ItemStream>): ItemStream {
         val itemStream = DefaultItemStreamGenerated(icon.clone(), name.toMutableMap(), lore.toMutableMap())
         val compound = itemStream.sourceCompound.computeIfAbsent("zaphkiel") { ItemTag() }.asCompound()
         compound[ItemKey.ID.key] = ItemTagData(id)
         compound[ItemKey.DATA.key] = Translator.toItemTag(ItemTag(), data)
+        prepareCallback.accept(itemStream)
         return build(player, itemStream)
     }
 
@@ -122,12 +127,13 @@ class DefaultItem(override val config: ConfigurationSection, override val group:
             lockedData.forEach { (k, v) -> itemStream.getZaphkielData().putDeep(k, v) }
             // 设置版本
             pre.itemStream.sourceCompound["zaphkiel"]!!.asCompound()[ItemKey.VERSION.key] = ItemTagData(version)
-            // 替换变量
+            // 替换 PlaceholderAPI 变量
             val placeholderReplaced = if (player != null) {
                 val map = HashMap<String, MutableList<String>>()
                 pre.lore.forEach { (key, lore) -> map[key] = lore.replacePlaceholder(player).toMutableList() }
                 map
             } else null
+            // 回调事件
             val post = ItemBuildEvent.Post(player, pre.itemStream, pre.name, placeholderReplaced ?: pre.lore)
             post.call()
             return post.itemStream
