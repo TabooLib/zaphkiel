@@ -1,19 +1,4 @@
-val taboolib_version: String by project
-
-plugins {
-    id("io.izzel.taboolib") version "1.50"
-}
-
-taboolib {
-    description {
-        name(rootProject.name)
-    }
-    install("common", "platform-bukkit", "module-nms", "module-nms-util", "module-configuration")
-    options("skip-minimize", "keep-kotlin-module", "skip-taboolib-relocate")
-    classifier = null
-    version = taboolib_version
-    exclude("taboolib")
-}
+taboolib { subproject = true }
 
 dependencies {
     api(project(":project:common"))
