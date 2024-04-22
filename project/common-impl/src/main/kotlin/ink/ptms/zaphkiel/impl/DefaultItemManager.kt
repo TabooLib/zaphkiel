@@ -8,6 +8,7 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import taboolib.common.io.runningClasses
 import taboolib.platform.util.giveItem
+import java.util.function.Consumer
 
 /**
  * Zaphkiel
@@ -42,17 +43,26 @@ class DefaultItemManager : ItemManager {
         registeredDisplay.clear()
     }
 
+
+    override fun giveItem(player: Player, name: String, amount: Int): Boolean {
+        return giveItem(player, getItem(name) ?: return false, amount) {}
+    }
+
+    override fun giveItem(player: Player, name: String, amount: Int, prepareCallback: Consumer<ItemStream>): Boolean {
+        return giveItem(player, getItem(name) ?: return false, amount, prepareCallback)
+    }
+
     override fun giveItem(player: Player, item: Item, amount: Int): Boolean {
-        val event = ItemGiveEvent(player, item.build(player), amount).also { it.call() }
+        return giveItem(player, item, amount) {}
+    }
+
+    override fun giveItem(player: Player, item: Item, amount: Int, prepareCallback: Consumer<ItemStream>): Boolean {
+        val event = ItemGiveEvent(player, item.build(player, prepareCallback), amount).also { it.call() }
         if (!event.isCancelled) {
             player.giveItem(event.itemStream.rebuildToItemStack(player), event.amount)
             return true
         }
         return false
-    }
-
-    override fun giveItem(player: Player, name: String, amount: Int): Boolean {
-        return giveItem(player, getItem(name) ?: return false, amount)
     }
 
     override fun getItem(name: String): Item? {

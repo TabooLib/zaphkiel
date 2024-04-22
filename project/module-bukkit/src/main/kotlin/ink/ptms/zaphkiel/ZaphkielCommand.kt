@@ -50,13 +50,28 @@ object ZaphkielCommand {
                 }
                 execute<CommandSender> { _, context, argument ->
                     val player = Bukkit.getPlayerExact(argument)!!
-                    Zaphkiel.api().getItemManager().giveItem(player, context.argument(-1))
+                    Zaphkiel.api().getItemManager().giveItem(player, context["item"])
                 }
                 dynamic(optional = true, comment = "amount") {
                     execute<CommandSender> { _, context, argument ->
-                        val player = Bukkit.getPlayerExact(context.argument(-1))!!
-                        val amount = argument.toIntOrNull() ?: 1
-                        Zaphkiel.api().getItemManager().giveItem(player, context.argument(-2), amount)
+
+                        val player = Bukkit.getPlayerExact(context["player"])!!
+                        val amount = context["amount"].toIntOrNull() ?: 1
+                        Zaphkiel.api().getItemManager().giveItem(player, context["item"], amount)
+                    }
+                    dynamic(optional = true, comment = "data") {
+                        execute<CommandSender> { _, context, argument ->
+                            val player = Bukkit.getPlayerExact(context["player"])!!
+                            val amount = context["amount"].toIntOrNull() ?: 1
+                            Zaphkiel.api().getItemManager().giveItem(player, context["item"], amount) {
+                                argument.split(" ").forEach { block ->
+                                    val split = block.split('=')
+                                    if (split.size == 2) {
+                                        it.getZaphkielData().putDeep(split[0], split[1])
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -71,7 +86,10 @@ object ZaphkielCommand {
                 val json = serializedItem.toJson().replace('§', '&')
                 val zipped = json.toByteArray().zip()
                 notify(sender, "序列化: &f$json")
-                notify(sender, "明文: &f${json.length} &7字符, &f${json.toByteArray().size} &7字节 &a-> &7压缩后: &f${zipped.size} &7字节")
+                notify(
+                    sender,
+                    "明文: &f${json.length} &7字符, &f${json.toByteArray().size} &7字节 &a-> &7压缩后: &f${zipped.size} &7字节"
+                )
             } catch (ex: Throwable) {
                 notify(sender, "无效的物品: $ex")
             }
