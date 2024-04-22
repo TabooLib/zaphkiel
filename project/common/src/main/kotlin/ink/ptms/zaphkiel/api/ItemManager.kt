@@ -3,6 +3,7 @@ package ink.ptms.zaphkiel.api
 import ink.ptms.zaphkiel.item.meta.Meta
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
+import java.util.function.Consumer
 
 /**
  * Zaphkiel
@@ -22,6 +23,14 @@ interface ItemManager {
      * 发放物品
      */
     fun giveItem(player: Player, name: String, amount: Int = 1): Boolean
+    /**
+     * 发放物品
+     */
+    fun giveItem(player: Player, name: String, amount: Int = 1, prepareCallback: Consumer<ItemStream>): Boolean
+    /**
+     * 发放物品
+     */
+    fun giveItem(player: Player, item: Item, amount: Int = 1, prepareCallback: Consumer<ItemStream>): Boolean
 
     /**
      * 获取物品
