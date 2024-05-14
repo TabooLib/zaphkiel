@@ -5,6 +5,7 @@ package ink.ptms.zaphkiel.impl.feature
 import ink.ptms.zaphkiel.Zaphkiel
 import ink.ptms.zaphkiel.api.Group
 import ink.ptms.zaphkiel.api.Item
+import ink.ptms.zaphkiel.impl.internal.ItemListener.onClick
 import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemFlag
@@ -13,6 +14,7 @@ import org.bukkit.inventory.meta.ItemMeta
 import taboolib.library.xseries.XMaterial
 import taboolib.module.ui.openMenu
 import taboolib.module.ui.type.Linked
+import taboolib.module.ui.type.PageableChest
 import taboolib.platform.util.Slots
 import taboolib.platform.util.buildItem
 import taboolib.platform.util.modifyLore
@@ -25,7 +27,7 @@ fun Player.openGroupMenu(parent: Group? = null) {
     // 播放音效
     playSound(location, Sound.UI_BUTTON_CLICK, 1f, 2f)
     // 打开页面
-    openMenu<Linked<MenuItem>>("Zaphkiel Items (Page %p)") {
+    openMenu<PageableChest<MenuItem>>("Zaphkiel Items (Page %p)") {
         rows(6)
         slots(Slots.CENTER)
         elements {
