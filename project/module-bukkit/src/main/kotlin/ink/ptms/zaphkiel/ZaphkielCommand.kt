@@ -50,13 +50,13 @@ object ZaphkielCommand {
                 }
                 execute<CommandSender> { _, context, argument ->
                     val player = Bukkit.getPlayerExact(argument)!!
-                    Zaphkiel.api().getItemManager().giveItem(player, context.argument(-1))
+                    Zaphkiel.api().getItemManager().giveItem(player, context["item"])
                 }
                 dynamic(optional = true, comment = "amount") {
                     execute<CommandSender> { _, context, argument ->
-                        val player = Bukkit.getPlayerExact(context.argument(-1))!!
+                        val player = Bukkit.getPlayerExact(context["player"])!!
                         val amount = argument.toIntOrNull() ?: 1
-                        Zaphkiel.api().getItemManager().giveItem(player, context.argument(-2), amount)
+                        Zaphkiel.api().getItemManager().giveItem(player, context["item"], amount)
                     }
                 }
             }
@@ -67,11 +67,14 @@ object ZaphkielCommand {
     val serialize = subCommand {
         execute<Player> { sender, _, _ ->
             try {
-                val serializedItem = Zaphkiel.api().getItemSerializer().serialize(sender.itemInHand)
+                val serializedItem = Zaphkiel.api().getItemSerializer().serialize(sender.inventory.itemInMainHand)
                 val json = serializedItem.toJson().replace('§', '&')
                 val zipped = json.toByteArray().zip()
                 notify(sender, "序列化: &f$json")
-                notify(sender, "明文: &f${json.length} &7字符, &f${json.toByteArray().size} &7字节 &a-> &7压缩后: &f${zipped.size} &7字节")
+                notify(
+                    sender,
+                    "明文: &f${json.length} &7字符, &f${json.toByteArray().size} &7字节 &a-> &7压缩后: &f${zipped.size} &7字节"
+                )
             } catch (ex: Throwable) {
                 notify(sender, "无效的物品: $ex")
             }
@@ -81,13 +84,14 @@ object ZaphkielCommand {
     @CommandBody
     val rebuild = subCommand {
         execute<Player> { sender, _, _ ->
-            if (sender.itemInHand.isAir()) {
+            val itemInMainHand = sender.inventory.itemInMainHand
+            if (itemInMainHand.isAir()) {
                 notify(sender, "请手持物品.")
                 return@execute
             }
-            val itemStream = sender.itemInHand.toItemStream()
+            val itemStream = itemInMainHand.toItemStream()
             if (itemStream.isExtension()) {
-                sender.setItemInHand(itemStream.rebuildToItemStack(sender))
+                sender.inventory.setItemInMainHand(itemStream.rebuildToItemStack(sender))
                 notify(sender, "成功.")
             } else {
                 notify(sender, "不是 Zaphkiel 物品.")

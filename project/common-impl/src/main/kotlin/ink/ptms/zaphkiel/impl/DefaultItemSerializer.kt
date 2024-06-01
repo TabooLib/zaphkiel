@@ -50,7 +50,7 @@ class DefaultItemSerializer : ItemSerializer {
     }
 
     override fun deserialize(json: String): ItemStream {
-        return deserialize(JsonParser().parse(json).asJsonObject)
+        return deserialize(JsonParser.parseString(json).asJsonObject)
     }
 
     override fun deserialize(json: JsonObject): ItemStream {

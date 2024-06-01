@@ -6,7 +6,7 @@ import org.serverct.ersha.api.AttributeAPI
 import org.serverct.ersha.attribute.data.AttributeData
 import taboolib.common.platform.event.OptionalEvent
 import taboolib.common.platform.event.SubscribeEvent
-import taboolib.common.reflect.Reflex.Companion.getProperty
+import taboolib.library.reflex.Reflex.Companion.getProperty
 import taboolib.common5.Coerce
 import taboolib.platform.util.isAir
 import taboolib.type.BukkitEquipment
