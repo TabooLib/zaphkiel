@@ -6,7 +6,7 @@ import ink.ptms.zaphkiel.impl.meta.MetaKey
 import ink.ptms.zaphkiel.item.meta.Meta
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
-import taboolib.common.io.runningClasses
+import taboolib.common.io.runningClassMapInJar
 import taboolib.platform.util.giveItem
 
 /**
@@ -26,10 +26,12 @@ class DefaultItemManager : ItemManager {
 
     val registeredGroup = HashMap<String, Group>()
 
-    val registeredMeta: MutableMap<String, Class<out Meta>> = runningClasses
-        .filter { it.isAnnotationPresent(MetaKey::class.java) }
-        .filterIsInstance<Class<out Meta>>()
-        .associateBy { c -> c.getAnnotation(MetaKey::class.java).value }
+    @Suppress("UNCHECKED_CAST")
+    val registeredMeta: MutableMap<String, Class<out Meta>> = runningClassMapInJar
+        .values
+        .filter { it.hasAnnotation(MetaKey::class.java) }
+        .associateBy { c -> c.getAnnotation(MetaKey::class.java).property("value", "") }
+        .mapValues { it.value.toClass() as Class<out Meta> }
         .toMutableMap()
 
     fun clearItem() {

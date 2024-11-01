@@ -5,7 +5,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     java
-    id("io.izzel.taboolib") version "2.0.11"
+    id("io.izzel.taboolib") version "2.0.20"
     id("org.jetbrains.kotlin.jvm") version "1.8.22"
 }
 
@@ -17,9 +17,11 @@ subprojects {
     // TabooLib 配置
     taboolib {
         env {
-            install(UNIVERSAL, BUKKIT_ALL, NMS_UTIL, DATABASE, UI, KETHER, EXPANSION_PLAYER_DATABASE)
+            install(Basic, Bukkit, BukkitUtil, BukkitNMS, BukkitNMSUtil, BukkitUI, BukkitHook)
+            install(Database, Kether, DatabasePlayer, Jexl)
+            install(CommandHelper)
         }
-        version { taboolib = "6.1.1-beta26" }
+        version { taboolib = "6.2.0-beta30" }
     }
 
     // 全局仓库
