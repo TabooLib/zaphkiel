@@ -1,5 +1,5 @@
 dependencies {
-    taboo("ink.ptms:um:1.0.1")
+    taboo("ink.ptms:um:1.1.5")
 }
 
 taboolib {

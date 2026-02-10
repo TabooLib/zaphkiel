@@ -8,6 +8,7 @@ import org.bukkit.inventory.meta.ItemMeta
 import org.bukkit.util.NumberConversions
 import taboolib.common5.Coerce
 import taboolib.library.configuration.ConfigurationSection
+import taboolib.library.xseries.XAttribute
 import taboolib.module.nms.*
 import taboolib.type.BukkitEquipment
 import java.util.*
@@ -21,8 +22,9 @@ class MetaAttribute(root: ConfigurationSection) : Meta(root) {
     init {
         root.getConfigurationSection("meta.attribute")?.getKeys(false)?.forEach { hand ->
             root.getConfigurationSection("meta.attribute.$hand")!!.getKeys(false).forEach { name ->
-                val attributeKey = BukkitAttribute.parse(name)
-                if (attributeKey != null) {
+                val attributeKey = XAttribute.of(name)
+                if (attributeKey.isPresent) {
+                    val inst = attributeKey.get().get()!!
                     if (MinecraftVersion.majorLegacy >= 11600) {
                         var equipmentSlot: EquipmentSlot? = null
                         if (hand != "all") {
@@ -44,7 +46,7 @@ class MetaAttribute(root: ConfigurationSection) : Meta(root) {
                             AttributeModifier(UUID.randomUUID(), "zaphkiel", amount, operation)
                         }
                         org.bukkit.attribute.Attribute.GENERIC_ATTACK_SPEED
-                        attributeList.add(attributeKey.toBukkit() to modifier)
+                        attributeList.add(inst to modifier)
                     } else {
                         try {
                             val uuid = UUID.randomUUID()
@@ -57,10 +59,10 @@ class MetaAttribute(root: ConfigurationSection) : Meta(root) {
                                 attribute["Amount"] = ItemTagData(NumberConversions.toDouble(attributeValue))
                                 attribute["Operation"] = ItemTagData(0)
                             }
-                            attribute["AttributeName"] = ItemTagData(attributeKey.minecraftKey)
+                            attribute["AttributeName"] = ItemTagData(inst.key.toString())
                             attribute["UUIDMost"] = ItemTagData(uuid.mostSignificantBits)
                             attribute["UUIDLeast"] = ItemTagData(uuid.leastSignificantBits)
-                            attribute["Name"] = ItemTagData(attributeKey.minecraftKey)
+                            attribute["Name"] = ItemTagData(inst.key.toString())
                             if (hand != "all") {
                                 BukkitEquipment.fromString(hand)?.run { attribute["Slot"] = ItemTagData(nms) }
                             }

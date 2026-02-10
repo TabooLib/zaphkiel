@@ -5,7 +5,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     java
-    id("io.izzel.taboolib") version "2.0.20"
+    id("io.izzel.taboolib") version "2.0.27"
     id("org.jetbrains.kotlin.jvm") version "1.8.22"
 }
 
@@ -21,7 +21,7 @@ subprojects {
             install(Database, Kether, DatabasePlayer, Jexl)
             install(CommandHelper)
         }
-        version { taboolib = "6.2.0-beta30" }
+        version { taboolib = "6.2.4-65252583" }
     }
 
     // 全局仓库
