@@ -9,5 +9,5 @@ dependencies {
     compileOnly("public:AttributePlus:3.2.6")
     compileOnly("public:HeadDatabase:1.3.0")
     compileOnly("public:Tiphareth:1.0.0")
-    compileOnly("ink.ptms:um:1.0.1")
+    compileOnly("ink.ptms:um:1.1.5")
 }
